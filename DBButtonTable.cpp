@@ -76,7 +76,7 @@ bool DBButtonTable::addButton(ButtonData button)
 	convertButtonDataToSQL(&button);
 
 	QString sqlText("INSERT INTO ");
-	sqlText = sqlText + BUTTONTABLENAME + " VALUES ( " + ButtonNr + ", " + ButtonID + ", " + Timestamp + ", "
+	sqlText = sqlText + BUTTONTABLENAME + " VALUES ( " + ButtonNr + ", " + ButtonID + ", " + Timestamp
 		+ ", " + Distributor + ", " + PDOP + ", " + HDOP + ", " + StandardDeviation
 		+ ", " + HAE_DEM + ", " + East_DEM + ", " + North_DEM + ", " + Slope_DEM + ", " + SolDy_DEM
 		+ ", " + SolYr_DEM + " );";
@@ -111,7 +111,7 @@ void DBButtonTable::convertButtonDataToSQL(ButtonData *button)
 	ButtonID=QString("'") + button->ButtonID + QString("'");
 	ButtonNr=QString("'") + button->ButtonNr + QString("'");
 	Distributor=QString("'") + button->Distributor + QString("'");
-	Timestamp=QString("'"); // + button->gpsPosition.timeStamp + QString("'");
+	Timestamp=QString("'") + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss") + QString("'");
 	if(button->PDOP!=-9999) PDOP = QString::number(button->PDOP, 'f', 2);
 	if(button->HDOP!=-9999) HDOP = QString::number(button->HDOP, 'f', 2);
 	if(button->StandardDeviation!=-9999) StandardDeviation = QString::number(button->StandardDeviation, 'f', 6);

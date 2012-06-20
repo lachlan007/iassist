@@ -105,6 +105,9 @@ void AutoProgramThread::run(){
             else
             {
 
+                emit setStatusColor(1);
+                emit writeStatus("Starting to program ...");
+
                 //====================================
                 // If a mission is running, stop it
                 //====================================
@@ -211,6 +214,8 @@ void AutoProgramThread::run(){
 void AutoProgramThread::abort()
 {
     this->stop();
+    emit writeButtonNr("");
+    emit writeButtonID("");
     emit buttonSwitch();
     // Close the databases
     dbButton->close();
