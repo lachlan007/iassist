@@ -181,8 +181,12 @@ extern "C" {
 #define FILE_TOO_BIG  -6
 
 // Misc
+#ifndef FALSE
 #define FALSE          0
+#endif
+#ifndef TRUE
 #define TRUE           1
+#endif
 
 #ifndef MAX_PORTNUM
    #define MAX_PORTNUM    16
