@@ -102,12 +102,9 @@ void IAssist::exitButtonClicked()
 
 void IAssist::initDir()
 {
-	QDir img("img");
 	QDir log("log");
 	QDir dir(QDir::current());
 
-	if(!img.exists())
-		dir.mkdir("img");
 	if(!log.exists())
 		dir.mkdir("log");
 }
