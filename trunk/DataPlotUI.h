@@ -9,6 +9,8 @@
 #include "DBMeasurementTable.h"
 #include <QtCore>
 
+#define TEXT_NONE "none"
+
 class DataPlotUI : public QDialog
 {
     Q_OBJECT

@@ -398,7 +398,13 @@ int ButtonIO::selectDevice(int portnum, uchar *SNum)
 	// Search for iButton devices connected to the 1-Wire network
 	// 1  device found
 	// 0  device not found
+	// Look for temperature+humidity logger
 	numDevice = FindDevices(portnum, &AllDevices, 0x41, 1);
+	if(numDevice == 0) {
+	    // Look for temperature logger
+	    usleep(500);
+	    numDevice = FindDevices(portnum, &AllDevices, 0x21, 1);
+	}
 
 	if(numDevice == 0)
 	{

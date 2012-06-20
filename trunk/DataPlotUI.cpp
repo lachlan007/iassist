@@ -46,7 +46,7 @@ DataPlotUI::DataPlotUI(QWidget *parent)
 }
 
 DataPlotUI::~DataPlotUI() {
-
+    delete curve1;
 }
 
 void DataPlotUI::initComboArea()
@@ -58,7 +58,7 @@ void DataPlotUI::initComboArea()
     QStringList listProfiles;
     QStringList listNone;
     QVector<MeasurementProfile> profileVector = db.getFinishedMeasurementProfiles();
-    listNone.append("none");
+    listNone.append(TEXT_NONE);
 
     for (int i = 0; i < profileVector.size(); ++i) {
         listProfiles.append("ProfileID: " + QString::number(profileVector.at(i).MeasurementProfileID)
@@ -80,6 +80,10 @@ void DataPlotUI::measurementProfileChanged()
     DBMeasurementTable db;
     double *y;
 
+    if(ui.cbMeasurementProfileID->currentText() == TEXT_NONE) {
+        return;
+    }
+
     db.open();
 
     QStringList tmp = ui.cbMeasurementProfileID->currentText().split(' ');
@@ -96,6 +100,7 @@ void DataPlotUI::measurementProfileChanged()
     curve1->setSamples(x, y, numValues);
     ui.plData->replot();
 
+    delete x;
     delete y;
 
 }
