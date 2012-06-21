@@ -110,7 +110,7 @@ private:
 	QString CollectingTime;
 	QString TimeShift;
 	QString SamplingRate;
-	QString SamplingStartTimeStamp;
+	QString SamplingStartTime;
 	QString Resolution;
 
 };

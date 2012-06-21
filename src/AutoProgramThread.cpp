@@ -151,7 +151,7 @@ void AutoProgramThread::run(){
                 button.ButtonNr = cachedCurrentArea + ButtonNrRight;
 
                 // Save mission information for button
-                profile.SamplingStartTimeStamp = iButtonCon->getSamplingStartTimeStamp();
+                profile.SamplingStartTime = iButtonCon->getSamplingStartTime();
                 profile.SamplingRate = iButtonCon->getSamplingRate();
                 profile.Resolution = iButtonCon->getSamplingResolution();
                 profile.ButtonNr = button.ButtonNr;

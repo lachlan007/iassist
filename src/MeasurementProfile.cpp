@@ -34,7 +34,7 @@ void MeasurementProfile::clearData()
 	MeasurementProfileID = -9999;
 	SessionNr = -9999;
 	ButtonNr = "";
-	SamplingStartTimeStamp = "";
+	SamplingStartTime = "";
 	CollectingTime = "";
 	ProgrammingTime = "";
 	TimeShift = -9999;

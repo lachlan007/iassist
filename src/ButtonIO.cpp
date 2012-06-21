@@ -896,7 +896,7 @@ QString ButtonIO::getDeviceTimeStamp()
 // Returns:  'dateTime'		timestamp when Button starts logging data
 //							format: "day.month.year hour:min:sec"
 //---------------------------------------------------------------------------
-QString ButtonIO::getSamplingStartTimeStamp()
+QString ButtonIO::getSamplingStartTime()
 {
    	return this->samplingStartTime.toString("dd.MM.yyyy hh:mm:ss");
 }
