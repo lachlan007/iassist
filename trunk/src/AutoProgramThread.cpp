@@ -155,6 +155,7 @@ void AutoProgramThread::run(){
                 profile.SamplingRate = iButtonCon->getSamplingRate();
                 profile.Resolution = iButtonCon->getSamplingResolution();
                 profile.ButtonNr = button.ButtonNr;
+                profile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 
                 emit writeButtonNr(button.ButtonNr);
                 emit writeButtonID(button.ButtonID);
