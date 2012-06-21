@@ -1,0 +1,10 @@
+#summary Installation of iAssist on a Linux machine
+
+= Fix permissions of DS9490 USB adaptor =
+
+Create /etc/udev/rules.d/80-iassist.rules
+
+{{{
+SUBSYSTEM=="usb",ACTION=="add",ATTR{idVendor}=="04fa", ATTR{idProduct}=="2490", 
+MODE="666"
+}}}
