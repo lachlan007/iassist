@@ -40,10 +40,7 @@ bool DBButtonTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ")
-			+ BUTTONTABLENAME + QString(" (ButtonNr char(10), ButtonID char(25), ")
-			+ QString(" Timestamp char(30), Distributor char(50), PDOP int, HDOP int,")
-			+ QString(" StandardDeviation int, HAE_DEM int, East_DEM int, North_DEM int, Slope_DEM int,")
-			+ QString(" SolDy_DEM int, SolYr_DEM int);"));
+			+ BUTTONTABLENAME + QString(" (ButtonNr char(10), ButtonID char(25));"));
 		if(success)
 		{
 			Log::write("Created new iButton Table in Database");
