@@ -36,6 +36,8 @@ public:
      */
     void initDir();
 
+    void prepareDb(QString dbFileName);
+
 private slots:
 
 	/**

@@ -107,6 +107,26 @@ void IAssist::initDir()
 
 	if(!log.exists())
 		dir.mkdir("log");
+
+}
+
+void IAssist::prepareDb(QString dbFileName)
+{
+    // Hack to allow multiple databases
+    dbFileName = "./" + dbFileName;
+    QFile db(dbFileName);
+    if(!db.exists()) {
+        db.open(QIODevice::WriteOnly);
+        db.close();
+    }
+
+    QFile link("./iButtonDB.tmp");
+    if(link.exists()) {
+        link.remove();
+    }
+
+    QFile::link(dbFileName, "./iButtonDB.tmp");
+
 }
 
 
