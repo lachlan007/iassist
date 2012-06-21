@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>iAssist - Program iButtons At-Home</string>
+   <string>iAssist - Program iButtons</string>
   </property>
   <widget class="QPushButton" name="btnStart">
    <property name="geometry">

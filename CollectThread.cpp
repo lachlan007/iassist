@@ -170,7 +170,7 @@ void CollectThread::run()
 					//========================================
 					measurementProfile.ButtonNr = button.ButtonNr;
 					measurementProfile.SessionNr = dbProfile.getLatestSessionNrByButtonNr(button.ButtonNr) + 1;
-					measurementProfile.DistributingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+					measurementProfile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					measurementProfile.Resolution = buttonIO.getSamplingResolution();
 					measurementProfile.SamplingRate = buttonIO.getSamplingRate();
 					measurementProfile.SamplingStartTimeStamp = buttonIO.getSamplingStartTimeStamp();

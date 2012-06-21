@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
-    <height>345</height>
+    <width>292</width>
+    <height>316</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,7 +23,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>iAssist - On-Site iButton Support</string>
+   <string>iAssist</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
@@ -73,7 +73,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>168</y>
+     <y>160</y>
      <width>271</width>
      <height>51</height>
     </rect>
@@ -89,7 +89,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>260</y>
      <width>271</width>
      <height>51</height>
     </rect>
@@ -108,7 +108,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>112</y>
+     <y>110</y>
      <width>271</width>
      <height>51</height>
     </rect>
@@ -127,7 +127,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>210</y>
      <width>271</width>
      <height>51</height>
     </rect>

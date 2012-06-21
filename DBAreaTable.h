@@ -49,15 +49,6 @@ public:
 	bool isAreaExisting(QString area);
 
 	/**
-	 * Updates the %Area which has the FootprintID of this %Area with the values stored in the parameter %Area.
-	 * If you wish to update just a few values of a %Area, just let the corresponding variable in the Area Object
-	 * empty. or equal to -9999.
-	 * @param area the %Area which has to be updated
-	 * @return true for success, false for failed
-	 */
-	bool updateArea(Area area);
-
-	/**
 	 * Returns QStringList with all the Areas (Footprint ID).
 	 * @return a list with all the FootprintIDs
 	 */
@@ -89,22 +80,7 @@ private:
 
 	//Footprints Table in iButtonDB
 	QString AreaID;
-	QString AAltitude;
-	QString ALongitude;
-	QString ALatitude;
-	QString AHAE_DEM;
-	QString AEast_DEM;
-	QString ANorth_DEM;
-	QString ASlope_DEM;
-	QString AAspect_DEM;
-	QString ASolDy_DEM;
-	QString ASolYr_DEM;
-	QString AStartLongitude;
-	QString AEndLongitude1;
-	QString AEndLongitude2;
-	QString AStartLatitude;
-	QString AEndLatitude1;
-	QString AEndLatitude2;
+
 };
 
 #endif /* DBAREATABLE_H_ */

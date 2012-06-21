@@ -104,7 +104,7 @@ bool ButtonIO::startMissionOnButton()
 		Log::writeError("mission parameters: Start delay is out of its limits.");
 		return false;
 	}
-	else if((input[7]<0) || (input[7])>365)
+	else if((input[8]<0) || (input[8])>365)
 	{
 		Log::writeError("mission parameters: Day delay is out of its limits.");
 		return false;
@@ -130,11 +130,13 @@ bool ButtonIO::startMissionOnButton()
 		this->samplingStartTime = this->samplingStartTime.addSecs(60*input[2]);
 	}
 	else if(input[6]==1)	// calculate mission start timestamp when
-	{						// start at 00:00 is enabled.
-		QDateTime midnight = QDateTime(QDate::currentDate().addDays(1 + input[7]), QTime::fromString("00:00:00", "hh:mm:ss"));
+	{						// start at specific time is enabled.
+	    QTime dayOffset(input[7]/60, input[7]-(input[7]/60)*60);
+	    int extraDay = (dayOffset < QTime::currentTime()) ? 1 : 0;
+	    QDateTime startTime = QDateTime(QDate::currentDate().addDays(extraDay + input[8]), dayOffset);
 		QDateTime now = QDateTime::currentDateTime();
 
-		double secsDelay = now.secsTo(midnight)/60.0;
+		double secsDelay = now.secsTo(startTime)/60.0;
 		if((secsDelay - (int)secsDelay)>0.5)
 		{
 			settings.startDelay = ((int) secsDelay) + 1;
@@ -143,7 +145,7 @@ bool ButtonIO::startMissionOnButton()
 		{
 			settings.startDelay = (int) secsDelay;
 		}
-		this->samplingStartTime = midnight;
+		this->samplingStartTime = startTime;
 	}
 
 
@@ -739,7 +741,7 @@ bool ButtonIO::downloadDeviceTimeStamp()
 	lower = (lower & 0x0f);
 	sec   = (int) lower + (int) upper * 10;
 
-	// get minutesno
+	// get minutes
 	lower = state [(RTC_TIME&0x3F) + 1];
 	upper = ((lower >> 4) & 0x07);
 	lower = (lower & 0x0f);

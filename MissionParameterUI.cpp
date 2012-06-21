@@ -39,8 +39,9 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
 	descriptions.insert(3, "enable rollover\t\t\t\t\t\t\t\t[0,1]");
 	descriptions.insert(4, "synchronize time with computer\t\t\t\t\t\t[0,1]");
 	descriptions.insert(5, "high temperature resolution\t\t\t\t\t\t[0,1]\t0: 8 Bit | 1: 16 Bit");
-	descriptions.insert(6, "start mission at 00:00\t\t\t\t\t\t\t[0,1]");
-	descriptions.insert(7, "day delay, if you want to start mission at 00:00 several days later\t[0,365]");
+	descriptions.insert(6, "start mission at specified time\t\t\t\t\t\t\t[0,1]");
+	descriptions.insert(7, "day delay, if you want to start mission at a given time of the day\t[0,1440]");
+	descriptions.insert(8, "day delay, if you want to start mission several days later\t[0,365]");
 
 	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(writeMissionParameterFile()));
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeWindow()));
@@ -51,7 +52,8 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
 	connect(ui.param4, SIGNAL(clicked()), this, SLOT(setStatusChangesMade()));
 	connect(ui.param5, SIGNAL(clicked()), this, SLOT(setStatusChangesMade()));
 	connect(ui.param6, SIGNAL(clicked()), this, SLOT(setStatusChangesMade()));
-	connect(ui.param7, SIGNAL(valueChanged(int)), this, SLOT(setStatusChangesMade()));
+	connect(ui.param7, SIGNAL(timeChanged(QTime)), this, SLOT(setStatusChangesMade()));
+	connect(ui.param8, SIGNAL(valueChanged(int)), this, SLOT(setStatusChangesMade()));
 
 	if(!readMissionParameterFile()){
 		ui.txtStatus->setStyleSheet(RED);
@@ -91,7 +93,7 @@ bool MissionParameterUI::readMissionParameterFile()
 	{
 		QTextStream in(&file);
 		int lineCount;
-		for(lineCount=0; lineCount<8; lineCount++)
+		for(lineCount=0; lineCount<9; lineCount++)
 		{
 			if (!in.atEnd())
 			{
@@ -116,7 +118,7 @@ bool MissionParameterUI::readMissionParameterFile()
 		Log::writeError("missionParameterUI: Start delay in file is out of its limits.");
 		return false;
 	}
-	else if((missionParameter[7]<0) || (missionParameter[7])>365)
+	else if((missionParameter[8]<0) || (missionParameter[8])>365)
 	{
 		Log::writeError("missionParameterUI: Day delay in file is out of its limits.");
 		return false;
@@ -140,7 +142,9 @@ bool MissionParameterUI::readMissionParameterFile()
 	ui.param4->setChecked(missionParameter[4]);
 	ui.param5->setChecked(missionParameter[5]);
 	ui.param6->setChecked(missionParameter[6]);
-	ui.param7->setValue(missionParameter[7]);
+	QTime time(missionParameter[7]/60, missionParameter[7]-(missionParameter[7]/60)*60);
+	ui.param7->setTime(time);
+	ui.param8->setValue(missionParameter[8]);
 
 	return true;
 
@@ -159,7 +163,8 @@ bool MissionParameterUI::writeMissionParameterFile()
 	missionParameter[4] = ui.param4->isChecked();
 	missionParameter[5] = ui.param5->isChecked();
 	missionParameter[6] = ui.param6->isChecked();
-	missionParameter[7] = ui.param7->value();
+	missionParameter[7] = ui.param7->time().hour()*60+ui.param7->time().minute();
+	missionParameter[8] = ui.param8->value();
 
 	// Create a file handle
 	QFile file(MISSION_PARAMETER_FILEPATH);
@@ -175,7 +180,7 @@ bool MissionParameterUI::writeMissionParameterFile()
 	{
 		QTextStream out(&file);
 		int lineCount;
-		for(lineCount=0; lineCount<8; lineCount++)
+		for(lineCount=0; lineCount<9; lineCount++)
 		{
 			out << missionParameter[lineCount] << "\t" << descriptions[lineCount] << "\n";
 		}
@@ -201,7 +206,12 @@ void MissionParameterUI::toggleSelectableParam(){
 		ui.label2->setEnabled(false);
 		ui.param7->setEnabled(true);
 		ui.label7->setEnabled(true);
+		ui.param8->setEnabled(true);
+		ui.label8->setEnabled(true);
 		ui.param2->setValue(0);
+		int extraDay = (ui.param7->time() < QTime::currentTime()) ? 1 : 0;
+		QDateTime startTime = QDateTime(QDate::currentDate().addDays(extraDay + ui.param8->value()), ui.param7->time());
+		ui.labelStartTime->setText(startTime.toString("dd/MM/yy hh:mm AP"));
 	}
 	else
 	{
@@ -209,6 +219,9 @@ void MissionParameterUI::toggleSelectableParam(){
 		ui.label2->setEnabled(true);
 		ui.param7->setEnabled(false);
 		ui.label7->setEnabled(false);
-		ui.param7->setValue(0);
+		ui.param8->setEnabled(false);
+		ui.label8->setEnabled(false);
+		ui.param8->setValue(0);
+		ui.labelStartTime->setText("n/a");
 	}
 }

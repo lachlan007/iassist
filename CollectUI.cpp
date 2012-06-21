@@ -40,8 +40,8 @@ CollectUI::CollectUI(QWidget *parent)
 	collectThr->setRedistribute(ui.cbRedistribute->isChecked());
 
 	// connect signals and slots
-	connect(ui.comboArea, SIGNAL(currentIndexChanged(QString)), this, SLOT(areaChanged(QString)));
-	connect(ui.comboButtonNr, SIGNAL(currentIndexChanged(QString)), this, SLOT(buttonNrChanged(QString)));
+	connect(ui.comboArea, SIGNAL(currentIndexChanged(QString)), this, SLOT(areaChanged()));
+	connect(ui.comboButtonNr, SIGNAL(currentIndexChanged(QString)), this, SLOT(buttonNrChanged()));
 	connect(ui.btnNextButton, SIGNAL(clicked()), this, SLOT(nextButtonClicked()));
 	connect(ui.cbRedistribute, SIGNAL(stateChanged(int)), this, SLOT(redistributeToggled(int)));
 
@@ -87,12 +87,12 @@ void CollectUI::updateComboButtonNr()
 	db.close();
 }
 
-void CollectUI::areaChanged(QString areaSelected)
+void CollectUI::areaChanged()
 {
 	updateComboButtonNr();
 }
 
-void CollectUI::buttonNrChanged(QString buttonNrSelected)
+void CollectUI::buttonNrChanged()
 {
     DBButtonTable dbButton;
     dbButton.open();

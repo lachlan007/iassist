@@ -76,10 +76,7 @@ bool DBButtonTable::addButton(ButtonData button)
 	convertButtonDataToSQL(&button);
 
 	QString sqlText("INSERT INTO ");
-	sqlText = sqlText + BUTTONTABLENAME + " VALUES ( " + ButtonNr + ", " + ButtonID + ", " + Timestamp
-		+ ", " + Distributor + ", " + PDOP + ", " + HDOP + ", " + StandardDeviation
-		+ ", " + HAE_DEM + ", " + East_DEM + ", " + North_DEM + ", " + Slope_DEM + ", " + SolDy_DEM
-		+ ", " + SolYr_DEM + " );";
+	sqlText = sqlText + BUTTONTABLENAME + " VALUES ( " + ButtonNr + ", " + ButtonID + ");";
 
 	// Send the query
 	bool success = query.exec(sqlText);
@@ -98,60 +95,8 @@ bool DBButtonTable::addButton(ButtonData button)
 void DBButtonTable::convertButtonDataToSQL(ButtonData *button)
 {
 	// Give all the digits "NULL" as value.
-	PDOP = "NULL";
-	HDOP = "NULL";
-	StandardDeviation = "NULL";
-	HAE_DEM = "NULL";
-	East_DEM = "NULL";
-	North_DEM = "NULL";
-	Slope_DEM = "NULL";
-	SolDy_DEM = "NULL";
-	SolYr_DEM = "NULL";
-
 	ButtonID=QString("'") + button->ButtonID + QString("'");
 	ButtonNr=QString("'") + button->ButtonNr + QString("'");
-	Distributor=QString("'") + button->Distributor + QString("'");
-	Timestamp=QString("'") + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss") + QString("'");
-	if(button->PDOP!=-9999) PDOP = QString::number(button->PDOP, 'f', 2);
-	if(button->HDOP!=-9999) HDOP = QString::number(button->HDOP, 'f', 2);
-	if(button->StandardDeviation!=-9999) StandardDeviation = QString::number(button->StandardDeviation, 'f', 6);
-	if(button->HAE_DEM!=-9999) HAE_DEM = QString::number(button->HAE_DEM, 'f', 1);
-	if(button->East_DEM!=-9999) East_DEM = QString::number(button->East_DEM, 'f', 4);
-	if(button->North_DEM!=-9999) North_DEM = QString::number(button->North_DEM, 'f', 4);
-	if(button->Slope_DEM!=-9999) Slope_DEM = QString::number(button->Slope_DEM, 'f', 8);
-	if(button->SolDy_DEM!=-9999) SolDy_DEM= QString::number(button->SolDy_DEM, 'f', 8);
-	if(button->SolYr_DEM!=-9999) SolYr_DEM = QString::number(button->SolYr_DEM, 'f', 8);
-}
-
-bool DBButtonTable::updateButton(ButtonData button)
-{
-	convertButtonDataToSQL(&button);
-	bool success = true;
-
-	if(Timestamp!="''" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "Timestamp", Timestamp);
-	if(Distributor!="''" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "Distributor", Distributor);
-	if(PDOP!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "PDOP", PDOP);
-	if(HDOP!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "HDOP", HDOP);
-	if(StandardDeviation!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "StandardDeviation", StandardDeviation);
-	if(HAE_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "HAE_DEM", HAE_DEM);
-	if(East_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "East_DEM", East_DEM);
-	if(North_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "North_DEM", North_DEM);
-	if(Slope_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "Slope_DEM", Slope_DEM);
-	if(SolDy_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "SolDy_DEM", SolDy_DEM);
-	if(SolYr_DEM!="NULL" && success)
-			success = update(BUTTONTABLENAME, "ButtonNr", ButtonNr, "SolYr_DEM", SolYr_DEM);
-
-	return success;
 }
 
 ButtonData DBButtonTable::readButton(QString _ButtonNr)
@@ -166,39 +111,6 @@ ButtonData DBButtonTable::readButton(QString _ButtonNr)
 
 	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "ButtonID");
 	if(temp!="") data.ButtonID = temp;
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "Distributor");
-	if(temp!="") data.Distributor = temp;
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "East_DEM");
-	if(temp!="") data.East_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "Timestamp");
-	if(temp!="") data.Timestamp = temp;
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "HAE_DEM");
-	if(temp!="") data.HAE_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "HDOP");
-	if(temp!="") data.HDOP = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "North_DEM");
-	if(temp!="") data.North_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "PDOP");
-	if(temp!="") data.PDOP = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "Slope_DEM");
-	if(temp!="") data.Slope_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "SolDy_DEM");
-	if(temp!="") data.SolDy_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "SolYr_DEM");
-	if(temp!="") data.SolYr_DEM = temp.toDouble();
-
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "StandardDeviation");
-	if(temp!="") data.StandardDeviation = temp.toDouble();
 
 	return data;
 }

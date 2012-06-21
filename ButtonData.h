@@ -25,28 +25,6 @@ public:
 	QString ButtonNr;
 	//! Button ID of the iButton e.g. 00:A2:00:00:B2:04:72:1B
 	QString ButtonID;
-	//! Name of the Distributor
-	QString Distributor;
-	//! Timestamp when button was installed
-	QString Timestamp;
-	//! PDOP
-	double PDOP;
-	//! HDOP
-	double HDOP;
-	//! Standard Deviation
-	double StandardDeviation;
-	//! HAE_DEM
-	double HAE_DEM;
-	//! East_DEM
-	double East_DEM;
-	//! North_DEM
-	double North_DEM;
-	//! Slope_DEM
-	double Slope_DEM;
-	//! SolDy_DEM
-	double SolDy_DEM;
-	//! SolYr_DEM
-	double SolYr_DEM;
 };
 
 #endif /* BUTTONDATA_H_ */
