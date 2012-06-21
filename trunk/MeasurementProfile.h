@@ -29,7 +29,7 @@ public:
 	//! Time when the Button was collected again (End of the measurement)
 	QString CollectingTime;
 	//! Time when the Button was distributed
-	QString DistributingTime;
+	QString ProgrammingTime;
 	//! Timeshift between the time on the button and the time on the system
 	int TimeShift;
 	//! Sampling Rate

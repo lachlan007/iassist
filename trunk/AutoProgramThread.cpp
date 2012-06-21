@@ -244,7 +244,7 @@ bool AutoProgramThread::checkMissionParameterFile(){
     {
         QTextStream in(&file);
         int lineCount;
-        for(lineCount=0; lineCount<8; lineCount++)
+        for(lineCount=0; lineCount<9; lineCount++)
         {
             if (!in.atEnd())
             {
@@ -268,7 +268,7 @@ bool AutoProgramThread::checkMissionParameterFile(){
         Log::writeError("autoProgram: Start delay in file is out of its limits.");
         return false;
     }
-    else if((missionParameter[7]<0) || (missionParameter[7])>365)
+    else if((missionParameter[8]<0) || (missionParameter[8])>365)
     {
         Log::writeError("autoProgram: Day delay in file is out of its limits.");
         return false;

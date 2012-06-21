@@ -44,15 +44,6 @@ public:
 	bool isButtonExistingByButtonID(QString buttonID);
 
 	/**
-	 * Updates a certain Button whith the given values in button. If you wish to update just a few values of a Button, just
-	 * let the corresponding variable in the ButtonData Object empty (clear and don't fill) or fill QStrings with an empty String and
-	 * doubles or integers with -9999
-	 * @param button the Button which has to be updated
-	 * @return true for success, false for failed
-	 */
-	bool updateButton(ButtonData button);
-
-	/**
 	 * Reads a Button with the given ButtonNr to a ButtonData Object and returns it.
 	 * @param _ButtonNr the Number of the Button
 	 * @return all the information which are stored in the database
@@ -106,17 +97,6 @@ private:
 	//iButton Table in iButtonDB
     QString ButtonNr;
     QString ButtonID;
-    QString Distributor;
-    QString Timestamp;
-    QString PDOP;
-    QString HDOP;
-    QString StandardDeviation;
-    QString HAE_DEM;
-    QString East_DEM;
-    QString North_DEM;
-    QString Slope_DEM;
-    QString SolDy_DEM;
-    QString SolYr_DEM;
-};
+ };
 
 #endif /* DBBUTTONTABLE_H_ */

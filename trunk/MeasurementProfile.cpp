@@ -36,7 +36,7 @@ void MeasurementProfile::clearData()
 	ButtonNr = "";
 	SamplingStartTimeStamp = "";
 	CollectingTime = "";
-	DistributingTime = "";
+	ProgrammingTime = "";
 	TimeShift = -9999;
 	SamplingRate = -9999;
 	Resolution = -9999;

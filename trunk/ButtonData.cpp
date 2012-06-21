@@ -37,15 +37,4 @@ void ButtonData::clearData()
 {
 	ButtonNr = "";
 	ButtonID = "";
-	Distributor = "";
-	Timestamp = "";
-	PDOP=-9999;
-	HDOP=-9999;
-	StandardDeviation=-9999;
-	HAE_DEM=-9999;
-	East_DEM=-9999;
-	North_DEM=-9999;
-	Slope_DEM=-9999;
-	SolDy_DEM=-9999;
-	SolYr_DEM=-9999;
 }

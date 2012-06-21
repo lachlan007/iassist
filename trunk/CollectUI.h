@@ -49,15 +49,15 @@ private:
 private slots:
 	/**
 	 * If the area in the comboBox changes this slot is called.
-	 * This slot simply calles buttonNrChanged()
+	 * This slot simply calls buttonNrChanged()
 	 */
-	void areaChanged(QString areaSelected);
+	void areaChanged();
 	/**
 	 * This slot changes the actually selected button in the
 	 * thread which controls the collecting of the buttons. And it
 	 * sends the photo list to the photoWidget.
 	 */
-	void buttonNrChanged(QString buttonNrSelected);
+	void buttonNrChanged();
 	/**
 	 * Closes the Collecting Window
 	 * @param buttonNrSelected the selected ButtonNr

@@ -76,7 +76,7 @@
      <x>10</x>
      <y>10</y>
      <width>381</width>
-     <height>341</height>
+     <height>350</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -281,7 +281,7 @@ high temperature resolution:	16 bit</string>
        </font>
       </property>
       <property name="text">
-       <string>start mission at 00:00</string>
+       <string>set mission start time</string>
       </property>
      </widget>
     </item>
@@ -300,6 +300,23 @@ high temperature resolution:	16 bit</string>
     </item>
     <item row="7" column="0">
      <widget class="QLabel" name="label7">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>start time</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QTimeEdit" name="param7">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label8">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -325,8 +342,8 @@ high temperature resolution:	16 bit</string>
       </property>
      </widget>
     </item>
-    <item row="7" column="1">
-     <widget class="QSpinBox" name="param7">
+    <item row="8" column="1">
+     <widget class="QSpinBox" name="param8">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -347,6 +364,23 @@ high temperature resolution:	16 bit</string>
       </property>
      </widget>
     </item>
+    <item row="9" column="0">
+     <widget class="QLabel" name="ddsdsLabel">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>effective starting time</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QLineEdit" name="labelStartTime">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -361,7 +395,7 @@ high temperature resolution:	16 bit</string>
   <tabstop>param4</tabstop>
   <tabstop>param5</tabstop>
   <tabstop>param6</tabstop>
-  <tabstop>param7</tabstop>
+  <tabstop>param8</tabstop>
  </tabstops>
  <resources/>
  <connections/>

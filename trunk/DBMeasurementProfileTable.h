@@ -106,7 +106,7 @@ private:
 	QString ButtonNr;
 	QString SessionNr;
 	QString MeasurementProfileID;
-	QString DistributingTime;
+	QString ProgrammingTime;
 	QString CollectingTime;
 	QString TimeShift;
 	QString SamplingRate;
