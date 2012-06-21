@@ -25,7 +25,7 @@ public:
 	//! The amount of Measurements of this button (how many sessions)
 	int SessionNr;
 	//! The Time when the button starts the measurement
-	QString SamplingStartTimeStamp;
+	QString SamplingStartTime;
 	//! Time when the Button was collected again (End of the measurement)
 	QString CollectingTime;
 	//! Time when the Button was distributed

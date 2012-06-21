@@ -43,7 +43,7 @@ bool DBMeasurementProfileTable::createTable()
 		bool success = query.exec(QString("CREATE TABLE ")
 			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonNr char(10), SessionNr int,")
 			+ QString(" ProgrammingTime char(30), CollectingTime char(30), TimeShift int, SamplingRate int,")
-			+ QString(" SamplingStartTimeStamp char(30), Resolution int);"));
+			+ QString(" SamplingStartTime char(30), Resolution int);"));
 		if(success)
 		{
 			Log::write("Created new MeasurementProfiles Table in Database");
@@ -80,8 +80,8 @@ bool DBMeasurementProfileTable::addProfile(MeasurementProfile profile)
 	// Create query
 	QString sqlText("INSERT INTO ");
 	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonNr, SessionNr, ProgrammingTime, CollectingTime, "
-			+ "TimeShift, SamplingRate, SamplingStartTimeStamp, Resolution) VALUES ( " + ButtonNr + ", " + SessionNr + ", "
-			+ ProgrammingTime + ", " + CollectingTime + ", " + TimeShift + ", " + SamplingRate + ", " + SamplingStartTimeStamp
+			+ "TimeShift, SamplingRate, SamplingStartTime, Resolution) VALUES ( " + ButtonNr + ", " + SessionNr + ", "
+			+ ProgrammingTime + ", " + CollectingTime + ", " + TimeShift + ", " + SamplingRate + ", " + SamplingStartTime
 			+ ", " + Resolution + " );";
 
 	// Send the query
@@ -115,7 +115,7 @@ void DBMeasurementProfileTable::convertDataToSQL(MeasurementProfile *profile)
 	if(profile->MeasurementProfileID!=-9999) this->MeasurementProfileID = QString::number(profile->MeasurementProfileID);
 	this->CollectingTime = "'" + profile->CollectingTime + "'";
 	this->ProgrammingTime = "'" + profile->ProgrammingTime + "'";
-	this->SamplingStartTimeStamp = "'" + profile->SamplingStartTimeStamp + "'";
+	this->SamplingStartTime = "'" + profile->SamplingStartTime + "'";
 
 }
 
@@ -144,8 +144,8 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "CollectingTime", CollectingTime);
 	if(ProgrammingTime!="''" && success)
 		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "ProgrammingTime", ProgrammingTime);
-	if(SamplingStartTimeStamp!="''" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingStartTimeStamp", SamplingStartTimeStamp);
+	if(SamplingStartTime!="''" && success)
+		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingStartTime", SamplingStartTime);
 
 	if(!success)
 	{
@@ -185,8 +185,8 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementPr
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ProgrammingTime");
 	if(temp!="") data.ProgrammingTime = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingStartTimeStamp");
-	if(temp!="") data.SamplingStartTimeStamp = temp;
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingStartTime");
+	if(temp!="") data.SamplingStartTime = temp;
 
 	return data;
 }

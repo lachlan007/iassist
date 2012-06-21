@@ -167,7 +167,7 @@ class ButtonIO
 		 * this functin before starting a new mission with 'startMission()'.
 		 * @return The OS timestamp.
 		 */
-		QString getSamplingStartTimeStamp();
+		QString getSamplingStartTime();
 
 
 		/**

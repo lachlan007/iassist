@@ -173,7 +173,7 @@ void CollectThread::run()
 					measurementProfile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					measurementProfile.Resolution = buttonIO.getSamplingResolution();
 					measurementProfile.SamplingRate = buttonIO.getSamplingRate();
-					measurementProfile.SamplingStartTimeStamp = buttonIO.getSamplingStartTimeStamp();
+					measurementProfile.SamplingStartTime = buttonIO.getSamplingStartTime();
 
 					//========================================
 					// Add the measurementProfile to the button
