@@ -5,6 +5,5 @@
 Create /etc/udev/rules.d/80-iassist.rules
 
 {{{
-SUBSYSTEM=="usb",ACTION=="add",ATTR{idVendor}=="04fa", ATTR{idProduct}=="2490", 
-MODE="666"
+SUBSYSTEM=="usb",ACTION=="add",ATTR{idVendor}=="04fa", ATTR{idProduct}=="2490", MODE="666"
 }}}
