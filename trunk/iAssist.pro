@@ -43,7 +43,8 @@ HEADERS += src/UserDialog.h \
     src/buttonIO/mbscrx77.h \
     src/buttonIO/mbsha.h \
     src/buttonIO/ownet.h \
-    src/buttonIO/pw77.h
+    src/buttonIO/pw77.h \
+    src/buttonIO/thermo21.h
 SOURCES += src/UserDialog.cpp \
     src/SystemCommand.cpp \
     src/MissionParameterUI.cpp \
@@ -87,7 +88,8 @@ SOURCES += src/UserDialog.cpp \
     src/buttonIO/mbscrx77.c \
     src/buttonIO/mbsha.c \
     src/buttonIO/owerr.c \
-    src/buttonIO/pw77.c
+    src/buttonIO/pw77.c \
+    src/buttonIO/thermo21.c
 FORMS += src/widgets/MissionParameterUI.ui \
     src/widgets/IAssist.ui \
     src/widgets/DBManagementUI.ui \

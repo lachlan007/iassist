@@ -11,6 +11,7 @@
 #include "buttonIO/findtype.h"
 #include "buttonIO/humutil.h"
 #include "buttonIO/mbee77.h"
+#include "buttonIO/thermo21.h"
 #include "Log.h"
 #include <QString>
 
@@ -183,6 +184,7 @@ class ButtonIO
 	private:
 
 		int portnum;				//port number of USB port
+		int buttonType;
 		int sample_No;				//number of sampled data
 		int input[8];				//array that contains mission parameter settings
 		int hour,min,sec;
@@ -232,6 +234,70 @@ class ButtonIO
 
 		int selectDevice(int portnum, uchar *SNum);		//This function searches for devices
 														//connected to the 1-Wire network
+
+        /**
+         * Start a new measuring mission
+         * @return true for successful / false for unsuccessful
+         */
+        bool startMissionOnButtonThHyg();
+
+        /**
+         * Start a new measuring mission
+         * @return true for successful / false for unsuccessful
+         */
+        bool startMissionOnButtonThermo();
+
+        /**
+         * Stop a running mission.
+         * @return true for successful / false for unsuccessful
+         */
+        bool stopMissionOnButtonThHyg();
+
+        /**
+         * Stop a running mission.
+         * @return true for successful / false for unsuccessful
+         */
+        bool stopMissionOnButtonThermo();
+
+        /**
+         * Determines if a mission is currently running.
+         * @return true for mission is already running.
+         * @return false for no mission is running.
+         */
+        bool isMissionInProgressThHyg();
+
+        /**
+         * Determines if a mission is currently running.
+         * @return true for mission is already running.
+         * @return false for no mission is running.
+         */
+        bool isMissionInProgressThermo();
+
+        /**
+         * Reads the iButton RC time and date.
+         * @return true successful / false for unsuccessful.
+         */
+        bool downloadDeviceTimeStampThHyg();
+
+        /**
+         * Reads the iButton RC time and date.
+         * @return true successful / false for unsuccessful.
+         */
+        bool downloadDeviceTimeStampThermo();
+
+        /**
+         * Reads the logged data from iButton sensor
+         * @return true for successful / false for unsuccessful
+         */
+        bool downloadMissionDataThHyg();
+
+        /**
+         * Reads the logged data from iButton sensor
+         * @return true for successful / false for unsuccessful
+         */
+        bool downloadMissionDataThermo();
+
+
 };
 
 #endif // BUTTONIO_H_
