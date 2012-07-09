@@ -32,6 +32,7 @@ using namespace std;
 ButtonIO::ButtonIO()
 {
 	portnum = 0;
+	sample_Array = NULL;
 }
 
 
@@ -49,6 +50,15 @@ unsigned char ButtonIO::getRegisterContent(int Address)
 	return readByte(portnum,SNum,Address);
 }
 
+bool ButtonIO::startMissionOnButton()
+{
+    if(buttonType == 0)
+    {
+        return startMissionOnButtonThHyg();
+    }
+    return startMissionOnButtonThermo();
+}
+
 //---------------------------------------------------------------------------
 // This function will start a new mission.
 //
@@ -59,7 +69,7 @@ unsigned char ButtonIO::getRegisterContent(int Address)
 // returns:  'true' 	if start the mission succeed
 //			 'false' 	if start the mission failed
 //---------------------------------------------------------------------------
-bool ButtonIO::startMissionOnButton()
+bool ButtonIO::startMissionOnButtonThHyg()
 {
 	int u = 0;
 	int retry = 5;
@@ -185,16 +195,150 @@ bool ButtonIO::startMissionOnButton()
 		if(!startMission(portnum,&SNum[0],settings,&config))
 		{
 			// OWERROR_DUMP(stdout);
-			Log::writeError("startMissionOnButton: Cannot start mission.");
+			Log::writeError("startMissionOnButtonThHyg: Cannot start mission.");
 		}
 		else
 		{
-			Log::write("startMissionOnButton: Mission started.");
+			Log::write("startMissionOnButtonThHyg: Mission started.");
 			return true;
 		}
 	}
 
 	return false;
+}
+
+bool ButtonIO::startMissionOnButtonThermo() {
+
+    ThermoStateType thermoState;
+
+    int u = 0;
+    int retry = 5;
+
+    for(int w=0;w<6;w++)
+    {
+        mission_start_timestamp[w] = 0;
+    }
+
+    usleep(5000);
+
+
+    // open "mission_start_parameter.txt"
+    ifstream tmplate;
+    tmplate.open (MISSION_PARAMETER_FILEPATH, ifstream::in);
+
+    if (tmplate.is_open())
+    {
+        while(!tmplate.eof())
+        {
+            getline (tmplate,line);
+            input[u] = atoi(line.c_str());
+            u=u+1;
+        }
+        tmplate.close();
+    }
+    else
+    {
+        Log::writeError("startMissionOnButton: Cannot open mission parameter file");
+        return false;
+    }
+
+    // check if the settings value for sample rate and start delay
+    // are inside their boundaries.
+    if((input[1]<1) || (input[1]>982800))
+    {
+        Log::writeError("mission parameters: Sample rate is out of its limits.");
+        return false;
+    }
+    else if((input[2]<0) || (input[2]>16777215))
+    {
+        Log::writeError("mission parameters: Start delay is out of its limits.");
+        return false;
+    }
+    else if((input[8]<0) || (input[8])>365)
+    {
+        Log::writeError("mission parameters: Day delay is out of its limits.");
+        return false;
+    }
+
+    // check for invalid boolean settings in "mission_start_parameters".
+    for(int t=3;t<=5;t++)
+    {
+        if(!((input[t]==0) || (input[t]==1)))
+        {
+            Log::writeError("mission parameters: Boolean setting has a wrong value.");
+            return false;
+        }
+    }
+
+     // Calculate Delay
+    if(input[6]==0) // calculate mission start timestamp when
+    {               // start at 00:00 is disabled.
+        thermoState.MissStat.start_delay = input[2];
+        this->samplingStartTime = QDateTime::currentDateTime();
+        this->samplingStartTime = this->samplingStartTime.addSecs(60*input[2]);
+    }
+    else if(input[6]==1)    // calculate mission start timestamp when
+    {                       // start at specific time is enabled.
+        QTime dayOffset(input[7]/60, input[7]-(input[7]/60)*60);
+        int extraDay = (dayOffset < QTime::currentTime()) ? 1 : 0;
+        QDateTime startTime = QDateTime(QDate::currentDate().addDays(extraDay + input[8]), dayOffset);
+        QDateTime now = QDateTime::currentDateTime();
+
+        double secsDelay = now.secsTo(startTime)/60.0;
+        if((secsDelay - (int)secsDelay)>0.5)
+        {
+            thermoState.MissStat.start_delay = ((int) secsDelay) + 1;
+        }
+        else
+        {
+            thermoState.MissStat.start_delay = (int) secsDelay;
+        }
+        this->samplingStartTime = startTime;
+    }
+
+    while(retry > 0)
+    {
+        retry--;
+
+        usleep(1500);
+
+        // check if the USB port is open
+        if(owUSB_is_port_open(portnum) == 0)
+        {
+            Log::writeError("ButtonIO::getButtonID: USB port is closed.");
+            return "failed";
+        }
+        else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+        {
+            Log::writeError("ButtonIO::getButtonID: The current iButton is not on the 1-Wire net.");
+            return "failed";
+        }
+
+        if (ReadThermoStatus(portnum,&SNum[0],&thermoState,stdout))
+        {
+            InterpretStatus(&thermoState.MissStat);
+
+            // set mission parameter values from "mission_start_parameter" file
+            thermoState.MissStat.rollover_enable = 0; //input[3];
+            thermoState.MissStat.sample_rate = 1; // input[1];
+            thermoState.MissStat.high_threshold = 220;
+            thermoState.MissStat.low_threshold = 0;
+            thermoState.MissStat.start_delay = 0;
+
+            if(!MissionThermo(portnum,&SNum[0],&thermoState,stdout))
+            {
+                // OWERROR_DUMP(stdout);
+                Log::writeError("startMissionOnButtonThermo: Cannot start mission.");
+            }
+            else
+            {
+                Log::write("startMissionOnButtonThermo: Mission started.");
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 
@@ -292,6 +436,14 @@ int ButtonIO::getSamplingResolution()
 	return  rate;
 }
 
+bool ButtonIO::stopMissionOnButton()
+{
+    if(buttonType == 0)
+    {
+        return stopMissionOnButtonThHyg();
+    }
+    return stopMissionOnButtonThermo();
+}
 
 //---------------------------------------------------------------------------
 // This function will stop a running mission. If no mission is running it
@@ -300,7 +452,7 @@ int ButtonIO::getSamplingResolution()
 // Returns:  'true' 	if stop the mission succeed
 //			 'false' 	if stop the mission failed
 //---------------------------------------------------------------------------
-bool ButtonIO::stopMissionOnButton()
+bool ButtonIO::stopMissionOnButtonThHyg()
 {
 	int retry = 5;
 
@@ -339,6 +491,40 @@ bool ButtonIO::stopMissionOnButton()
 	return false;
 }
 
+bool ButtonIO::stopMissionOnButtonThermo()
+{
+    return true;
+}
+
+
+//---------------------------------------------------------------------------
+// This function will figure out, if a mission is currently running.
+//
+//  Return:  'true'     if a mission is already running
+//           'false'    if no mission in progress
+//---------------------------------------------------------------------------
+bool ButtonIO::isMissionInProgress()
+{
+    usleep(5000);
+    // check if port is opened
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ButtonIO::isMissionInProgress: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ButtonIO::isMissionInProgress: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    if(buttonType == 0)
+    {
+        return isMissionInProgressThHyg();
+    }
+    return isMissionInProgressThermo();
+
+}
 
 //---------------------------------------------------------------------------
 // This function will figure out, if a mission is currently running.
@@ -346,36 +532,45 @@ bool ButtonIO::stopMissionOnButton()
 //	Return:  'true'		if a mission is already running
 //			 'false'	if no mission in progress
 //---------------------------------------------------------------------------
-bool ButtonIO::isMissionInProgress()
+bool ButtonIO::isMissionInProgressThHyg()
 {
-	usleep(5000);
-	// check if port is opened
-	if(owUSB_is_port_open(portnum) == 0)
-	{
-		Log::writeError("ButtonIO::isMissionInProgress: USB port is closed.");
-		return false;
-	}
-	else if(!(owVerify(portnum, false)))	// check if the current iButton device is on 1-Wire net
-	{
-		Log::writeError("ButtonIO::isMissionInProgress: The current iButton is not on the 1-Wire net.");
-		return false;
-	}
-
 	usleep(2000);
 	// read device status register
 	if (!getFlag(portnum, SNum, GENERAL_STATUS_REGISTER, GSR_BIT_MISSION_IN_PROGRESS))
 	{
 		// OWERROR(OWERROR_HYGRO_STOP_MISSION_UNNECESSARY);
-		Log::write("ButtonIO::isMissionInProgress: No mission in progress.");
+		Log::write("ButtonIO::isMissionInProgressThHyg: No mission in progress.");
 		// cout << "No Mission in progress" << endl;
 		return false;
 	}
 	else
 	{
-		Log::write("ButtonIO::isMissionInProgress: Mission is in progress.");
+		Log::write("ButtonIO::isMissionInProgressThHyg: Mission is in progress.");
 		// cout << "Mission is in progress" << endl;
 		return true;
 	}
+}
+
+//---------------------------------------------------------------------------
+// This function will figure out, if a mission is currently running.
+//
+//  Return:  'true'     if a mission is already running
+//           'false'    if no mission in progress
+//---------------------------------------------------------------------------
+bool ButtonIO::isMissionInProgressThermo()
+{
+    ThermoStateType thermoState;
+    if (ReadThermoStatus(portnum,&SNum[0],&thermoState,stdout))
+    {
+        InterpretStatus(&thermoState.MissStat);
+        if(thermoState.MissStat.mission_in_progress == 1) {
+            Log::write("ButtonIO::isMissionInProgressThermo: Mission is in progress.");
+            return true;
+        } else {
+            Log::write("ButtonIO::isMissionInProgressThermo: No mission in progress.");
+        }
+    }
+    return false;
 }
 
 
@@ -401,11 +596,13 @@ int ButtonIO::selectDevice(int portnum, uchar *SNum)
 	// 1  device found
 	// 0  device not found
 	// Look for temperature+humidity logger
+	buttonType = 0;
 	numDevice = FindDevices(portnum, &AllDevices, 0x41, 1);
 	if(numDevice == 0) {
 	    // Look for temperature logger
 	    usleep(500);
 	    numDevice = FindDevices(portnum, &AllDevices, 0x21, 1);
+	    buttonType = 1;
 	}
 
 	if(numDevice == 0)
@@ -678,6 +875,15 @@ QString ButtonIO::getButtonID()
 	return Button_ID;
 }
 
+bool ButtonIO::downloadDeviceTimeStamp()
+{
+    if(buttonType == 0)
+    {
+        return downloadDeviceTimeStampThHyg();
+    }
+    return downloadDeviceTimeStampThermo();
+}
+
 
 //---------------------------------------------------------------------------
 // This function will read the iButton RC time and date.
@@ -695,7 +901,7 @@ QString ButtonIO::getButtonID()
 // Returns:  'true' 	if reading device time succeed
 //			 'false' 	if reading device time failed.
 //---------------------------------------------------------------------------
-bool ButtonIO::downloadDeviceTimeStamp()
+bool ButtonIO::downloadDeviceTimeStampThHyg()
 {
 	hour = 0; min = 0;
 	sec = 0; pm = 0;
@@ -791,6 +997,51 @@ bool ButtonIO::downloadDeviceTimeStamp()
    	device_date[2] = year;
 
 	return true;
+}
+
+bool ButtonIO::downloadDeviceTimeStampThermo() {
+
+    ThermoStateType thermoState;
+
+    usleep(5000);
+    // check if USB port is open
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ButtonIO::downloadDeviceTimeStampThermo: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ButtonIO::downloadDeviceTimeStampThermo: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    usleep(2000);
+    // read the register contents
+    if(!readDevice(portnum,SNum,&state[0],&config))
+    {
+        Log::writeError("ButtonIO::downloadDeviceTimeStampThermo: Cannot read device");
+        return false;
+    }
+
+    if(!ReadThermoStatus(portnum, &SNum[0], &thermoState, stdout))
+    {
+        return false;
+    }
+
+    InterpretStatus(&thermoState.MissStat);
+    QDateTime rtc = QDateTime::fromTime_t(thermoState.MissStat.current_time);
+
+    device_time[0] = rtc.toString("h").toInt();
+    device_time[1] = rtc.toString("m").toInt();
+    device_time[2] = rtc.toString("s").toInt();
+
+    device_date[0] = rtc.toString("d").toInt();
+    device_date[1] = rtc.toString("M").toInt();
+    device_date[2] = rtc.toString("yyyy").toInt();
+
+    return true;
+
 }
 
 
@@ -901,6 +1152,38 @@ QString ButtonIO::getSamplingStartTime()
    	return this->samplingStartTime.toString("dd.MM.yyyy hh:mm:ss");
 }
 
+//---------------------------------------------------------------------------
+// This function will read the sampled data form the iButton.
+//
+// 'sample_Array' - Name of Array that contains all the sampled data
+//                  sample_Array[0] -> first measured data
+//                  sample_Array[n] -> nth measured data
+// 'sample_No'    - Integer Variable that contains the number of stored samples.
+//
+// Returns:  'true'     if reading data succeed
+//           'false'    if reading data failed.
+//---------------------------------------------------------------------------
+bool ButtonIO::downloadMissionData()
+{
+    usleep(5000);
+    // check if USB port is open
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ButtonIO::downloadMissionData: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ButtonIO::downloadMissionData: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    if(buttonType == 0)
+    {
+        return downloadMissionDataThHyg();
+    }
+    return downloadMissionDataThermo();
+}
 
 //---------------------------------------------------------------------------
 // This function will read the sampled data form the iButton.
@@ -913,7 +1196,7 @@ QString ButtonIO::getSamplingStartTime()
 // Returns:  'true'		if reading data succeed
 //			 'false'	if reading data failed.
 //---------------------------------------------------------------------------
-bool ButtonIO::downloadMissionData()
+bool ButtonIO::downloadMissionDataThHyg()
 {
     uchar page[8192];
 	int i = 0;
@@ -923,19 +1206,6 @@ bool ButtonIO::downloadMissionData()
 	int maxSamples = 0;
 	int wrapCount = 0;
 	sample_No = 0;
-
-	usleep(5000);
-	// check if USB port is open
-	if(owUSB_is_port_open(portnum) == 0)
-	{
-		Log::writeError("ButtonIO::downloadMissionData: USB port is closed.");
-		return false;
-	}
-	else if(!(owVerify(portnum, false)))	// check if the current iButton device is on 1-Wire net
-	{
-		Log::writeError("ButtonIO::downloadMissionData: The current iButton is not on the 1-Wire net.");
-		return false;
-	}
 
 	// enable high speed data download.
 	if(!owOverdriveAccess(portnum))
@@ -989,6 +1259,10 @@ bool ButtonIO::downloadMissionData()
 	//cout << sample_No << endl;
 
 	//create dynamic array
+	if(sample_Array != NULL)
+	{
+	    delete sample_Array;
+	}
 	sample_Array = new double[sample_No];
 
 	if(sample_No == 0)
@@ -1113,6 +1387,52 @@ bool ButtonIO::downloadMissionData()
 	Log::write("Reading mission data completed.");
 	owSpeed(portnum,MODE_NORMAL);
 	return true;
+}
+
+
+//---------------------------------------------------------------------------
+// This function will read the sampled data form the iButton.
+//
+// 'sample_Array' - Name of Array that contains all the sampled data
+//                  sample_Array[0] -> first measured data
+//                  sample_Array[n] -> nth measured data
+// 'sample_No'    - Integer Variable that contains the number of stored samples.
+//
+// Returns:  'true'     if reading data succeed
+//           'false'    if reading data failed.
+//---------------------------------------------------------------------------
+bool ButtonIO::downloadMissionDataThermo()
+{
+    ThermoStateType thermoState;
+
+    if (DownloadThermo(portnum,&SNum[0],&thermoState,stdout))
+    {
+        // interpret the results of the download
+        InterpretStatus(&thermoState.MissStat);
+        InterpretLog(&thermoState.LogData, &thermoState.MissStat);
+
+        sample_No = thermoState.LogData.num_log;
+
+        //create dynamic array
+        if(sample_Array != NULL)
+        {
+            delete sample_Array;
+        }
+        sample_Array = new double[sample_No];
+
+        for(int i = 0; i < thermoState.LogData.num_log; i++)
+        {
+            sample_Array[i] = thermoState.LogData.temp[i];
+        }
+
+    }
+    else
+    {
+        return false;
+    }
+
+    Log::write("6");
+    return true;
 }
 
 
