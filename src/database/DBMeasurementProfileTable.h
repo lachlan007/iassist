@@ -4,7 +4,7 @@
 #define MEASUREMENTPROFILETABLENAME "MeasurementProfiles"
 
 #include "DBConnection.h"
-#include "MeasurementProfile.h"
+#include "../MeasurementProfile.h"
 
 /**
  * This class provides access to the table MeasurementProfiles in the database.

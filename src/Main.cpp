@@ -2,8 +2,8 @@
 
 #include <QtGui>
 #include <QApplication>
-#include "DBConnection.h"
-#include "UserDialog.h"
+#include "database/DBConnection.h"
+#include "ui/UserDialog.h"
 #include "ButtonIO.h"
 
 int main(int argc, char *argv[])

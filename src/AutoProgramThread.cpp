@@ -51,7 +51,21 @@ AutoProgramThread::~AutoProgramThread(){
 
 void AutoProgramThread::run(){
 
+    uchar SNum[8];
+    MissionParameterFile& mp = MissionParameterFile::Instance();
     threadEnabled = true;
+
+    //===========================
+    // Checking the ParameterFile
+    //===========================
+    if(!mp.loadMissionParameters())
+    {
+        this->abort();
+        emit writeStatus("Check Mission Parameter file."); // Parameter file is not correct
+        emit setStatusColor(0);
+        Log::writeError("autoProgramThread: The Mission Parameter file is missing or corrupt.");
+        return;
+    }
 
     // Check if the iButton reader is connected
     if (!iButtonCon->openPort())
@@ -59,18 +73,6 @@ void AutoProgramThread::run(){
         this->abort();
         emit writeStatus("ERROR: No reader connected!");
         emit setStatusColor(0);
-        return;
-    }
-
-    //===========================
-    // Checking the ParameterFile
-    //===========================
-    if(!this->checkMissionParameterFile())
-    {
-        this->abort();
-        emit writeStatus("Check Mission Parameter file."); // Parameter file is not correct
-        emit setStatusColor(0);
-        Log::writeError("autoProgramThread: The Mission Parameter file is missing or corrupt.");
         return;
     }
 
@@ -86,7 +88,7 @@ void AutoProgramThread::run(){
         QString cachedCurrentArea = currentArea;
 
         // Check if a Button is connected
-        if(iButtonCon->isButtonConnected())
+        if(iButtonCon->getConnectedButton(&SNum[0]))
         {
             // to be sure the user has really plugged the button into the reader
             sleep(1);
@@ -95,7 +97,7 @@ void AutoProgramThread::run(){
             button.clearData();
 
             // Get the Button's ID
-            button.ButtonID = iButtonCon->getButtonID();
+            button.ButtonID = ButtonIO::buttonIDStr(&SNum[0]);
 
             // Check if it is really a new button
             if ((button.ButtonID == lastButtonID) || (button.ButtonID=="failed"))
@@ -112,11 +114,11 @@ void AutoProgramThread::run(){
                 // If a mission is running, stop it
                 //====================================
                 int res=1;
-                if(iButtonCon->isMissionInProgress())
+                if(iButtonCon->isMissionInProgress(&SNum[0]))
                 {
                     emit setStatusColor(1);
                     emit writeStatus("Mission was running, stopping it.");
-                    res = this->stopMissionOnButton(iButtonCon);
+                    res = this->stopMissionOnButton(iButtonCon, &SNum[0]);
                     if(res==-1)
                     {
                         this->abort();
@@ -130,7 +132,7 @@ void AutoProgramThread::run(){
                 //=========================
                 // Start a new mission
                 //=========================
-                res = this->startMissionOnButton(iButtonCon);
+                res = this->startMissionOnButton(iButtonCon, &SNum[0]);
                 if(res==-1)
                 {
                     this->abort();
@@ -151,9 +153,16 @@ void AutoProgramThread::run(){
                 button.ButtonNr = cachedCurrentArea + ButtonNrRight;
 
                 // Save mission information for button
-                profile.SamplingStartTime = iButtonCon->getSamplingStartTime();
-                profile.SamplingRate = iButtonCon->getSamplingRate();
-                profile.Resolution = iButtonCon->getSamplingResolution();
+                if(mp.getSetMissionStartTime())
+                {
+                    profile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toString("dd.MM.yyyy hh:mm:ss");
+                }
+                else
+                {
+                    profile.SamplingStartTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+                }
+                profile.SamplingRate = mp.getSamplingRate();
+                profile.Resolution = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
                 profile.ButtonNr = button.ButtonNr;
                 profile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 
@@ -231,61 +240,6 @@ void AutoProgramThread::stop(){
     threadEnabled=false;
 }
 
-bool AutoProgramThread::checkMissionParameterFile(){
-    int missionParameter[16];
-    // Create a file handle
-    QFile file(MISSION_PARAMETER_FILEPATH);
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) // Open the file
-    {
-        Log::writeError("autoProgram: Can't open mission parameter file.");
-        return false;
-    }
-    else
-    {
-        QTextStream in(&file);
-        int lineCount;
-        for(lineCount=0; lineCount<9; lineCount++)
-        {
-            if (!in.atEnd())
-            {
-                QString line = in.readLine();
-                missionParameter[lineCount] = line.split("\t")[0].toInt();
-
-            }
-        }
-        file.close();
-    }
-
-    // check if the settings value for sample rate and start delay
-    // are inside their boundaries.
-    if((missionParameter[1]<1) || (missionParameter[1]>982800))
-    {
-        Log::writeError("autoProgram: Sample rate in file is out of its limits.");
-        return false;
-    }
-    else if((missionParameter[2]<0) || (missionParameter[2]>16777215))
-    {
-        Log::writeError("autoProgram: Start delay in file is out of its limits.");
-        return false;
-    }
-    else if((missionParameter[8]<0) || (missionParameter[8])>365)
-    {
-        Log::writeError("autoProgram: Day delay in file is out of its limits.");
-        return false;
-    }
-
-    // check for invalid boolean settings in "mission_start_parameters".
-    for(int t=3;t<=6;t++)
-    {
-        if(!((missionParameter[t]==0) || (missionParameter[t]==1)))
-        {
-            Log::writeError("autoProgram: Boolean setting in file has a wrong value.");
-            return false;
-        }
-    }
-    return true;
-}
 
 void AutoProgramThread::setArea(QString area){
     currentArea = area;
@@ -294,11 +248,11 @@ void AutoProgramThread::setArea(QString area){
     emit writeButtonID("");
 }
 
-int AutoProgramThread::stopMissionOnButton(ButtonIO *buttonIO)
+int AutoProgramThread::stopMissionOnButton(ButtonIO *buttonIO, uchar* SNum)
 {
     QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-    while((!buttonIO->stopMissionOnButton()) && (answer == QMessageBox::Retry))
+    while((!buttonIO->stopMission(SNum)) && (answer == QMessageBox::Retry))
     {
         QMutexLocker locker(&mutex);
         emit askIgnoreQuestion("The mission on this iButton could not be stopped."
@@ -337,11 +291,11 @@ void AutoProgramThread::replyIgnoreQuestion(QString question, QMessageBox::Stand
     waitCondition.wakeOne();
 }
 
-int AutoProgramThread::startMissionOnButton(ButtonIO *buttonIO)
+int AutoProgramThread::startMissionOnButton(ButtonIO *buttonIO, uchar* SNum)
 {
     QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-    while((!buttonIO->startMissionOnButton()) && (answer == QMessageBox::Retry))
+    while((!buttonIO->startMission(SNum)) && (answer == QMessageBox::Retry))
     {
         QMutexLocker locker(&mutex);
         emit askIgnoreQuestion("The mission on this iButton could not be started."

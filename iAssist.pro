@@ -7,27 +7,31 @@ UI_DIR = tmp/
 QT += core \
     gui \
     sql
-HEADERS += src/UserDialog.h \
-    src/SystemCommand.h \
-    src/MissionParameterUI.h \
+HEADERS += src/SystemCommand.h \
     src/Log.h \
     src/IAssist.h \
-    src/DBMeasurementTable.h \
-    src/DBMeasurementProfileTable.h \
-    src/DBManagementUI.h \
-    src/DBConnection.h \
-    src/DBButtonTable.h \
-    src/DBAreaTable.h \
-    src/CollectUI.h \
     src/CollectThread.h \
-    src/AutoProgramUI.h \
     src/AutoProgramThread.h \
     src/MeasurementProfile.h \
     src/Area.h \
     src/ButtonData.h \
     src/ButtonIO.h \
     src/Measurement.h \
-    src/DataPlotUI.h \
+    src/MissionData.h \
+    src/ThermochronButton.h \
+    src/ThermoHygrochronButton.h \
+    src/MissionParameterFile.h \
+    src/database/DBMeasurementTable.h \
+    src/database/DBMeasurementProfileTable.h \
+    src/database/DBManagementUI.h \
+    src/database/DBConnection.h \
+    src/database/DBButtonTable.h \
+    src/database/DBAreaTable.h \
+    src/ui/UserDialog.h \
+    src/ui/MissionParameterUI.h \
+    src/ui/CollectUI.h \
+    src/ui/AutoProgramUI.h \
+    src/ui/DataPlotUI.h \
     src/buttonIO/findtype.h \
     src/buttonIO/humutil.h \
     src/buttonIO/libusbds2490.h \
@@ -45,28 +49,32 @@ HEADERS += src/UserDialog.h \
     src/buttonIO/ownet.h \
     src/buttonIO/pw77.h \
     src/buttonIO/thermo21.h
-SOURCES += src/UserDialog.cpp \
-    src/SystemCommand.cpp \
-    src/MissionParameterUI.cpp \
+SOURCES += src/SystemCommand.cpp \
     src/Main.cpp \
     src/Log.cpp \
     src/IAssist.cpp \
-    src/DBMeasurementTable.cpp \
-    src/DBMeasurementProfileTable.cpp \
-    src/DBManagementUI.cpp \
-    src/DBConnection.cpp \
-    src/DBButtonTable.cpp \
-    src/DBAreaTable.cpp \
-    src/CollectUI.cpp \
     src/CollectThread.cpp \
-    src/AutoProgramUI.cpp \
     src/AutoProgramThread.cpp \
     src/MeasurementProfile.cpp \
     src/Area.cpp \
     src/ButtonData.cpp \
     src/ButtonIO.cpp \
     src/Measurement.cpp \
-    src/DataPlotUI.cpp \
+    src/MissionData.cpp \
+    src/ThermochronButton.cpp \
+    src/ThermoHygrochronButton.cpp \
+    src/MissionParameterFile.cpp \
+    src/database/DBMeasurementTable.cpp \
+    src/database/DBMeasurementProfileTable.cpp \
+    src/database/DBManagementUI.cpp \
+    src/database/DBConnection.cpp \
+    src/database/DBButtonTable.cpp \
+    src/database/DBAreaTable.cpp \
+    src/ui/UserDialog.cpp \
+    src/ui/MissionParameterUI.cpp \
+    src/ui/CollectUI.cpp \
+    src/ui/AutoProgramUI.cpp \
+    src/ui/DataPlotUI.cpp \
     src/buttonIO/crcutil.c \
     src/buttonIO/findtype.c \
     src/buttonIO/humutil.c \
@@ -99,7 +107,7 @@ FORMS += src/widgets/MissionParameterUI.ui \
 LIBS += -L/usr/local/lib \
     -L/usr/lib \
     -lusb \
-	-lqwt
+    -lqwt
 INCLUDEPATH += /usr/include/qwt
 macx {
 INCLUDEPATH += /opt/local/include \

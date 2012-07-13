@@ -4,7 +4,7 @@
 #define BUTTONTABLENAME	"iButtons"
 
 #include "DBConnection.h"
-#include "ButtonData.h"
+#include "../ButtonData.h"
 
 /**
  * This class provides access to the table iButton in the database.

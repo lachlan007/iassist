@@ -11,8 +11,8 @@
 #include <QSqlError>
 #include <QVariant>
 #include <cstdlib>
-#include "Log.h"
-#include "SystemCommand.h"
+#include "../Log.h"
+#include "../SystemCommand.h"
 
 /**
  * DBConnection supplies support to manage one single Database with one single DatabaseConnection.

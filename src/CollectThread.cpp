@@ -42,6 +42,10 @@ CollectThread::~CollectThread() {
 
 void CollectThread::run()
 {
+    uchar SNum[8];
+    MissionData missionData;
+    MissionParameterFile &mp = MissionParameterFile::Instance();
+
 	// set the Thread running variable to true
 	running = true;
 
@@ -65,7 +69,7 @@ void CollectThread::run()
 		// attached and if a button is
 		// selected in the UI
 		//==========================
-		if(buttonIO.isButtonConnected() && button.ButtonID!="")
+		if(buttonIO.getConnectedButton(&SNum[0]) && button.ButtonID != "")
 		{
 			// emit setStatus("iButton found. Checking it.", STYLESHEETYELLOW);
 			// Wait till the iButton is really connected
@@ -73,11 +77,11 @@ void CollectThread::run()
 
 			// If a Button is found we check if its really a new button or if it's the wrong button
 			// Case 1: it's a new button and its ID matches to the button we are looking for
-			if(button.ButtonID == buttonIO.getButtonID() && latestReadButtonID!=button.ButtonID)
+			if(button.ButtonID == ButtonIO::buttonIDStr(&SNum[0]) && latestReadButtonID!=button.ButtonID)
 			{
 				// emit setStatus("iButton found.", STYLESHEETYELLOW);
 				// Verify that mission was in progress
-				int res = this->verifyMissionRunningOnButton(&buttonIO);
+				int res = this->verifyMissionRunningOnButton(&buttonIO, &SNum[0]);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not detect a running mission on iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -86,7 +90,7 @@ void CollectThread::run()
 				}
 
 				// Stop the running mission, but only if res is not 0
-				if(res!=0) res = this->stopMissionOnButton(&buttonIO);
+				if(res!=0) res = this->stopMissionOnButton(&buttonIO, &SNum[0]);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not stop the mission on iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -96,7 +100,7 @@ void CollectThread::run()
 
 				// Get the mission data
 				emit this->setStatus("Reading mission data.", STYLESHEETYELLOW);
-				res = this->getMissionDataOnButton(&buttonIO); //TODO
+				res = this->getMissionDataFromButton(&buttonIO, &SNum[0], missionData);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not get mission data of iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -109,8 +113,8 @@ void CollectThread::run()
 				//===============================================
 				// to enter them to the database
 				measurement.ButtonNr = button.ButtonNr;
-				measurement.missionData = buttonIO.getSampleArray();
-				measurement.size = buttonIO.getSampleSize();
+				measurement.missionData = missionData.samples;
+				measurement.size = missionData.numSamples;
 				measurement.MeasurementProfileID = dbProfile.getLatestAddedProfileIDByButtonNr(button.ButtonNr);
 
 				// Get all the values to update the measurement profile table
@@ -118,19 +122,7 @@ void CollectThread::run()
 				measurementProfile.ButtonNr = button.ButtonNr;
 				measurementProfile.MeasurementProfileID = dbProfile.getLatestAddedProfileIDByButtonNr(button.ButtonNr);
 				measurementProfile.CollectingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
-
-				// Calculate time shift
-				res = this->downloadTimeStampOnButton(&buttonIO);
-				if(res==1)
-				{
-					measurementProfile.TimeShift = buttonIO.getTimeShift();
-				}
-				else if(res==-1)
-				{
-					this->abort();
-					return;
-				}
-
+				measurementProfile.TimeShift = missionData.collectTimeHost.secsTo(missionData.collectTimeButton);
 
 				//=================================================
 				// Enter the measurement to the database and update
@@ -140,12 +132,11 @@ void CollectThread::run()
 				if(!this->addCollectedDataToDB(&measurement, &measurementProfile, &dbMeasurement, &dbProfile))
 				{
 					this->abort();
+					missionData.clear();
 					return;
 				}
 
-				// GSN export used during SenSys 2010 demo - not in production
-				//CSVExport4GSN ex;
-				//ex.appendMeasurementProfileToFile(QString::number(measurement.MeasurementProfileID));
+			    missionData.clear();
 
 				if(redistribute)
 				{
@@ -157,7 +148,7 @@ void CollectThread::run()
 					//========================================
 					// restart a new session
 					//========================================
-					res = this->startMissionOnButton(&buttonIO);
+					res = this->startMissionOnButton(&buttonIO, &SNum[0]);
 					if(res==-1)
 					{
 						this->abort();
@@ -171,9 +162,16 @@ void CollectThread::run()
 					measurementProfile.ButtonNr = button.ButtonNr;
 					measurementProfile.SessionNr = dbProfile.getLatestSessionNrByButtonNr(button.ButtonNr) + 1;
 					measurementProfile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
-					measurementProfile.Resolution = buttonIO.getSamplingResolution();
-					measurementProfile.SamplingRate = buttonIO.getSamplingRate();
-					measurementProfile.SamplingStartTime = buttonIO.getSamplingStartTime();
+					if(mp.getSetMissionStartTime())
+					{
+					    measurementProfile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toString("dd.MM.yyyy hh:mm:ss");
+					}
+					else
+					{
+					    measurementProfile.SamplingStartTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+					}
+					measurementProfile.SamplingRate = mp.getSamplingRate();
+					measurementProfile.Resolution = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
 
 					//========================================
 					// Add the measurementProfile to the button
@@ -207,7 +205,7 @@ void CollectThread::run()
 			{
 				emit setStatus("Please select NEW iButton.", STYLESHEETGREEN);
 			}
-			else if(buttonIO.getButtonID()==latestReadButtonID)
+			else if(ButtonIO::buttonIDStr(&SNum[0])==latestReadButtonID)
 			{
 				emit setStatus("Please insert NEW iButton: " + button.ButtonNr);
 			}
@@ -298,11 +296,11 @@ void CollectThread::displayUserMessageSlt(QString message)
 	waitCondition.wakeOne();
 }
 
-int CollectThread::verifyMissionRunningOnButton(ButtonIO *buttonIO)
+int CollectThread::verifyMissionRunningOnButton(ButtonIO *buttonIO, uchar* SNum)
 {
 	QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-	while((!buttonIO->isMissionInProgress()) && (answer == QMessageBox::Retry))
+	while((!buttonIO->isMissionInProgress(SNum)) && (answer == QMessageBox::Retry))
 	{
 		Log::write("WARNING: iButton " + button.ButtonNr + " was NOT running a mission.");
 		QMutexLocker locker(&mutex);
@@ -329,11 +327,11 @@ int CollectThread::verifyMissionRunningOnButton(ButtonIO *buttonIO)
 	}
 }
 
-int CollectThread::stopMissionOnButton(ButtonIO *buttonIO)
+int CollectThread::stopMissionOnButton(ButtonIO *buttonIO, uchar* SNum)
 {
 	QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-	while((!buttonIO->stopMissionOnButton()) && (answer == QMessageBox::Retry))
+	while((!buttonIO->stopMission(SNum)) && (answer == QMessageBox::Retry))
 	{
 		QMutexLocker locker(&mutex);
 		emit askIgnoreQuestion("The mission on this iButton could not be stopped."
@@ -359,11 +357,11 @@ int CollectThread::stopMissionOnButton(ButtonIO *buttonIO)
 	}
 }
 
-int CollectThread::startMissionOnButton(ButtonIO *buttonIO)
+int CollectThread::startMissionOnButton(ButtonIO *buttonIO, uchar* SNum)
 {
 	QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-	while((!buttonIO->startMissionOnButton()) && (answer == QMessageBox::Retry))
+	while((!buttonIO->startMission(SNum)) && (answer == QMessageBox::Retry))
 	{
 		QMutexLocker locker(&mutex);
 		emit askIgnoreQuestion("The mission on this iButton could not be started."
@@ -389,48 +387,17 @@ int CollectThread::startMissionOnButton(ButtonIO *buttonIO)
 	}
 }
 
-int CollectThread::getMissionDataOnButton(ButtonIO *buttonIO)
+int CollectThread::getMissionDataFromButton(ButtonIO *buttonIO, uchar* SNum, MissionData& missionData)
 {
 	QMessageBox::StandardButton answer = QMessageBox::Retry;
 
-	while((!buttonIO->downloadMissionData()) && (answer == QMessageBox::Retry))
+	while((!buttonIO->downloadMissionData(SNum, missionData)) && (answer == QMessageBox::Retry))
 	{
 		QMutexLocker locker(&mutex);
 		emit askIgnoreQuestion("The Data could not be loaded from the iButton."
 				+ QString("\nPlease choose what to do: ")
 				+ "\n\nRetry: \ttry again getting the data"
 				+ "\nIgnore: \tfor just go ahead"
-				+ "\nAbort: \tfor stop collecting iButtons"
-				, &answer);
-		waitCondition.wait(&mutex);
-	}
-
-	if(answer == QMessageBox::Retry)
-	{
-		return 1;
-	}
-	else if(answer == QMessageBox::Ignore)
-	{
-		return 0;
-	}
-	else
-	{
-		return -1;
-	}
-
-}
-
-int CollectThread::downloadTimeStampOnButton(ButtonIO *buttonIO)
-{
-	QMessageBox::StandardButton answer = QMessageBox::Retry;
-
-	while((!buttonIO->downloadDeviceTimeStamp()) && (answer == QMessageBox::Retry))
-	{
-		QMutexLocker locker(&mutex);
-		emit askIgnoreQuestion("The actual Time on the iButton could not be read."
-				+ QString("\nPlease choose what to do: ")
-				+ "\n\nRetry: \ttry again getting the time"
-				+ "\nIgnore: \tfor just go ahead without saving the time"
 				+ "\nAbort: \tfor stop collecting iButtons"
 				, &answer);
 		waitCondition.wait(&mutex);

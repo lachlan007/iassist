@@ -8,9 +8,9 @@
 #include <QFile>
 #include <QTextStream>
 #include "Log.h"
-#include "DBButtonTable.h"
-#include "DBAreaTable.h"
-#include "DBMeasurementProfileTable.h"
+#include "database/DBButtonTable.h"
+#include "database/DBAreaTable.h"
+#include "database/DBMeasurementProfileTable.h"
 #include "MeasurementProfile.h"
 #include "ButtonData.h"
 #include "ButtonIO.h"
@@ -19,6 +19,7 @@
 #include <QWaitCondition>
 #include <QMessageBox>
 #include <QtCore>
+#include "MissionParameterFile.h"
 
 /**
  * This is the thread class for the automatic programming of iButtons at home.
@@ -116,14 +117,6 @@ private:
     //! used to lock and stop the thread while a dialog box is displayed
     QMutex mutex;
 
-	/**
-	 *  Checks if the Mission Parameter file is available and if its content is
-	 *  valid.
-	 *
-	 *  @return	Returns true if the file is available and valid.
-	 */
-	bool checkMissionParameterFile();
-
     /**
      * Tries to stop a Mission on a button
      * @param buttonIO pointer to a ButtonIO connection which is already opened
@@ -131,7 +124,7 @@ private:
      * <br> -1 if the mission could not be stopped and the thread should end
      * <br> 0 if the mission could not be stopped and the thread should continue
      */
-    int stopMissionOnButton(ButtonIO *buttonIO);
+    int stopMissionOnButton(ButtonIO *buttonIO, uchar* SNum);
 
     /**
      * Tries to start a Mission on a iButton.
@@ -140,7 +133,7 @@ private:
      * <br>-1 if the mission could not be started and the thread should end
      * <br> 0 if the mission could not be started and the thread should continue
      */
-    int startMissionOnButton(ButtonIO *buttonIO);
+    int startMissionOnButton(ButtonIO *buttonIO, uchar* SNum);
 
     /**
      * Aborts the thread and closes all the open databases. Only used to abort the thread

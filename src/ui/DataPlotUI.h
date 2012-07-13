@@ -5,8 +5,8 @@
 #include "ui_DataPlotUI.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include "DBMeasurementProfileTable.h"
-#include "DBMeasurementTable.h"
+#include "../database/DBMeasurementProfileTable.h"
+#include "../database/DBMeasurementTable.h"
 #include <QtCore>
 
 #define TEXT_NONE "none"

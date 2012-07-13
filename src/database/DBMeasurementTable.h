@@ -4,7 +4,7 @@
 #define MEASUREMENTTABLENAME "Measurement"
 
 #include "DBConnection.h"
-#include "Measurement.h"
+#include "../Measurement.h"
 #include <QtCore>
 
 /**

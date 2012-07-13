@@ -9,12 +9,12 @@
 #include "ButtonData.h"
 #include "ButtonIO.h"
 #include "Measurement.h"
-#include "DBButtonTable.h"
-#include "DBMeasurementTable.h"
-#include "DBMeasurementProfileTable.h"
+#include "database/DBButtonTable.h"
+#include "database/DBMeasurementTable.h"
+#include "database/DBMeasurementProfileTable.h"
 #include "MeasurementProfile.h"
 #include "QMessageBox"
-//#include "CSVExport4GSN.h"
+#include "MissionParameterFile.h"
 
 #define STYLESHEETRED 		"background-color: rgb(255, 181, 181);"
 #define STYLESHEETYELLOW 	"background-color: rgb(255, 246, 207);"
@@ -134,7 +134,7 @@ private:
      * <br> -1 if no mission is running or an error appeared and the thread should end
      * <br> 0 if no mission is running or an error appeared and the thread should continue
      */
-    int verifyMissionRunningOnButton(ButtonIO *buttonIO);
+    int verifyMissionRunningOnButton(ButtonIO *buttonIO, uchar* SNum);
 
     /**
      * Tries to stop a Mission on a button
@@ -143,7 +143,7 @@ private:
      * <br> -1 if the mission could not be stopped and the thread should end
      * <br> 0 if the mission could not be stopped and the thread should continue
      */
-    int stopMissionOnButton(ButtonIO *buttonIO);
+    int stopMissionOnButton(ButtonIO *buttonIO, uchar* SNum);
 
     /**
      * Tries to get the Mission Data of a button
@@ -152,7 +152,7 @@ private:
      * <br> -1 if the mission data could not be read and the thread should end
      * <br> 0 if the mission data could not be read and the thread should continue
      */
-    int getMissionDataOnButton(ButtonIO *buttonIO);
+    int getMissionDataFromButton(ButtonIO *buttonIO, uchar* SNum, MissionData& data);
 
     /**
      * Tries to start a Mission on a iButton.
@@ -161,16 +161,7 @@ private:
      * <br>-1 if the mission could not be started and the thread should end
      * <br> 0 if the mission could not be started and the thread should continue
      */
-    int startMissionOnButton(ButtonIO *buttonIO);
-
-    /**
-     * Tries to download the actual time on the iButton.
-     * @param buttonIO pointer to a ButtonIO connection which is already opened
-     * @return 1 for successfully downloaded the time
-     * <br>-1 if the time could not be downloaded and the thread should end
-     * <br> 0 if the time could not be downloaded and the thread should continue
-     */
-    int downloadTimeStampOnButton(ButtonIO *buttonIO);
+    int startMissionOnButton(ButtonIO *buttonIO, uchar* SNum);
 
     /**
      * Aborts the thread and closes all the open databases. Only used to abort the thread

@@ -34,7 +34,7 @@ public:
 	int TimeShift;
 	//! Sampling Rate
 	int SamplingRate;
-	//! Resolution 8bit or 16bit
+	//! Enabled high resolution mode
 	int Resolution;
 
 	/**

@@ -3,12 +3,12 @@
 
 #include <QtGui/QDialog>
 #include "ui_IAssist.h"
-#include "AutoProgramUI.h"
-#include "CollectUI.h"
-#include "MissionParameterUI.h"
-#include "DBManagementUI.h"
+#include "ui/AutoProgramUI.h"
+#include "ui/CollectUI.h"
+#include "ui/MissionParameterUI.h"
+#include "database/DBManagementUI.h"
 #include "SystemCommand.h"
-#include "DataPlotUI.h"
+#include "ui/DataPlotUI.h"
 
 
 /**
