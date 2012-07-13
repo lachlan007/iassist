@@ -6,7 +6,7 @@
 #include "ui_DBManagementUI.h"
 #include "DBAreaTable.h"
 #include "DBButtonTable.h"
-#include "UserDialog.h"
+#include "../ui/UserDialog.h"
 #include "DBMeasurementTable.h"
 #include "DBMeasurementProfileTable.h"
 

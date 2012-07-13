@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 #include "ui_AutoProgramUI.h"
-#include "AutoProgramThread.h"
+#include "../AutoProgramThread.h"
 
 /**
  * This is the GUI class for the automatic programming of iButtons at home.

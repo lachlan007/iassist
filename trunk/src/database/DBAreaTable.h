@@ -4,7 +4,7 @@
 #define AREATABLENAME	"Footprints"
 
 #include "DBConnection.h"
-#include "Area.h"
+#include "../Area.h"
 
 /**
  * This class provides access to the table Footprints in the database.

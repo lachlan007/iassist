@@ -3,9 +3,9 @@
 
 #include <QtGui/QDialog>
 #include "ui_CollectUI.h"
-#include "DBAreaTable.h"
-#include "DBButtonTable.h"
-#include "CollectThread.h"
+#include "../database/DBAreaTable.h"
+#include "../database/DBButtonTable.h"
+#include "../CollectThread.h"
 
 #define STYLESHEETRED 		"background-color: rgb(255, 181, 181);"
 #define STYLESHEETYELLOW 	"background-color: rgb(255, 246, 207);"
