@@ -41,7 +41,7 @@ public:
 
     static bool getButtonTime(int portnum, uchar* SNum, QDateTime& buttonTime, QDateTime& hostTime);
 
-    static bool downloadMissionData(int portnum, uchar* SNum, int& numberOfSamples, double* samples);
+    static bool downloadMissionData(int portnum, uchar* SNum, int& numSamples, double*& samples);
 
 };
 

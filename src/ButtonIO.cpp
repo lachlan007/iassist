@@ -275,8 +275,6 @@ bool ButtonIO::isMissionInProgress(uchar *SNum)
         return false;
     }
 
-    Log::write(ButtonIO::buttonIDStr(&SNum[0]));
-
     if(SNum[0] == FAMILY_THERMOHYG)
     {
         return ThermoHygrochronButton::isMissionInProgress(portnum, &SNum[0]);
