@@ -165,7 +165,7 @@ bool ThermochronButton::getButtonTime(int portnum, uchar* SNum, QDateTime& butto
     return true;
 }
 
-bool ThermochronButton::downloadMissionData(int portnum, uchar* SNum, int& numberOfSamples, double* samples)
+bool ThermochronButton::downloadMissionData(int portnum, uchar* SNum, int& numSamples, double*& samples)
 {
     ThermoStateType thermoState;
 
@@ -188,8 +188,15 @@ bool ThermochronButton::downloadMissionData(int portnum, uchar* SNum, int& numbe
         InterpretStatus(&thermoState.MissStat);
         InterpretLog(&thermoState.LogData, &thermoState.MissStat);
 
-        numberOfSamples = thermoState.LogData.num_log;
-        samples = new double[numberOfSamples];
+        numSamples = thermoState.LogData.num_log;
+
+        if(numSamples == 0)
+        {
+            Log::write("ThermochronButton::downloadMissionData: No samples yet for this mission.");
+            return true;
+        }
+
+        samples = new double[numSamples];
 
         for(int i = 0; i < thermoState.LogData.num_log; i++)
         {

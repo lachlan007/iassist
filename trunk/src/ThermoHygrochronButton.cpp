@@ -255,7 +255,7 @@ bool ThermoHygrochronButton::getButtonTime(int portnum, uchar* SNum, QDateTime& 
     return true;
 }
 
-bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& numberOfSamples, double* samples)
+bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& numSamples, double*& samples)
 {
      uchar page[8192];
      uchar state[96];
@@ -305,16 +305,16 @@ bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& 
      tempone = (int)(state[32]&0x0000FF);
      temptwo = (int)(state[33]<<8)&0x00FF00;
      tempthr = (int)(state[34]<<16)&0xFF0000;
-     numberOfSamples = tempone + temptwo + tempthr;
+     numSamples = tempone + temptwo + tempthr;
 
-     if(numberOfSamples == 0)
+     if(numSamples == 0)
      {
          Log::write("ThermoHygrochronButton::downloadMissionData: No samples yet for this mission.");
          owSpeed(portnum,MODE_NORMAL);
          return true;
      }
 
-     samples = new double[numberOfSamples];
+     samples = new double[numSamples];
 
      usleep(2000);
      // figure out how many bytes for each temperature sample
@@ -344,9 +344,7 @@ bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& 
              dataBytes += 1;
          }
      }
-     //cout << "dataBytes: " << dataBytes << endl;
 
-     //cout << "tempBytes + dataBytes = " << (tempBytes + dataBytes) << endl;
      // figure max number of samples
      switch(tempBytes + dataBytes)
      {
@@ -375,31 +373,31 @@ bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& 
 
      usleep(2000);
      if(getFlag(portnum,SNum,MISSION_CONTROL_REGISTER,MCR_BIT_ENABLE_ROLLOVER)
-        && (numberOfSamples>maxSamples))// intentional assignment
+        && (numSamples>maxSamples))// intentional assignment
      {
-         wrapCount = numberOfSamples % maxSamples;
+         wrapCount = numSamples % maxSamples;
          //cout << "enable rollover?" << endl;
      }
 
 
      //DEBUG: For bad SOICS
      if(!getFlag(portnum,SNum,MISSION_CONTROL_REGISTER,MCR_BIT_ENABLE_ROLLOVER)
-        && (numberOfSamples>maxSamples))
+        && (numSamples>maxSamples))
      {
          Log::writeError("ThermoHygrochronButton::downloadMissionData: (device error) Rollover was not enabled, but it did occur.");
          return false;
      }
 
-     if(numberOfSamples>maxSamples) {
-         numberOfSamples = maxSamples;
+     if(numSamples>maxSamples) {
+         numSamples = maxSamples;
      }
 
 
-     if((tempBytes*numberOfSamples)>0)
+     if((tempBytes*numSamples)>0)
      {
          // cout << "for loop until: " << ((tempBytes*sampleCnt/32)+((tempBytes*sampleCnt%32)>0?1:0)) << endl;
 
-         for(i=0;i<((tempBytes*numberOfSamples/32)+((tempBytes*numberOfSamples%32)>0?1:0));i++)
+         for(i=0;i<((tempBytes*numSamples/32)+((tempBytes*numSamples%32)>0?1:0));i++)
          {
              if(!readPageCRCEE77(2,portnum,SNum,i+128,&page[i*32]))
              {
@@ -408,7 +406,7 @@ bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& 
              }
          }
 
-         for(i=0;i<numberOfSamples;i++)
+         for(i=0;i<numSamples;i++)
          {
              val = decodeTemperature(&page[(wrapCount+i*tempBytes)%(maxSamples*tempBytes)],
                    tempBytes,true,config);
