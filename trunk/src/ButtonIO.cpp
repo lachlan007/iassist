@@ -295,6 +295,10 @@ QString ButtonIO::buttonIDStr(uchar *SNum) {
     QString buttonID = QString("");
     for(int i=7; i >= 0; i--)
     {
+    	if(SNum[i] < 16)
+    	{
+    		buttonID += "0";
+    	}
         buttonID += QString("%1").arg(SNum[i], 0, 16);
     }
     return buttonID.toUpper();
