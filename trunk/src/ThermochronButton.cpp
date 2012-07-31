@@ -49,7 +49,7 @@ bool ThermochronButton::startButtonMission(int portnum, uchar* SNum)
             return "failed";
         }
 
-        if (ReadThermoStatus(portnum,&SNum[0],&thermoState,stdout))
+        if (ReadThermoStatus(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
         {
             InterpretStatus(&thermoState.MissStat);
 
@@ -78,7 +78,7 @@ bool ThermochronButton::startButtonMission(int portnum, uchar* SNum)
                 }
             }
 
-            if(!MissionThermo(portnum,&SNum[0],&thermoState,stdout))
+            if(!MissionThermo(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
             {
                 Log::writeError("ThermochronButton::startButtonMission: Cannot start mission.");
             }
@@ -114,7 +114,7 @@ bool ThermochronButton::isMissionInProgress(int portnum, uchar* SNum)
         return false;
     }
 
-    if (ReadThermoStatus(portnum,&SNum[0],&thermoState,stdout))
+    if (ReadThermoStatus(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
     {
         InterpretStatus(&thermoState.MissStat);
         if(thermoState.MissStat.mission_in_progress == 1) {
@@ -152,7 +152,7 @@ bool ThermochronButton::getButtonTime(int portnum, uchar* SNum, QDateTime& butto
     usleep(2000);
     hostTime = QDateTime::currentDateTime();
 
-    if(!ReadThermoStatus(portnum, &SNum[0], &thermoState, stdout))
+    if(!ReadThermoStatus(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
     {
         return false;
     }
@@ -182,7 +182,7 @@ bool ThermochronButton::downloadMissionData(int portnum, uchar* SNum, int& numSa
         return false;
     }
 
-    if (DownloadThermo(portnum,&SNum[0],&thermoState,stdout))
+    if (DownloadThermo(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
     {
         // interpret the results of the download
         InterpretStatus(&thermoState.MissStat);
