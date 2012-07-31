@@ -53,9 +53,9 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
 	else{
 		ui.txtStatus->setStyleSheet(GREEN);
 		ui.txtStatus->setText("Mission parameter file loaded.");
-		initUI();
-		toggleSelectableParam();
 	}
+	initUI();
+	toggleSelectableParam();
 }
 
 MissionParameterUI::~MissionParameterUI()

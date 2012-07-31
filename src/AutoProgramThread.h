@@ -14,7 +14,6 @@
 #include "MeasurementProfile.h"
 #include "ButtonData.h"
 #include "ButtonIO.h"
-#include "Area.h"
 #include <QMutex>
 #include <QWaitCondition>
 #include <QMessageBox>
@@ -57,7 +56,7 @@ public slots:
 	 *
 	 * @oaram area	new area
 	 */
-	void setArea(QString area);
+	void setFootprint(QString footprintID);
 
 private:
 	/**
@@ -70,7 +69,7 @@ private:
 	 * AutoProgramThread and its parent AutoProgramUI. AutoProgramThread updates
 	 * it via the SLOT setArea().
 	 */
-	QString currentArea;
+	QString currentFootprint;
 	/**
 	 * Manages the database connection to the button table.
 	 */
