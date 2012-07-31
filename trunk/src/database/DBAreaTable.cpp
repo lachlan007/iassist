@@ -56,27 +56,25 @@ bool DBAreaTable::createTable()
 	}
 }
 
-bool DBAreaTable::addArea(Area areaData)
+bool DBAreaTable::addArea(QString footprintID)
 {
-	if(this->isAreaExisting(areaData.AreaID))
+	if(this->isAreaExisting(footprintID))
 	{
-		Log::writeError("dbAreaTable: Cannot add Area twice: " + areaData.AreaID);
-		this->appendError("Cannot add Area twice: " + areaData.AreaID);
+		Log::writeError("dbAreaTable: Cannot add Area twice: " + footprintID);
+		this->appendError("Cannot add Area twice: " + footprintID);
 		return false;
 	}
 
 	QSqlQuery query(this->getDB());
 
-	convertAreaDataToSQL(&areaData);
-
-	QString text = "INSERT INTO " + QString(AREATABLENAME) + " VALUES ( " + AreaID + " );";
+	QString text = "INSERT INTO " + QString(AREATABLENAME) + " VALUES ( '" + footprintID + "');";
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot add Area: " + areaData.AreaID + " " + error);
-		this->appendError("Cannot add Area: " + areaData.AreaID);
+		Log::writeError("dbAreaTable: Cannot add Area: " + footprintID + " " + error);
+		this->appendError("Cannot add Area: " + footprintID);
 		return false;
 	}
 	else
@@ -85,25 +83,20 @@ bool DBAreaTable::addArea(Area areaData)
 	}
 }
 
-void DBAreaTable::convertAreaDataToSQL(Area *area)
-{
-	// Doubles and ints have to be "NULL" for the SQL Statement
-	AreaID="'" + area->AreaID + "'";
-}
 
-bool DBAreaTable::deleteArea(QString area)
+bool DBAreaTable::deleteArea(QString footprintID)
 {
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + AREATABLENAME
-			+ QString(" WHERE FootprintID LIKE '") + area + QString("';");
+			+ QString(" WHERE FootprintID LIKE '") + footprintID + QString("';");
 
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot delete Area: " + area + " " + error);
-		this->appendError("Cannot delete Area: " + area);
+		Log::writeError("dbAreaTable: Cannot delete Area: " + footprintID + " " + error);
+		this->appendError("Cannot delete Area: " + footprintID);
 		return false;
 	}
 	else
@@ -112,20 +105,20 @@ bool DBAreaTable::deleteArea(QString area)
 	}
 }
 
-bool DBAreaTable::isAreaExisting(QString area)
+bool DBAreaTable::isAreaExisting(QString footprintID)
 {
 	// Ask DB for this area
 	QSqlQuery query(this->getDB());
 	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME)
-		+ " WHERE FootprintID LIKE '" + area + "'";
+		+ " WHERE FootprintID LIKE '" + footprintID + "'";
 
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot detect if Area " + area + " already entered: " + error);
-		this->appendError("Cannot detect if Area existing: " + area);
+		Log::writeError("dbAreaTable: Cannot detect if Area " + footprintID + " already entered: " + error);
+		this->appendError("Cannot detect if Area existing: " + footprintID);
 		return false;
 	}
 
@@ -166,19 +159,6 @@ QStringList DBAreaTable::getAllArea()
 		}
 	}
 	return list;
-}
-
-Area DBAreaTable::readArea(QString footprintID)
-{
-	Area data;
-	QString temp;
-	QString sqlFootprintID = this->toSQLString(footprintID);
-
-	// Get all the data and save them to ButtonData
-	temp = this->read(AREATABLENAME, "FootprintID", sqlFootprintID, "FootprintID");
-	if(temp!="") data.AreaID = temp;
-
-	return data;
 }
 
 bool DBAreaTable::open()

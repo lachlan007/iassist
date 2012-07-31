@@ -4,7 +4,6 @@
 #define AREATABLENAME	"Footprints"
 
 #include "DBConnection.h"
-#include "../Area.h"
 
 /**
  * This class provides access to the table Footprints in the database.
@@ -28,25 +27,25 @@ public:
 
 	/**
 	 * Adds a Footprint to the Database
-	 * @param area a Area Object
+	 * @param footprintID name of the footprint
 	 * @return true or false for the success state
 	 */
-	bool addArea(Area areaData);
+	bool addArea(QString footprintID);
 
 	/**
 	 * Deletes a certain Footprint out of the Footprint (%Area) Table of the Database.
 	 * Attention: Buttons, Photos and Measurements have to be deleted separately.
-	 * @param area are which should be deleted
+	 * @param footprintID are which should be deleted
 	 * @return true or false for the success state
 	 */
-	bool deleteArea(QString area);
+	bool deleteArea(QString footprintID);
 
 	/**
 	 * Returns if the specified %Area is already entered in the Footprint Table of the iButton Database
 	 * @param area %Area to look for
 	 * @return true if found at least once, false if not found
 	 */
-	bool isAreaExisting(QString area);
+	bool isAreaExisting(QString footprintID);
 
 	/**
 	 * Returns QStringList with all the Areas (Footprint ID).
@@ -55,31 +54,10 @@ public:
 	QStringList getAllArea();
 
 	/**
-	 * Returns an Area Object which contains all the Data of a specified %Area which are stored in the database
-	 * @param footprintID the ID of the Footprint (%Area) we want to read
-	 * @return the Area Object, filled with data found in database
-	 */
-	Area readArea(QString footprintID);
-
-	/**
 	 * Opens the Database. If no Database is existing, it creates one first. And if the
 	 * table is not existing it creates a table as well.
 	 */
 	bool open();
-
-
-
-private:
-	/**
-	 * Converts Area object to proper SQL Language which is needed for SQLite
-	 * this means if a number doesn't exist there has to be NULL submitted to the database
-	 * and if a String doesn't exist there has to be submitted '' to the SQLite database.
-	 * @param area a pointer to the Area Object
-	 */
-	void convertAreaDataToSQL(Area *area);
-
-	//Footprints Table in iButtonDB
-	QString AreaID;
 
 };
 

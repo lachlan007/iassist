@@ -135,9 +135,9 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>70</y>
-      <width>410</width>
+      <width>431</width>
       <height>16</height>
      </rect>
     </property>
@@ -284,9 +284,9 @@ high temperature resolution:	16 bit</string>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>180</y>
-      <width>401</width>
+      <width>421</width>
       <height>61</height>
      </rect>
     </property>
@@ -316,7 +316,7 @@ high temperature resolution:	16 bit</string>
       <x>0</x>
       <y>30</y>
       <width>421</width>
-      <height>21</height>
+      <height>23</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">

@@ -23,13 +23,13 @@
 
 AutoProgramThread::AutoProgramThread(QObject *parent){
 
-    currentArea = "AA";
+    currentFootprint = "AA";
     threadEnabled = false;
     connect(this, SIGNAL(buttonSwitch()), parent, SLOT(buttonSwitch()));
     connect(this, SIGNAL(writeStatus(QString)), parent, SLOT(readStatus(QString)));
     connect(this, SIGNAL(writeButtonNr(QString)), parent, SLOT(readButtonNr(QString)));
     connect(this, SIGNAL(writeButtonID(QString)), parent, SLOT(readButtonID(QString)));
-    connect(parent, SIGNAL(setArea(QString)), this, SLOT(setArea(QString)));
+    connect(parent, SIGNAL(setArea(QString)), this, SLOT(setFootprint(QString)));
     connect(this, SIGNAL(setStatusColor(int)), parent, SLOT(setStatusColor(int)));
     connect(this, SIGNAL(askIgnoreQuestion(QString, QMessageBox::StandardButton*)),
             this, SLOT(replyIgnoreQuestion(QString, QMessageBox::StandardButton*)));
@@ -85,7 +85,7 @@ void AutoProgramThread::run(){
 
     while (threadEnabled)
     {
-        QString cachedCurrentArea = currentArea;
+        QString cachedCurrentFootprint = currentFootprint;
 
         // Check if a Button is connected
         if(iButtonCon->getConnectedButton(&SNum[0]))
@@ -148,9 +148,9 @@ void AutoProgramThread::run(){
                 // Store settings to DB
                 //===============================
                 // Calculate next ButtonNr for the selected area and save to button
-                QString ButtonNrRight = QString::number(dbButton->getLastAddedButtonNrInt(cachedCurrentArea) + 1);
+                QString ButtonNrRight = QString::number(dbButton->getLastAddedButtonNrInt(cachedCurrentFootprint) + 1);
                 ButtonNrRight = ButtonNrRight.rightJustified(3,'0');
-                button.ButtonNr = cachedCurrentArea + ButtonNrRight;
+                button.ButtonNr = cachedCurrentFootprint + ButtonNrRight;
 
                 // Save mission information for button
                 if(mp.getSetMissionStartTime())
@@ -179,12 +179,10 @@ void AutoProgramThread::run(){
                 }
 
                 // Check if the chosen Area is already existing
-                if(!dbArea->isAreaExisting(cachedCurrentArea))
+                if(!dbArea->isAreaExisting(cachedCurrentFootprint))
                 {
                     // if not create it in the database
-                    Area temparea;
-                    temparea.AreaID = cachedCurrentArea;
-                    if(!dbArea->addArea(temparea))
+                    if(!dbArea->addArea(cachedCurrentFootprint))
                     {
                         emit writeStatus("Programming iButton FAILED.");	// DB Error
                         emit setStatusColor(0);
@@ -241,8 +239,8 @@ void AutoProgramThread::stop(){
 }
 
 
-void AutoProgramThread::setArea(QString area){
-    currentArea = area;
+void AutoProgramThread::setFootprint(QString footprintID){
+    currentFootprint = footprintID;
     button.clearData();
     emit writeButtonNr("");
     emit writeButtonID("");

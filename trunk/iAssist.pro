@@ -13,7 +13,6 @@ HEADERS += src/SystemCommand.h \
     src/CollectThread.h \
     src/AutoProgramThread.h \
     src/MeasurementProfile.h \
-    src/Area.h \
     src/ButtonData.h \
     src/ButtonIO.h \
     src/Measurement.h \
@@ -56,7 +55,6 @@ SOURCES += src/SystemCommand.cpp \
     src/CollectThread.cpp \
     src/AutoProgramThread.cpp \
     src/MeasurementProfile.cpp \
-    src/Area.cpp \
     src/ButtonData.cpp \
     src/ButtonIO.cpp \
     src/Measurement.cpp \
