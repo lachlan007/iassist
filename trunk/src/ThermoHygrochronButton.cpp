@@ -32,7 +32,7 @@ bool ThermoHygrochronButton::startButtonMission(int portnum, uchar* SNum)
     MissionParameterFile& mp = MissionParameterFile::Instance();
 
     // Set mission parameters
-    settings.enableRollover = mp.getEnableRollover();
+    settings.enableRollover = (short)mp.getEnableRollover();
     settings.timeSync = 1;
     settings.tempEnabled = 1;
     settings.dataEnabled = 0;
@@ -42,8 +42,8 @@ bool ThermoHygrochronButton::startButtonMission(int portnum, uchar* SNum)
     settings.highDataAlarm = 0;
     settings.lowDataAlarm = 0;
     settings.tempAlarm = 0;
-    settings.highTempResolution = mp.getHighTemperatureResolution();
-    settings.sampleRate = mp.getSamplingRate();
+    settings.highTempResolution = (short)mp.getHighTemperatureResolution();
+    settings.sampleRate = (int)mp.getSamplingRate();
 
     settings.startDelay = 0;
     // Calculate Delay
