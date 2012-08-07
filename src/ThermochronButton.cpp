@@ -67,7 +67,7 @@ bool ThermochronButton::startButtonMission(int portnum, uchar* SNum)
             // Calculate Delay
             if(mp.getSetMissionStartTime()) {
                 QDateTime now = QDateTime::currentDateTime();
-                double secsDelay = now.secsTo(QDateTime::fromTime_t(mp.getMissionStartTime()));
+                double secsDelay = static_cast<double>(mp.getMissionStartTime()-now.toTime_t())/60.0;
                 if((secsDelay - (int)secsDelay)>0.5)
                 {
                     thermoState.MissStat.start_delay = ((int) secsDelay) + 1;
