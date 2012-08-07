@@ -31,6 +31,7 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
+	initDone = false;
 
 	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(storeMissionParameters()));
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeWindow()));
@@ -78,6 +79,7 @@ void MissionParameterUI::initUI()
 	ui.pEnHighTempRes->setChecked(mp.getHighTemperatureResolution());
 	ui.pSetMissionStartTime->setChecked(mp.getSetMissionStartTime());
 	ui.pMissionStartTime->setDateTime(QDateTime::fromTime_t(mp.getMissionStartTime()));
+	initDone = true;
 }
 
 bool MissionParameterUI::storeMissionParameters()
@@ -102,10 +104,12 @@ bool MissionParameterUI::storeMissionParameters()
 
 void MissionParameterUI::setStatusChangesMade()
 {
-	ui.txtStatus->setStyleSheet(YELLOW);
-	ui.txtStatus->setText("Changes have been made. Please save or they will be lost.");
-
-	toggleSelectableParam();
+    if(initDone)
+    {
+        ui.txtStatus->setStyleSheet(YELLOW);
+        ui.txtStatus->setText("Changes have been made. Please save or they will be lost.");
+        toggleSelectableParam();
+    }
 }
 
 void MissionParameterUI::toggleSelectableParam()

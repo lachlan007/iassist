@@ -42,6 +42,8 @@ private:
 
     void initUI();
 
+    bool initDone;
+
 private slots:
 
     /**
