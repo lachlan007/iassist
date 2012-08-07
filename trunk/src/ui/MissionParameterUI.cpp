@@ -41,6 +41,7 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
 	connect(ui.pSetMissionStartTime, SIGNAL(clicked()), this, SLOT(setStatusChangesMade()));
 	connect(ui.pEnTempCalib, SIGNAL(clicked()), this, SLOT(setStatusChangesMade()));
 	connect(ui.pMissionStartTime, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(setStatusChangesMade()));
+	connect(ui.btnTimeNow, SIGNAL(clicked()), this, SLOT(setStartTimeNow()));
 
 	MissionParameterFile& mp = MissionParameterFile::Instance();
 
@@ -118,10 +119,17 @@ void MissionParameterUI::toggleSelectableParam()
 	{
 		ui.lMissionStartTime->setEnabled(true);
 		ui.pMissionStartTime->setEnabled(true);
+		ui.btnTimeNow->setEnabled(true);
 	}
 	else
 	{
 	    ui.lMissionStartTime->setEnabled(false);
 	    ui.pMissionStartTime->setEnabled(false);
+	    ui.btnTimeNow->setEnabled(false);
 	}
+}
+
+void MissionParameterUI::setStartTimeNow()
+{
+    ui.pMissionStartTime->setDateTime(QDateTime::currentDateTime());
 }
