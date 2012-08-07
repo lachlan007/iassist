@@ -61,6 +61,8 @@ private slots:
      */
     void closeWindow();
 
+    void setStartTimeNow();
+
 };
 
 #endif // MISSIONPARAMETERUI_H

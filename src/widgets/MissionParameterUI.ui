@@ -231,10 +231,13 @@ high temperature resolution:	16 bit</string>
       <x>0</x>
       <y>230</y>
       <width>421</width>
-      <height>80</height>
+      <height>97</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_7">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label6">
        <property name="sizePolicy">
@@ -278,6 +281,13 @@ high temperature resolution:	16 bit</string>
      </item>
      <item row="1" column="1">
       <widget class="QDateTimeEdit" name="pMissionStartTime"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="btnTimeNow">
+       <property name="text">
+        <string>Set to NOW</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
