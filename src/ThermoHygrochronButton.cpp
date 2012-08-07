@@ -246,9 +246,8 @@ bool ThermoHygrochronButton::getButtonTime(int portnum, uchar* SNum, QDateTime& 
     lower = (lower & 0x0f);
     year  = upper*10 + lower + year + 2000;
 
-    QString dateTimeStr = QString::number(day) + "." + QString::number(month) + "." + QString::number(year)
-        + " " + QString::number(hour) + "." + QString::number(min) + "." + QString::number(sec);
-    buttonTime.fromString(dateTimeStr, "d.M.yyyy H:m:s");
+    buttonTime.setDate(QDate(year, month, day));
+    buttonTime.setTime(QTime(hour, min, sec));
 
     Log::write("Device time: " + buttonTime.toString());
 

@@ -765,7 +765,7 @@ void InterpretStatus(MissionStatus *mstatus)
    mstatus->download_time = TimGetSeconds();
 #else
    temp = time(&tlong);
-   tstruct = localtime(&tlong); 
+   tstruct = gmtime(&tlong);
    td.day = (ushort)tstruct->tm_mday;
    td.month = tstruct->tm_mon + 1;  // (1.01)
    td.year = tstruct->tm_year + 1900;
@@ -807,7 +807,7 @@ void FormatMission(MissionStatus *mstatus)
 #ifdef __MC68K__
    TimSecondsToDateTime(tlong, tstruct);
 #else
-   tstruct = localtime(&tlong);
+   tstruct = gmtime(&tlong);
 #endif
 
    // convert to BCD
@@ -957,7 +957,7 @@ void MissionStatusToString(MissionStatus *mstatus, int ConvertToF, char *str)
 #ifndef __MC68K__
    // current PC time
    temp = time(&tlong);
-   tstruct = localtime(&tlong);
+   tstruct = gmtime(&tlong);
  
    cnt += sprintf(&str[cnt],"Current PC Time: %02d/%02d/%04d  %02d:%02d:%02d\n",
        tstruct->tm_mon + 1,tstruct->tm_mday,tstruct->tm_year + 1900,
