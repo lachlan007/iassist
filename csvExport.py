@@ -15,7 +15,7 @@ sqlStmt = 'SELECT MeasurementProfileID, ButtonNr, SessionNr, SamplingStartTime, 
 c2 = conn.cursor()
 for row in c.execute(sqlStmt):
 	# Not yet collected
-	if row[7] == None:
+	if row[7] == None or row[7] == "":
 		continue
 	t = (row[0],)
 	c2.execute('SELECT MAX(MeasurementNr) FROM Measurement WHERE MeasurementProfileID=?', t)

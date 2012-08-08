@@ -95,7 +95,12 @@ bool MissionParameterUI::storeMissionParameters()
 	mp.setEnableRollover(ui.pEnRollover->isChecked());
 	mp.setHighTemperatureResolution(ui.pEnHighTempRes->isChecked());
 	mp.setSetMissionStartTime(ui.pSetMissionStartTime->isChecked());
-	mp.setMissionStartTime(ui.pMissionStartTime->dateTime().toTime_t());
+
+	QDateTime missionStart;
+	// Ensure that second field is 0
+	missionStart.setDate(ui.pMissionStartTime->date());
+	missionStart.setTime(QTime(ui.pMissionStartTime->time().hour(), ui.pMissionStartTime->time().minute(), 0));
+	mp.setMissionStartTime(missionStart.toTime_t());
 
 	mp.storeMissionParameters();
 	ui.txtStatus->setStyleSheet(GREEN);
