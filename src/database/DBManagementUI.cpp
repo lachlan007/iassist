@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------
 #include "DBManagementUI.h"
 
-DBManagementUI::DBManagementUI(QWidget *parent)
+DBManagementUI::DBManagementUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);

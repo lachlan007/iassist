@@ -59,14 +59,14 @@ IAssist::~IAssist()
 
 void IAssist::programButtonClicked()
 {
-	AutoProgramUI *program = new AutoProgramUI(this);
+	AutoProgramUI *program = new AutoProgramUI(deploymentId, this);
 	program->show();
 	program->activateWindow();
 }
 
 void IAssist::collectButtonClicked()
 {
-	CollectUI *collect = new CollectUI(this);
+	CollectUI *collect = new CollectUI(deploymentId, this);
 	collect->show();
 	collect->activateWindow();
 }
@@ -80,14 +80,14 @@ void IAssist::missionParameterButtonClicked()
 
 void IAssist::removeDbContClicked()
 {
-	DBManagementUI *dbManUI = new DBManagementUI(this);
+	DBManagementUI *dbManUI = new DBManagementUI(deploymentId, this);
 	dbManUI->show();
 	dbManUI->activateWindow();
 }
 
 void IAssist::dataPlotButtonClicked()
 {
-    DataPlotUI *dataPlot = new DataPlotUI(this);
+    DataPlotUI *dataPlot = new DataPlotUI(deploymentId, this);
     dataPlot->show();
     dataPlot->activateWindow();
 }
@@ -110,23 +110,5 @@ void IAssist::initDir()
 
 }
 
-void IAssist::prepareDb(QString dbFileName)
-{
-    // Hack to allow multiple databases
-    dbFileName = "./" + dbFileName;
-    QFile db(dbFileName);
-    if(!db.exists()) {
-        db.open(QIODevice::WriteOnly);
-        db.close();
-    }
-
-    QFile link("./iButtonDB.tmp");
-    if(link.exists()) {
-        link.remove();
-    }
-
-    QFile::link(dbFileName, "./iButtonDB.tmp");
-
-}
 
 

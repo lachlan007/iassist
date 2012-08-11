@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DeploymentSelectUIClass</class>
+ <widget class="QDialog" name="DeploymentSelectUIClass">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>370</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>370</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>370</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>iAssist - Select Deployment</string>
+  </property>
+  <widget class="QPushButton" name="btnQuit">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>220</y>
+     <width>191</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Quit Application</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>351</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select Existing Deployment</string>
+   </property>
+   <widget class="QComboBox" name="selDeploymentLoad">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>25</y>
+      <width>181</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnLoadDeployment">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>25</y>
+      <width>141</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Load</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>351</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Delete Deployment</string>
+   </property>
+   <widget class="QComboBox" name="selDeploymentDelete">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>181</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnDeleteDeployment">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>30</y>
+      <width>141</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Delete</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>351</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Create New Deployment</string>
+   </property>
+   <widget class="QPushButton" name="btnCreateDeployment">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>25</y>
+      <width>141</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Create and Load</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txtDeploymentName">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>181</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>2</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout"/>
+  </widget>
+  <zorder>groupBox_2</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>btnQuit</zorder>
+  <zorder>groupBox_3</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>selDeploymentLoad</tabstop>
+  <tabstop>btnLoadDeployment</tabstop>
+  <tabstop>txtDeploymentName</tabstop>
+  <tabstop>btnCreateDeployment</tabstop>
+  <tabstop>selDeploymentDelete</tabstop>
+  <tabstop>btnDeleteDeployment</tabstop>
+  <tabstop>btnQuit</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

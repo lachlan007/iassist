@@ -2,9 +2,6 @@
 //  iAssist - Rapid deployment of Maxim iButton(c) miniature logger devices
 //  Copyright (C) 2012 ETH Zurich, Computer Engineering and Networks
 //      Laboratory, Matthias Keller <kellmatt at tik.ee.ethz.ch>
-//  Copyright (C) 2009 Guido Hungerbuehler
-//  Copyright (C) 2009 Oliver Knecht
-//  Copyright (C) 2009 Suhel Sheikh
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,44 +16,47 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
+#ifndef DBDEPLOYMENTTABLE_H_
+#define DBDEPLOYMENTTABLE_H_
+
+#define DEPLOYMENTTABLENAME	"Deployments"
+
+#include "DBConnection.h"
+#include <QVector>
+#include <QPair>
+
 /**
- * Measurement: Class that provides all the variables to store the measurements of a button
- *
+ * This class provides access to the table Footprints in the database.
+ * It supplies all necessary functions to edit and read the database.
  */
-
-#ifndef MEASUREMENT_H_
-#define MEASUREMENT_H_
-
-#include <QString>
-
-/**
- * Holds all the variables containing to a measurement
- */
-class Measurement {
+class DBDeploymentTable : public DBConnection {
 public:
-
 	/**
 	 * Default constructor
 	 */
-	Measurement();
+	DBDeploymentTable();
 	/**
 	 * Default deconstructor
 	 */
-	virtual ~Measurement();
+	virtual ~DBDeploymentTable();
 
 	/**
-	 * Resets all the values
+	 * Creates a new Deployment Table, if there's no one existing
 	 */
-	void cleanMeasurement();
+	bool createTable();
 
-	//! points to the array of the data saved in this button
-	double *missionData;
-	//! is the buttonNr of this button
-	QString ButtonNr;
-	//! is the size of this measurement
-	int size;
-	//! is the link to the measurement profile
-	int MeasurementProfileID;
+	bool addDeployment(QString deploymentName, int &insertId);
+
+	bool deleteDeployment(int deploymentID);
+
+	QVector<QPair<int,QString> > getAllDeployments();
+
+	/**
+	 * Opens the Database. If no Database is existing, it creates one first. And if the
+	 * table is not existing it creates a table as well.
+	 */
+	bool open();
+
 };
 
-#endif /* MEASUREMENT_H_ */
+#endif /* DBDEPLOYMENTTABLE_H_ */

@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------
 #include "AutoProgramUI.h"
 
-AutoProgramUI::AutoProgramUI(QWidget *parent)
+AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
 
