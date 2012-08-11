@@ -27,10 +27,9 @@
 #include "ui/AutoProgramUI.h"
 #include "ui/CollectUI.h"
 #include "ui/MissionParameterUI.h"
-#include "database/DBManagementUI.h"
-#include "SystemCommand.h"
+#include "ui/DBManagementUI.h"
 #include "ui/DataPlotUI.h"
-
+#include "SystemCommand.h"
 
 /**
  * This is the main window of the iAssist software. It starts all the different subprogramms
