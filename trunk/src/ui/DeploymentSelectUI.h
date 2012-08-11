@@ -2,9 +2,6 @@
 //  iAssist - Rapid deployment of Maxim iButton(c) miniature logger devices
 //  Copyright (C) 2012 ETH Zurich, Computer Engineering and Networks
 //      Laboratory, Matthias Keller <kellmatt at tik.ee.ethz.ch>
-//  Copyright (C) 2009 Guido Hungerbuehler
-//  Copyright (C) 2009 Oliver Knecht
-//  Copyright (C) 2009 Suhel Sheikh
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,44 +16,55 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
-/**
- * Measurement: Class that provides all the variables to store the measurements of a button
- *
- */
+#ifndef DEPLOYMENTSELECTUI_H
+#define DEPLOYMENTSELECTUI_H
 
-#ifndef MEASUREMENT_H_
-#define MEASUREMENT_H_
-
-#include <QString>
+#include <QtGui/QDialog>
+#include "ui_DeploymentSelectUI.h"
+#include "UserDialog.h"
+#include "../database/DBDeploymentTable.h"
 
 /**
- * Holds all the variables containing to a measurement
+ * Displays a GUI to set the mission parameter for the iButton.
  */
-class Measurement {
+
+class DeploymentSelectUI : public QDialog
+{
+    Q_OBJECT
+
 public:
+    /**
+     * Displays the mission parameter window and calls the
+     * readMissionParameterFile() function, so that the displayed initial
+     * values are the same as in the file (if there is one).
+     */
+    DeploymentSelectUI(QWidget *parent = 0);
+    /**
+     * Default destructor.
+     */
+    ~DeploymentSelectUI();
 
-	/**
-	 * Default constructor
-	 */
-	Measurement();
-	/**
-	 * Default deconstructor
-	 */
-	virtual ~Measurement();
+    int getSelectedDeploymentId() { return selectedDeploymentId; }
 
-	/**
-	 * Resets all the values
-	 */
-	void cleanMeasurement();
+private:
+    Ui::DeploymentSelectUIClass ui;
 
-	//! points to the array of the data saved in this button
-	double *missionData;
-	//! is the buttonNr of this button
-	QString ButtonNr;
-	//! is the size of this measurement
-	int size;
-	//! is the link to the measurement profile
-	int MeasurementProfileID;
+    void initUI();
+
+    int selectedDeploymentId;
+
+    QVector<QPair<int, QString> > deployments;
+
+private slots:
+
+    void loadDeployment();
+
+    void createNewDeployment();
+
+    void deleteDeployment();
+
+    void quitApplication();
+
 };
 
-#endif /* MEASUREMENT_H_ */
+#endif // DEPLOYMENTSELECTUI_H

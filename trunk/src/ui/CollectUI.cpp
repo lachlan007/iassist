@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------
 #include "CollectUI.h"
 
-CollectUI::CollectUI(QWidget *parent)
+CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);

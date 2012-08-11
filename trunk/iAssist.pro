@@ -26,11 +26,13 @@ HEADERS += src/SystemCommand.h \
     src/database/DBConnection.h \
     src/database/DBButtonTable.h \
     src/database/DBAreaTable.h \
+	src/database/DBDeploymentTable.h \
     src/ui/UserDialog.h \
     src/ui/MissionParameterUI.h \
     src/ui/CollectUI.h \
     src/ui/AutoProgramUI.h \
     src/ui/DataPlotUI.h \
+	src/ui/DeploymentSelectUI.h \
     src/buttonIO/findtype.h \
     src/buttonIO/humutil.h \
     src/buttonIO/libusbds2490.h \
@@ -68,11 +70,13 @@ SOURCES += src/SystemCommand.cpp \
     src/database/DBConnection.cpp \
     src/database/DBButtonTable.cpp \
     src/database/DBAreaTable.cpp \
+    src/database/DBDeploymentTable.cpp \
     src/ui/UserDialog.cpp \
     src/ui/MissionParameterUI.cpp \
     src/ui/CollectUI.cpp \
     src/ui/AutoProgramUI.cpp \
     src/ui/DataPlotUI.cpp \
+	src/ui/DeploymentSelectUI.cpp \
     src/buttonIO/crcutil.c \
     src/buttonIO/findtype.c \
     src/buttonIO/humutil.c \
@@ -101,7 +105,8 @@ FORMS += src/widgets/MissionParameterUI.ui \
     src/widgets/DBManagementUI.ui \
     src/widgets/CollectUI.ui \
     src/widgets/AutoProgramUI.ui \
-    src/widgets/DataPlotUI.ui
+    src/widgets/DataPlotUI.ui \
+    src/widgets/DeploymentSelectUI.ui
 LIBS += -L/usr/local/lib \
     -L/usr/lib \
     -lusb \

@@ -22,7 +22,7 @@
 #include "DataPlotUI.h"
 
 
-DataPlotUI::DataPlotUI(QWidget *parent)
+DataPlotUI::DataPlotUI(int deploymentId, QWidget *parent)
 : QDialog(parent) {
     ui.setupUi(this);
 
