@@ -22,7 +22,6 @@ HEADERS += src/SystemCommand.h \
     src/MissionParameterFile.h \
     src/database/DBMeasurementTable.h \
     src/database/DBMeasurementProfileTable.h \
-    src/database/DBManagementUI.h \
     src/database/DBConnection.h \
     src/database/DBButtonTable.h \
     src/database/DBAreaTable.h \
@@ -33,6 +32,7 @@ HEADERS += src/SystemCommand.h \
     src/ui/AutoProgramUI.h \
     src/ui/DataPlotUI.h \
 	src/ui/DeploymentSelectUI.h \
+	src/ui/DBManagementUI.h \
     src/buttonIO/findtype.h \
     src/buttonIO/humutil.h \
     src/buttonIO/libusbds2490.h \
@@ -66,7 +66,6 @@ SOURCES += src/SystemCommand.cpp \
     src/MissionParameterFile.cpp \
     src/database/DBMeasurementTable.cpp \
     src/database/DBMeasurementProfileTable.cpp \
-    src/database/DBManagementUI.cpp \
     src/database/DBConnection.cpp \
     src/database/DBButtonTable.cpp \
     src/database/DBAreaTable.cpp \
@@ -77,6 +76,7 @@ SOURCES += src/SystemCommand.cpp \
     src/ui/AutoProgramUI.cpp \
     src/ui/DataPlotUI.cpp \
 	src/ui/DeploymentSelectUI.cpp \
+	src/ui/DBManagementUI.cpp \
     src/buttonIO/crcutil.c \
     src/buttonIO/findtype.c \
     src/buttonIO/humutil.c \

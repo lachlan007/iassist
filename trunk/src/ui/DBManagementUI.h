@@ -25,11 +25,11 @@
 #include <QtGui/QDialog>
 #include <QFile>
 #include "ui_DBManagementUI.h"
-#include "DBAreaTable.h"
-#include "DBButtonTable.h"
-#include "../ui/UserDialog.h"
-#include "DBMeasurementTable.h"
-#include "DBMeasurementProfileTable.h"
+#include "../database/DBAreaTable.h"
+#include "../database/DBButtonTable.h"
+#include "../database/DBMeasurementTable.h"
+#include "../database/DBMeasurementProfileTable.h"
+#include "UserDialog.h"
 
 
 #define STYLESHEETWHITE		"background-color: rgb(255, 255, 255);"
