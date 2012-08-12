@@ -56,22 +56,27 @@ void DataPlotUI::initComboArea()
     ui.cbMeasurementProfileID->clear();
 
     DBButtonTable dbBut(deploymentId);
-    DBMeasurementProfileTable db;
-    db.open();
+    DBMeasurementProfileTable dbMeas;
+    dbMeas.open();
     dbBut.open();
     QStringList listProfiles;
     QStringList listNone;
-    QVector<MeasurementProfile> profileVector = db.getFinishedMeasurementProfiles();
+    QVector<MeasurementProfile> profileVector = dbMeas.getFinishedMeasurementProfiles();
     listNone.append(TEXT_NONE);
 
     for (int i = 0; i < profileVector.size(); ++i) {
         ButtonData b = dbBut.getButtonByButtonId(profileVector.at(i).ButtonId);
+        if(b.ButtonNr == "")
+        {
+            // Button belongs to other deployment
+            continue;
+        }
         listProfiles.append("ProfileID: " + QString::number(profileVector.at(i).MeasurementProfileID)
                         + ", ButtonNr: " + b.ButtonNr
                         + ", SessionNr: " + QString::number(profileVector.at(i).SessionNr));
     }
     ui.cbMeasurementProfileID->addItems(listNone + listProfiles);
-    db.close();
+    dbMeas.close();
     dbBut.close();
 
 }

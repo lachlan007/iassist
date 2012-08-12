@@ -46,7 +46,6 @@ IAssist::IAssist(QWidget *parent)
 	// Initialize the Log file (create, clear)
 	Log::logfile_init();
 
-
 	// Set icons
 	QIcon title ("./ico/ibutton.png");
 	this->setWindowIcon(title);
@@ -108,6 +107,15 @@ void IAssist::initDir()
 	if(!log.exists())
 		dir.mkdir("log");
 
+}
+
+void IAssist::setDeploymentId(int deploymentId)
+{
+    DBDeploymentTable db;
+    this->deploymentId = deploymentId;
+    db.open();
+    ui.txtDeploymentName->setText("Deployment: " + db.getDeploymentName(deploymentId));
+    db.close();
 }
 
 

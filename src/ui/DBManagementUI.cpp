@@ -25,6 +25,7 @@ DBManagementUI::DBManagementUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
+    this->deploymentId = deploymentId;
 
 	ui.txtStatus->setStyleSheet(STYLESHEETWHITE);
 
@@ -41,7 +42,6 @@ DBManagementUI::DBManagementUI(int deploymentId, QWidget *parent)
 
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
 
-	this->deploymentId = deploymentId;
 }
 
 
@@ -274,22 +274,29 @@ bool DBManagementUI::deleteButton(QString buttonNr)
 {
 	// Delete all the measurements to this iButton
 	DBMeasurementTable dbMeas;
+	DBMeasurementProfileTable dbProfile;
+	DBButtonTable dbButton(deploymentId);
 	dbMeas.open();
-	if(!dbMeas.deleteMeasurementByButtonNr(buttonNr))
+	dbProfile.open();
+    dbButton.open();
+	int buttonId = dbButton.getButtonIdByButtonNr(buttonNr);
+	QVector<MeasurementProfile> profiles = dbProfile.getProfilesByButtonID(buttonId);
+
+	for(int i=0; i<profiles.size(); i++)
 	{
-		dbMeas.close();
-		this->appendReport(QString("An Error occured, during deleting the Measurement from the database.")
-				+ "\nSummary:\nMeasurements: not deleted\nMeasurementProfiles: not deleted\niButton: not deleted");
-		return false;
+	    if(!dbMeas.deleteMeasurementsByMeasurementProfileID(profiles.at(i).MeasurementProfileID))
+	    {
+	        dbMeas.close();
+	        dbProfile.close();
+	        dbButton.close();
+	        this->appendReport(QString("An Error occured, during deleting the Measurement from the database.")
+	                + "\nSummary:\nMeasurements: not deleted\nMeasurementProfiles: not deleted\niButton: not deleted");
+	        return false;
+	    }
 	}
 	dbMeas.close();
 
 	// Delete all the measurementProfiles to this iButton
-	DBMeasurementProfileTable dbProfile;
-	DBButtonTable dbButton(deploymentId);
-	dbProfile.open();
-	dbButton.open();
-	int buttonId = dbButton.getButtonIdByButtonNr(buttonNr);
 	if(!dbProfile.deleteProfileByButtonId(buttonId))
 	{
 		dbProfile.close();

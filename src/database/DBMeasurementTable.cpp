@@ -38,10 +38,11 @@ bool DBMeasurementTable::createTable()
 	}
 	else
 	{
-		QSqlQuery query(this->getDB());
-		bool success = query.exec(QString("CREATE TABLE ")
-				+ MEASUREMENTTABLENAME + QString(" (MeasurementID INTEGER PRIMARY KEY, ButtonNr char(10),")
-				+ QString(" MeasurementProfileID int, MeasurementNr int, Measurement int);"));
+	    QSqlQuery query(this->getDB());
+	    bool success = query.exec(QString("CREATE TABLE ") +
+	            MEASUREMENTTABLENAME + QString(" (MeasurementID INTEGER PRIMARY KEY,") +
+	            QString(" MeasurementProfileID int, MeasurementNr int, Measurement int, FOREIGN KEY(MeasurementProfileID) ") +
+	            QString(" REFERENCES MeasurementProfiles(MeasurementProfileID));"));
 		if(success)
 		{
 			Log::write("Created new Measurement Table in Database");
@@ -57,40 +58,19 @@ bool DBMeasurementTable::createTable()
 	}
 }
 
-bool DBMeasurementTable::deleteMeasurementByButtonNr(QString buttonNr)
+bool DBMeasurementTable::deleteMeasurementsByMeasurementProfileID(int measurementProfileId)
 {
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + MEASUREMENTTABLENAME
-			+ QString(" WHERE ButtonNr='") + buttonNr + QString("';");
+			+ QString(" WHERE MeasurementProfileID=") + QString::number(measurementProfileId) + QString(";");
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbMeasurementTable: Cannot delete Measurements of Button: " + buttonNr
+		Log::writeError("dbMeasurementTable: Cannot delete Measurements of profile: " + QString::number(measurementProfileId)
 				+ " / Error: " + error);
-		this->appendError("Cannot delete Measurements of Button: " + buttonNr);
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
-bool DBMeasurementTable::deleteMeasurementByArea(QString area)
-{
-	QSqlQuery query(this->getDB());
-	QString text = QString("DELETE FROM ") + MEASUREMENTTABLENAME
-			+ QString(" WHERE ButtonNr='") + area + QString("%';");
-	bool success = query.exec(text);
-
-	if(!success)
-	{
-		QString error = query.lastError().text();
-		Log::writeError("dbMeasurementTable: Cannot delete Measurements of Button: " + area
-				+ " / Error: " + error);
-		this->appendError("Cannot delete Measurements of Button: " + area);
+		this->appendError("Cannot delete Measurements of profile: " + QString::number(measurementProfileId));
 		return false;
 	}
 	else
@@ -108,8 +88,8 @@ bool DBMeasurementTable::addMeasurement(Measurement meas)
 	db.transaction();
 
 	QString textBeg = "INSERT INTO " + QString(MEASUREMENTTABLENAME)
-			+ " (ButtonNr, MeasurementProfileID , MeasurementNr, Measurement) VALUES( '"
-			+ meas.ButtonNr + "', " + QString::number(meas.MeasurementProfileID) + ", ";
+			+ " (MeasurementProfileID , MeasurementNr, Measurement) VALUES( '"
+			+ "', " + QString::number(meas.MeasurementProfileID) + ", ";
 
 	// insert all measurements
 	for(int i=0; i<meas.size; i++)

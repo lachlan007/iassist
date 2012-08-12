@@ -50,19 +50,7 @@ public:
 	 */
 	bool createTable();
 
-	/**
-	 * Deletes a %Measurement to a certain ButtonNr
-	 * @param buttonNr Nr of the button which measurements should be deleted
-	 * @return true or false for the success state
-	 */
-	bool deleteMeasurementByButtonNr(QString buttonNr);
-
-	/**
-	 * Deletes a %Measurement to a certain %Area (Footprint)
-	 * @param area FootprintID which measurements should be deleted
-	 * @return true or false for the success state
-	 */
-	bool deleteMeasurementByArea(QString area);
+	bool deleteMeasurementsByMeasurementProfileID(int measurementProfileId);
 
 	/**
 	 * Adds a %Measurement to a of a certain Button to the %Measurement Table of the Database

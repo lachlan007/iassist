@@ -24,6 +24,7 @@
 AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
 
     currentFootprint = "AA";
+    this->deploymentId = deploymentId;
     threadEnabled = false;
     connect(this, SIGNAL(buttonSwitch()), parent, SLOT(buttonSwitch()));
     connect(this, SIGNAL(writeStatus(QString)), parent, SLOT(readStatus(QString)));
@@ -41,7 +42,6 @@ AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
     // Creating an instance for iButton I/O
     iButtonCon = new ButtonIO();
 
-    this->deploymentId = deploymentId;
 }
 
 AutoProgramThread::~AutoProgramThread(){

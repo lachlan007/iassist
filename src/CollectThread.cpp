@@ -22,6 +22,7 @@
 #include "CollectThread.h"
 
 CollectThread::CollectThread(int deploymentId, QObject *parent) {
+    this->deploymentId = deploymentId;
 	// Setup the values
 	measurement.cleanMeasurement();
 	measurementProfile.clearData();
@@ -34,8 +35,6 @@ CollectThread::CollectThread(int deploymentId, QObject *parent) {
 
 	connect(this, SIGNAL(displayUserMessage(QString)),
 			this, SLOT(displayUserMessageSlt(QString)));
-
-	this->deploymentId = deploymentId;
 
 	dbProfile = new DBMeasurementProfileTable();
 	dbButton = new DBButtonTable(deploymentId);

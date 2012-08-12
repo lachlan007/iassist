@@ -68,7 +68,7 @@ void DeploymentSelectUI::loadDeployment()
     }
 
     // Get the selected item
-    selectedDeploymentId = deployments.at(ui.selDeploymentDelete->currentIndex()-1).first;
+    selectedDeploymentId = deployments.at(ui.selDeploymentLoad->currentIndex()-1).first;
     done(Accepted);
 }
 
@@ -94,7 +94,6 @@ void DeploymentSelectUI::createNewDeployment()
         db.open();
         db.addDeployment(deploymentName, selectedDeploymentId);
         db.close();
-        UserDialog::warning("Added deployment: " + QString::number(selectedDeploymentId));
         done(Accepted);
     }
 

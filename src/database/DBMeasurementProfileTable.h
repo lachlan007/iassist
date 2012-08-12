@@ -84,13 +84,6 @@ public:
 	bool open();
 
 	/**
-	 * Deletes the Measurement Profiles to a certain area from the database.
-	 * @param _area the area
-	 * @return true if successful, false otherwise
-	 */
-	bool deleteProfileByArea(QString _area);
-
-	/**
 	 * Deletes the Measurement Profiles to a certain button from the database.
 	 * @param _buttonNr the buttonNr
 	 * @return true if successful, false otherwise
@@ -103,6 +96,8 @@ public:
 	 * @return Vector
 	 */
 	QVector<MeasurementProfile> getFinishedMeasurementProfiles();
+
+	QVector<MeasurementProfile> getProfilesByButtonID(int buttonId);
 
 private:
 	/**

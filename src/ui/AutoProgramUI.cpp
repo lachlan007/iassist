@@ -24,7 +24,6 @@
 AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
-
 	currentArea="AA";
 
 	ui.setupUi(this);
