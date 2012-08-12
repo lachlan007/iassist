@@ -133,7 +133,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboArea">
+  <widget class="QComboBox" name="comboFootprint">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -201,7 +201,7 @@
     <string>Delete &amp;iButton</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnDelArea">
+  <widget class="QPushButton" name="btnDelFootprint">
    <property name="geometry">
     <rect>
      <x>10</x>

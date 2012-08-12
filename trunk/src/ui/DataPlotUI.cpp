@@ -95,13 +95,13 @@ void DataPlotUI::measurementProfileChanged()
         return;
     }
 
-    db.open();
-
     QStringList tmp = ui.cbMeasurementProfileID->currentText().split(' ');
     QString measurementProfileID = tmp.at(1);
     measurementProfileID.chop(1);
 
+    db.open();
     int numValues = db.getMeasurementsByProfileID(measurementProfileID, &y);
+    db.close();
 
     double *x = new double[numValues];
     for(int i = 0; i < numValues; i++) {

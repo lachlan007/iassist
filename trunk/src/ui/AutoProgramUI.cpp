@@ -24,7 +24,7 @@
 AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
-	currentArea="AA";
+	currentFootprint="AA";
 
 	ui.setupUi(this);
 
@@ -32,10 +32,10 @@ AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
 	autoProgramRunning = false;
 
 	connect(ui.btnStart, SIGNAL(clicked()), this, SLOT(buttonSwitch()));
-	connect(ui.btnDecArea, SIGNAL(clicked()), this, SLOT(decArea()));
-	connect(ui.btnIncArea, SIGNAL(clicked()), this, SLOT(incArea()));
-	connect(ui.btnDecAreaMore, SIGNAL(clicked()), this, SLOT(decAreaMore()));
-	connect(ui.btnIncAreaMore, SIGNAL(clicked()), this, SLOT(incAreaMore()));
+	connect(ui.btnDecFootprint, SIGNAL(clicked()), this, SLOT(decFootprint()));
+	connect(ui.btnIncFootprint, SIGNAL(clicked()), this, SLOT(incFootprint()));
+	connect(ui.btnDecFootprintMore, SIGNAL(clicked()), this, SLOT(decFootprintMore()));
+	connect(ui.btnIncFootprintMore, SIGNAL(clicked()), this, SLOT(incFootprintMore()));
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
 }
@@ -117,130 +117,130 @@ void AutoProgramUI::readButtonID(QString ButtonID){
 	}
 }
 
-void AutoProgramUI::incArea(){
-	currentArea = ui.lblArea->text();
+void AutoProgramUI::incFootprint(){
+	currentFootprint = ui.lblFootprint->text();
 
 	// Increase the area by 1
 
-	QChar charAr1 = currentArea[0];
-	QChar charAr2 = currentArea[1];
+	QChar charAr1 = currentFootprint[0];
+	QChar charAr2 = currentFootprint[1];
 	ushort value1 = charAr1.unicode();
 	ushort value2 = charAr2.unicode();
 
 	if(value2<65)	// If value2 < (Capital ASCII letters)
 	{
-		currentArea.replace(1,1, QString("A")); // Set to A
+		currentFootprint.replace(1,1, QString("A")); // Set to A
 	}
 	else if(value2>=90)	// If value2 > (Capital ASCII letters) OR "Z"
 	{
-		currentArea.replace(1,1, QString("A")); // Set to A
+		currentFootprint.replace(1,1, QString("A")); // Set to A
 
 		if(value1<65)	// If value1 < (Capital ASCII letters)
 		{
-			currentArea.replace(0,1, QString("A")); // Set to A
+			currentFootprint.replace(0,1, QString("A")); // Set to A
 		}
 		else if(value1>=90)	// If value1 > (capital ASCII letters) OR "Z"
 		{
-			currentArea.replace(0,1, QString("A")); // Set to A
+			currentFootprint.replace(0,1, QString("A")); // Set to A
 		}
 		else // If value1 == (Capital ASCII letter)
 		{
-			currentArea.replace(0,1, QString(QChar(value1+1))); // Increase by 1
+			currentFootprint.replace(0,1, QString(QChar(value1+1))); // Increase by 1
 		}
 	}
 	else // If value2 == (Capital ASCII letter)
 	{
-		currentArea.replace(1,1, QString(QChar(value2+1))); // Increase by 1
+		currentFootprint.replace(1,1, QString(QChar(value2+1))); // Increase by 1
 	}
 
-	ui.lblArea->setText(currentArea);
-	emit setArea(currentArea);
+	ui.lblFootprint->setText(currentFootprint);
+	emit setArea(currentFootprint);
 }
 
-void AutoProgramUI::decArea(){
-	currentArea = ui.lblArea->text();
+void AutoProgramUI::decFootprint(){
+	currentFootprint = ui.lblFootprint->text();
 
 	// Decrease the area by 1
-	QChar charAr1 = currentArea[0];
-	QChar charAr2 = currentArea[1];
+	QChar charAr1 = currentFootprint[0];
+	QChar charAr2 = currentFootprint[1];
 	ushort value1 = charAr1.unicode();
 	ushort value2 = charAr2.unicode();
 
 	if(value2<=65)
 	{
-		currentArea.replace(1 , 1, QString("Z"));
+		currentFootprint.replace(1 , 1, QString("Z"));
 		if(value1<=65)
 		{
-			currentArea.replace(0, 1, QString("Z"));
+			currentFootprint.replace(0, 1, QString("Z"));
 		}
 		else if(value1>90)
 		{
-			currentArea.replace(0, 1, QString("Z"));
+			currentFootprint.replace(0, 1, QString("Z"));
 		}
 		else
 		{
-			currentArea.replace(0, 1, QString(QChar(value1-1)));
+			currentFootprint.replace(0, 1, QString(QChar(value1-1)));
 		}
 	}
 	else if(value2>90)
 	{
-		currentArea.replace(1 , 1, QString("Z"));
+		currentFootprint.replace(1 , 1, QString("Z"));
 	}
 	else
 	{
-		currentArea.replace(1, 1, QString(QChar(value2-1)));
+		currentFootprint.replace(1, 1, QString(QChar(value2-1)));
 	}
 
-	ui.lblArea->setText(currentArea);
-	emit setArea(currentArea);
+	ui.lblFootprint->setText(currentFootprint);
+	emit setArea(currentFootprint);
 }
 
 
-void AutoProgramUI::incAreaMore(){
-	currentArea = ui.lblArea->text();
+void AutoProgramUI::incFootprintMore(){
+	currentFootprint = ui.lblFootprint->text();
 
 	// Increase the area by 26 (left letter)
 
-	QChar charAr1 = currentArea[0];
+	QChar charAr1 = currentFootprint[0];
 	ushort value1 = charAr1.unicode();
 
 		if(value1<65)	// If value1 < (Capital ASCII letters)
 		{
-			currentArea.replace(0,1, QString("A")); // Set to A
+			currentFootprint.replace(0,1, QString("A")); // Set to A
 		}
 		else if(value1>=90)	// If value1 > (capital ASCII letters) OR "Z"
 		{
-			currentArea.replace(0,1, QString("A")); // Set to A
+			currentFootprint.replace(0,1, QString("A")); // Set to A
 		}
 		else // If value1 == (Capital ASCII letter)
 		{
-			currentArea.replace(0,1, QString(QChar(value1+1))); // Increase by 1
+			currentFootprint.replace(0,1, QString(QChar(value1+1))); // Increase by 1
 		}
 
-	ui.lblArea->setText(currentArea);
-	emit setArea(currentArea);
+	ui.lblFootprint->setText(currentFootprint);
+	emit setArea(currentFootprint);
 }
 
-void AutoProgramUI::decAreaMore(){
-	currentArea = ui.lblArea->text();
+void AutoProgramUI::decFootprintMore(){
+	currentFootprint = ui.lblFootprint->text();
 
 	// Decrease the area by 26 (left letter)
-	QChar charAr1 = currentArea[0];
+	QChar charAr1 = currentFootprint[0];
 	ushort value1 = charAr1.unicode();
 
 		if(value1<=65)
 		{
-			currentArea.replace(0, 1, QString("Z"));
+			currentFootprint.replace(0, 1, QString("Z"));
 		}
 		else if(value1>90)
 		{
-			currentArea.replace(0, 1, QString("Z"));
+			currentFootprint.replace(0, 1, QString("Z"));
 		}
 		else
 		{
-			currentArea.replace(0, 1, QString(QChar(value1-1)));
+			currentFootprint.replace(0, 1, QString(QChar(value1-1)));
 		}
 
-	ui.lblArea->setText(currentArea);
-	emit setArea(currentArea);
+	ui.lblFootprint->setText(currentFootprint);
+	emit setArea(currentFootprint);
 }

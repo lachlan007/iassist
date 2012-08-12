@@ -46,8 +46,8 @@ IAssist::IAssist(QWidget *parent)
 	// Initialize the Log file (create, clear)
 	Log::logfile_init();
 
-	// Set icons
-	QIcon title ("./ico/ibutton.png");
+	// Set icon
+	QIcon title ("./ico/iassist.png");
 	this->setWindowIcon(title);
 
 }

@@ -67,7 +67,7 @@
     <string>Button ID</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboArea">
+  <widget class="QComboBox" name="comboFootprint">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -250,7 +250,7 @@
  <tabstops>
   <tabstop>btnStart</tabstop>
   <tabstop>btnClose</tabstop>
-  <tabstop>comboArea</tabstop>
+  <tabstop>comboFootprint</tabstop>
   <tabstop>comboButtonNr</tabstop>
   <tabstop>btnNextButton</tabstop>
   <tabstop>txtStatus</tabstop>

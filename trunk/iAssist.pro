@@ -4,7 +4,7 @@ CONFIG += console
 MOC_DIR = tmp/
 OBJECTS_DIR = tmp/
 UI_DIR = tmp/
-ICON = ico/icon.icns
+ICON = ico/iassist.icns
 QT += core \
     gui \
     sql
@@ -25,7 +25,7 @@ HEADERS += src/SystemCommand.h \
     src/database/DBMeasurementProfileTable.h \
     src/database/DBConnection.h \
     src/database/DBButtonTable.h \
-    src/database/DBAreaTable.h \
+    src/database/DBFootprintTable.h \
 	src/database/DBDeploymentTable.h \
     src/ui/UserDialog.h \
     src/ui/MissionParameterUI.h \
@@ -69,7 +69,7 @@ SOURCES += src/SystemCommand.cpp \
     src/database/DBMeasurementProfileTable.cpp \
     src/database/DBConnection.cpp \
     src/database/DBButtonTable.cpp \
-    src/database/DBAreaTable.cpp \
+    src/database/DBFootprintTable.cpp \
     src/database/DBDeploymentTable.cpp \
     src/ui/UserDialog.cpp \
     src/ui/MissionParameterUI.cpp \

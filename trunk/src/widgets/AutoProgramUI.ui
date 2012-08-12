@@ -131,7 +131,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnDecArea">
+  <widget class="QPushButton" name="btnDecFootprint">
    <property name="geometry">
     <rect>
      <x>69</x>
@@ -147,7 +147,7 @@
     <string>&lt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnIncArea">
+  <widget class="QPushButton" name="btnIncFootprint">
    <property name="geometry">
     <rect>
      <x>270</x>
@@ -176,7 +176,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="lblArea">
+  <widget class="QLabel" name="lblFootprint">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -198,7 +198,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnIncAreaMore">
+  <widget class="QPushButton" name="btnIncFootprintMore">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -214,7 +214,7 @@
     <string>&gt;&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnDecAreaMore">
+  <widget class="QPushButton" name="btnDecFootprintMore">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -251,10 +251,10 @@
  <tabstops>
   <tabstop>btnStart</tabstop>
   <tabstop>btnClose</tabstop>
-  <tabstop>btnDecAreaMore</tabstop>
-  <tabstop>btnDecArea</tabstop>
-  <tabstop>btnIncArea</tabstop>
-  <tabstop>btnIncAreaMore</tabstop>
+  <tabstop>btnDecFootprintMore</tabstop>
+  <tabstop>btnDecFootprint</tabstop>
+  <tabstop>btnIncFootprint</tabstop>
+  <tabstop>btnIncFootprintMore</tabstop>
  </tabstops>
  <resources/>
  <connections/>

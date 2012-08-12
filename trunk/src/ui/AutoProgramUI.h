@@ -100,7 +100,7 @@ private:
 	/**
 	 * Keeps track of the currently set area.
 	 */
-	QString currentArea;
+	QString currentFootprint;
 
 private slots:
 	/**
@@ -113,25 +113,25 @@ private slots:
 	 * Increases the area displayed on the GUI by 1 and informs AutoDistributeThread
 	 * about the new area.
 	 */
-	void incArea();
+	void incFootprint();
 	/**
 	 * Receives a signal when the Area-Decrease-Button has been pushed.
 	 * Decreses the area displayed on the GUI by 1 and informs AutoDistributeThread
 	 * about the new area.
 	 */
-	void decArea();
+	void decFootprint();
 	/**
 	 * Receives a signal when the Area-Increase-More-Button has been pushed.
 	 * Increases the area displayed on the GUI by 26 (i.e. first letter changes) and informs AutoDistributeThread
 	 * about the new area.
 	 */
-	void incAreaMore();
+	void incFootprintMore();
 	/**
 	 * Receives a signal when the Area-Decrease-More-Button has been pushed.
 	 * Decreses the area displayed on the GUI by 26 (i.e. first letter changes) and informs AutoDistributeThread
 	 * about the new area.
 	 */
-	void decAreaMore();
+	void decFootprintMore();
 
 signals:
 	/**
