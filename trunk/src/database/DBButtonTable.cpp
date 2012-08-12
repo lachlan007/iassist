@@ -21,8 +21,8 @@
 //---------------------------------------------------------------------------
 #include "DBButtonTable.h"
 
-DBButtonTable::DBButtonTable() {
-
+DBButtonTable::DBButtonTable(int deploymentId) : DBConnection() {
+    this->deploymentId = deploymentId;
 }
 
 DBButtonTable::~DBButtonTable() {
@@ -40,7 +40,7 @@ bool DBButtonTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ")
-			+ BUTTONTABLENAME + QString(" (ButtonNr char(10), ButtonID char(25));"));
+			+ BUTTONTABLENAME + QString(" (ButtonID INTEGER PRIMARY KEY, DeploymentID INTEGER, ButtonNr char(10), SerialNr char(25));"));
 		if(success)
 		{
 			Log::write("Created new iButton Table in Database");
@@ -56,16 +56,16 @@ bool DBButtonTable::createTable()
 	}
 }
 
-bool DBButtonTable::addButton(ButtonData button)
+bool DBButtonTable::addButton(ButtonData button, int &insertId)
 {
 	// Create the Query to add a complete iButton Database entry to the database
 	QSqlQuery query(this->getDB());
 
 	// Check if Button is already entered
-	if(this->isButtonExistingByButtonNr(button.ButtonNr))
+	if(this->isButtonExistingBySerialNr(button.SerialNr))
 	{
 		Log::writeError("dbButtonTable: Cannot add a button twice.");
-		this->appendError("Cannot add a button twice. " + button.ButtonNr + " already in DB");
+		this->appendError("Cannot add a button twice. " + button.SerialNr + " already in DB");
 		return false;
 	}
 
@@ -73,7 +73,8 @@ bool DBButtonTable::addButton(ButtonData button)
 	convertButtonDataToSQL(&button);
 
 	QString sqlText("INSERT INTO ");
-	sqlText = sqlText + BUTTONTABLENAME + " VALUES ( " + ButtonNr + ", " + ButtonID + ");";
+	sqlText = sqlText + BUTTONTABLENAME + " (DeploymentID, ButtonNr, SerialNr) VALUES ( " + QString::number(deploymentId) +
+	        ", " +  ButtonNr + ", " + SerialNr + ");";
 
 	// Send the query
 	bool success = query.exec(sqlText);
@@ -85,6 +86,8 @@ bool DBButtonTable::addButton(ButtonData button)
 		this->appendError("Cannot add Button to Database: " + error);
 	}
 
+	insertId = query.lastInsertId().toInt();
+
 	query.clear();
 	return success;
 }
@@ -92,24 +95,81 @@ bool DBButtonTable::addButton(ButtonData button)
 void DBButtonTable::convertButtonDataToSQL(ButtonData *button)
 {
 	// Give all the digits "NULL" as value.
-	ButtonID=QString("'") + button->ButtonID + QString("'");
 	ButtonNr=QString("'") + button->ButtonNr + QString("'");
+	SerialNr=QString("'") + button->SerialNr + QString("'");
+
 }
 
-ButtonData DBButtonTable::readButton(QString _ButtonNr)
+ButtonData DBButtonTable::getButtonByButtonNr(QString buttonNr)
 {
 	ButtonData data;
 	QString temp;
 
 	// Get all the data and save them to ButtonData
 
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "ButtonNr");
+	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(buttonNr), "ButtonNr");
 	if(temp!="") data.ButtonNr = temp;
 
-	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(_ButtonNr), "ButtonID");
-	if(temp!="") data.ButtonID = temp;
+	temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(buttonNr), "SerialNr");
+	if(temp!="") data.SerialNr = temp;
 
 	return data;
+}
+
+ButtonData DBButtonTable::getButtonBySerialNr(QString serialNr)
+{
+    ButtonData data;
+    QString temp;
+
+    // Get all the data and save them to ButtonData
+
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "ButtonNr");
+    if(temp!="") data.ButtonNr = temp;
+
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "SerialNr");
+    if(temp!="") data.SerialNr = temp;
+
+    return data;
+}
+
+ButtonData DBButtonTable::getButtonByButtonId(int buttonId)
+{
+    ButtonData data;
+    QString temp;
+
+    // Get all the data and save them to ButtonData
+
+    temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "ButtonNr");
+    if(temp!="") data.ButtonNr = temp;
+
+    temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "SerialNr");
+    if(temp!="") data.SerialNr = temp;
+
+    return data;
+}
+
+int DBButtonTable::getButtonIdBySerialNr(QString serialNr)
+{
+    QString temp;
+    int buttonId;
+
+    // Get all the data and save them to ButtonData
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "ButtonID");
+    if(temp!="") buttonId = temp.toInt();
+
+    return buttonId;
+}
+
+int DBButtonTable::getButtonIdByButtonNr(QString buttonNr)
+{
+    QString temp;
+    int buttonId;
+
+    // Get all the data and save them to ButtonData
+    temp = this->read(BUTTONTABLENAME, "ButtonNr", this->toSQLString(buttonNr), "ButtonID");
+    if(temp!="") buttonId = temp.toInt();
+
+    return buttonId;
 }
 
 QStringList DBButtonTable::getAllButtonNr()
@@ -117,7 +177,8 @@ QStringList DBButtonTable::getAllButtonNr()
 	QStringList list;
 	QSqlQuery query(this->getDB());
 
-	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) + QString(";");
+	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) +
+	        QString(" WHERE DeploymentID = ") + QString::number(deploymentId) + QString(";");
 	bool success = query.exec(text);
 
 	if(success)
@@ -140,7 +201,8 @@ QStringList DBButtonTable::getAllButtonNr(QString _area)
 	QStringList list;
 	QSqlQuery query(this->getDB());
 
-	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) + " WHERE ButtonNr LIKE '" + _area + "%';";
+	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) + " WHERE DeploymentID = " +
+	        QString::number(deploymentId) + " AND ButtonNr LIKE '" + _area + "%';";
 	bool success = query.exec(text);
 
 	if(success)
@@ -161,7 +223,8 @@ QStringList DBButtonTable::getAllButtonNr(QString _area)
 int DBButtonTable::getLastAddedButtonNrInt(QString _area)
 {
 	QSqlQuery query(this->getDB());
-	QString text = QString("SELECT ButtonNr FROM ") + BUTTONTABLENAME + QString(" WHERE ButtonNr LIKE '") + _area + QString("%';");
+	QString text = QString("SELECT ButtonNr FROM ") + BUTTONTABLENAME + QString(" WHERE DeploymentID = " +
+            QString::number(deploymentId) + " AND ButtonNr LIKE '") + _area + QString("%';");
 
 	int nr = 0;
 	QString tempStr = "";
@@ -180,20 +243,20 @@ int DBButtonTable::getLastAddedButtonNrInt(QString _area)
 	return nr;
 }
 
-bool DBButtonTable::deleteButtonByButtonNr(QString buttonNr)
+bool DBButtonTable::deleteButtonByButtonId(int buttonId)
 {
 	bool success;
 
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + BUTTONTABLENAME
-			+ QString(" WHERE ButtonNr='") + buttonNr + QString("';");
+			+ QString(" WHERE ButtonID=") + QString::number(buttonId) + QString(";");
 	success = query.exec(text);
 
 	if(!success)
 	{
-		Log::writeError("dbButtonTable: Cannot delete Button: " + buttonNr
+		Log::writeError("dbButtonTable: Cannot delete Button: " + QString::number(buttonId)
 				+ " / Error indicated: " + query.lastError().text());
-		this->appendError("Cannot delete Button: " + buttonNr);
+		this->appendError("Cannot delete Button: " + QString::number(buttonId));
 		return false;
 	}
 	else
@@ -207,8 +270,8 @@ bool DBButtonTable::deleteButtonByArea(QString area)
 	bool success;
 
 	QSqlQuery query(this->getDB());
-	QString text = QString("DELETE FROM ") + BUTTONTABLENAME
-			+ QString(" WHERE ButtonNr LIKE '") + area + QString("%';");
+	QString text =  QString("DELETE FROM ") + QString(BUTTONTABLENAME)
+			+  QString(" WHERE DeploymentID = ") + QString::number(deploymentId) +  QString(" AND ButtonNr LIKE '") + area + QString("%';");
 	success = query.exec(text);
 
 	if(!success)
@@ -224,12 +287,13 @@ bool DBButtonTable::deleteButtonByArea(QString area)
 	}
 }
 
+/*
 bool DBButtonTable::isButtonExistingByButtonNr(QString buttonNr)
 {
 	// Ask DB for this ButtonNr
 	QSqlQuery query(this->getDB());
-	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME)
-		+ QString(" WHERE ButtonNr LIKE '") + QString(buttonNr + "'");
+	QString text = "SELECT ButtonNr FROM " + QString(BUTTONTABLENAME)
+		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND ButtonNr LIKE '" + buttonNr + "'";
 	bool success = query.exec(text);
 
 	if(!success)
@@ -251,13 +315,14 @@ bool DBButtonTable::isButtonExistingByButtonNr(QString buttonNr)
 	else
 		return false;
 }
+*/
 
-bool DBButtonTable::isButtonExistingByButtonID(QString buttonID)
+bool DBButtonTable::isButtonExistingBySerialNr(QString serialNr)
 {
 	// Ask DB for this ButtonNr
 	QSqlQuery query(this->getDB());
 	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME)
-		+ QString(" WHERE ButtonNr LIKE '") + QString(buttonID + "'");
+		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND SerialNr LIKE '" + QString(serialNr + "'");
 	bool success = query.exec(text);
 
 	if(!success)
@@ -279,6 +344,7 @@ bool DBButtonTable::isButtonExistingByButtonID(QString buttonID)
 	else
 		return false;
 }
+
 
 bool DBButtonTable::open()
 {
@@ -295,4 +361,31 @@ bool DBButtonTable::open()
 	return true;
 }
 
+QString DBButtonTable::read(QString table, QString compCol, QString compVal, QString getCol)
+{
+    QSqlQuery query(this->getDB());
+    QString text = QString("SELECT " + getCol + " FROM " + table
+            + " WHERE DeploymentID = " + QString::number(deploymentId) + " AND " + compCol + "=" + compVal +";");
+
+    bool success = query.exec(text);
+
+    if(!success)
+    {
+        Log::writeError("dbConnection: Cannot read database for value: " + getCol
+                + " / Error: " + query.lastError().text());
+        appendError("Cannot read database. Error is: " + query.lastError().text());
+        return "";
+    }
+    else
+    {
+        if(query.next())
+        {
+            return query.value(0).toString();
+        }
+        else
+        {
+            return "";
+        }
+    }
+}
 

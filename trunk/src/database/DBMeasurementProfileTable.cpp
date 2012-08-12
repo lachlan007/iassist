@@ -22,8 +22,6 @@
 #include "DBMeasurementProfileTable.h"
 
 DBMeasurementProfileTable::DBMeasurementProfileTable() {
-
-
 }
 
 DBMeasurementProfileTable::~DBMeasurementProfileTable() {
@@ -41,7 +39,7 @@ bool DBMeasurementProfileTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ")
-			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonNr char(10), SessionNr int,")
+			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonID INTEGER, SessionNr int,")
 			+ QString(" ProgrammingTime char(30), CollectingTime char(30), TimeShift int, SamplingRate int,")
 			+ QString(" SamplingStartTime char(30), Resolution int);"));
 		if(success)
@@ -72,15 +70,15 @@ bool DBMeasurementProfileTable::addProfile(MeasurementProfile profile)
 	//	return false;
 	//}
 
-	profile.SessionNr = this->getLatestSessionNrByButtonNr(profile.ButtonNr) + 1;
+	profile.SessionNr = this->getLatestSessionNrByButtonId(profile.ButtonId) + 1;
 
 	// Convert the ButtonData to SQL Format
 	this->convertDataToSQL(&profile);
 
 	// Create query
 	QString sqlText("INSERT INTO ");
-	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonNr, SessionNr, ProgrammingTime, CollectingTime, "
-			+ "TimeShift, SamplingRate, SamplingStartTime, Resolution) VALUES ( " + ButtonNr + ", " + SessionNr + ", "
+	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonID, SessionNr, ProgrammingTime, CollectingTime, "
+			+ "TimeShift, SamplingRate, SamplingStartTime, Resolution) VALUES ( " + ButtonId + ", " + SessionNr + ", "
 			+ ProgrammingTime + ", " + CollectingTime + ", " + TimeShift + ", " + SamplingRate + ", " + SamplingStartTime
 			+ ", " + Resolution + " );";
 
@@ -107,7 +105,7 @@ void DBMeasurementProfileTable::convertDataToSQL(MeasurementProfile *profile)
 	SamplingRate ="NULL";
 	Resolution = "NULL";
 
-	ButtonNr ="'" + profile->ButtonNr + "'";
+	this->ButtonId = QString::number(profile->ButtonId);
 	if(profile->SessionNr!=-9999) this->SessionNr= QString::number(profile->SessionNr);
 	if(profile->Resolution!=-9999) this->Resolution= QString::number(profile->Resolution);
 	if(profile->SamplingRate!=-9999) this->SamplingRate = QString::number(profile->SamplingRate);
@@ -126,12 +124,10 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 
 	if(profile.MeasurementProfileID==-9999)
 	{
-		Log::writeError("dbMeasurementProfileTable: Cannot update Profile, 'cause MeasurementProfileID is missing.");
+		Log::writeError("dbMeasurementProfileTable: Cannot update Profile, because MeasurementProfileID is missing.");
 		return false;
 	}
 
-	if(ButtonNr!="''" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "ButtonNr", ButtonNr);
 	if(SessionNr!="NULL" && success)
 		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SessionNr", SessionNr);
 	if(Resolution!="NULL" && success)
@@ -164,8 +160,8 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementPr
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "MeasurementProfileID");
 	if(temp!="") data.MeasurementProfileID = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ButtonNr");
-	if(temp!="") data.ButtonNr = temp;
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ButtonID");
+	if(temp!="") data.ButtonId = temp.toInt();
 
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SessionNr");
 	if(temp!="") data.SessionNr = temp.toInt();
@@ -191,10 +187,10 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementPr
 	return data;
 }
 
-int DBMeasurementProfileTable::getLatestAddedProfileIDByButtonNr(QString _buttonNr)
+int DBMeasurementProfileTable::getLatestAddedProfileIDByButtonId(int buttonId)
 {
 	QSqlQuery query(this->getDB());
-	QString text = QString("SELECT MeasurementProfileID FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonNr LIKE '") + _buttonNr + QString("';");
+	QString text = QString("SELECT MeasurementProfileID FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonID = ") + QString::number(buttonId) + QString(";");
 
 	int nr = 0;
 	int temp = 0;
@@ -215,10 +211,10 @@ int DBMeasurementProfileTable::getLatestAddedProfileIDByButtonNr(QString _button
 	return nr;
 }
 
-int DBMeasurementProfileTable::getLatestSessionNrByButtonNr(QString _buttonNr)
+int DBMeasurementProfileTable::getLatestSessionNrByButtonId(int buttonId)
 {
 	QSqlQuery query(this->getDB());
-	QString text = QString("SELECT SessionNr FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonNr LIKE '") + _buttonNr + QString("';");
+	QString text = QString("SELECT SessionNr FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonID = ") + QString::number(buttonId) + QString(";");
 
 	int nr = 0;
 	int temp = 0;
@@ -277,20 +273,20 @@ bool DBMeasurementProfileTable::deleteProfileByArea(QString _area)
 	}
 }
 
-bool DBMeasurementProfileTable::deleteProfileByButtonNr(QString _buttonNr)
+bool DBMeasurementProfileTable::deleteProfileByButtonId(int buttonId)
 {
 	bool success;
 
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + MEASUREMENTPROFILETABLENAME
-			+ QString(" WHERE ButtonNr='") + _buttonNr + QString("';");
+			+ QString(" WHERE ButtonId=") + QString::number(buttonId) + QString(";");
 	success = query.exec(text);
 
 	if(!success)
 	{
-		Log::writeError("dbMeasurementProfileTable: Cannot delete Profiles to: " + _buttonNr
+		Log::writeError("dbMeasurementProfileTable: Cannot delete Profiles to: " + QString::number(buttonId)
 				+ " / Error: " + query.lastError().text());
-		this->appendError("Cannot delete Profiles to: " + _buttonNr);
+		this->appendError("Cannot delete Profiles to: " + QString::number(buttonId));
 		return false;
 	}
 	else
@@ -325,3 +321,32 @@ QVector<MeasurementProfile> DBMeasurementProfileTable::getFinishedMeasurementPro
     }
     return profileVector;
 }
+
+QString DBMeasurementProfileTable::read(QString table, QString compCol, QString compVal, QString getCol)
+{
+    QSqlQuery query(this->getDB());
+    QString text = QString("SELECT " + getCol + " FROM " + table
+            + " WHERE " + compCol + "=" + compVal +";");
+
+    bool success = query.exec(text);
+
+    if(!success)
+    {
+        Log::writeError("dbConnection: Cannot read database for value: " + getCol
+                + " / Error: " + query.lastError().text());
+        appendError("Cannot read database. Error is: " + query.lastError().text());
+        return "";
+    }
+    else
+    {
+        if(query.next())
+        {
+            return query.value(0).toString();
+        }
+        else
+        {
+            return "";
+        }
+    }
+}
+

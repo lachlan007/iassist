@@ -40,8 +40,8 @@ public:
 
 	//! MeasurementProfile ID
 	int MeasurementProfileID;
-	//! The number of the Button, the %MeasurementProfile belongs to
-	QString ButtonNr;
+	//! The index of the corresponding entry in the button table
+	int ButtonId;
 	//! The amount of Measurements of this button (how many sessions)
 	int SessionNr;
 	//! The Time when the button starts the measurement

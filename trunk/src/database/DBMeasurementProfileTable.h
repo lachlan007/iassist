@@ -72,20 +72,9 @@ public:
 	 */
 	MeasurementProfile readProfile(QString _measurementProfileID);
 
-	/**
-	 * Returns the latest added MeasurementProfileID to a ButtonNr
-	 * @param _buttonNr the number of the button whose last %MeasurementProfile ID we want to have
-	 * @return the latest added MeasurementID
-	 */
-	int getLatestAddedProfileIDByButtonNr(QString _buttonNr);
+	int getLatestAddedProfileIDByButtonId(int buttonId);
 
-	/**
-	 * Returns the latest added SessionNr to a ButtonNr. The Measurement Nr is the amount
-	 * of measurement series of this button.
-	 * @param _buttonNr the number of the button (e.g. AA001)
-	 * @return the amount of measurements sessions to a Button (SessionNr)
-	 */
-	int getLatestSessionNrByButtonNr(QString _buttonNr);
+	int getLatestSessionNrByButtonId(int buttonId);
 
 	/**
 	 * Opens the database connection. Adds a table if no one is existing and creates
@@ -106,7 +95,7 @@ public:
 	 * @param _buttonNr the buttonNr
 	 * @return true if successful, false otherwise
 	 */
-	bool deleteProfileByButtonNr(QString _buttonNr);
+	bool deleteProfileByButtonId(int buttonId);
 
 	/**
 	 * Returns measurement profiles for which the related measurement data is
@@ -116,15 +105,23 @@ public:
 	QVector<MeasurementProfile> getFinishedMeasurementProfiles();
 
 private:
-
 	/**
 	 * Converts all the values of a MeasurementProfile to a SQLite representation
 	 * @param profile a pointer to the MeasurementProfile Object
 	 */
 	void convertDataToSQL(MeasurementProfile *profile);
 
+    /**
+     * Reads one specific field in the database. If more than one hit is found, only the first
+     * will be returned. It represents the following SQL statement:
+     * SELECT getCOL FROM table WHERE compCol=compVal
+     * @param table The table name of the DB
+     * @param compCol the column which will be compared to compVal
+     */
+	QString read(QString table, QString compCol, QString compVal, QString getCol);
+
 	// all the variables of the DBMeasurementProfileTable
-	QString ButtonNr;
+	QString ButtonId;
 	QString SessionNr;
 	QString MeasurementProfileID;
 	QString ProgrammingTime;

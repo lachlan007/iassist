@@ -40,6 +40,8 @@ DBManagementUI::DBManagementUI(int deploymentId, QWidget *parent)
 	connect(ui.btnDelButton, SIGNAL(clicked()), this, SLOT(deleteButtonClicked()));
 
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
+
+	this->deploymentId = deploymentId;
 }
 
 
@@ -53,7 +55,7 @@ void DBManagementUI::initComboArea()
 {
 	ui.comboArea->clear();
 
-	DBAreaTable db;
+	DBAreaTable db(deploymentId);
 	db.open();
 	QStringList listArea;
 	QStringList listNone;
@@ -71,7 +73,7 @@ void DBManagementUI::initComboArea()
 void DBManagementUI::updateComboButtonNr()
 {
 	ui.comboButtonNr->clear();
-	DBButtonTable db;
+	DBButtonTable db(deploymentId);
 	db.open();
 	QStringList listNone;
 	listNone.append("none");
@@ -114,22 +116,22 @@ void DBManagementUI::buttonNrChanged()
 	if(ui.comboButtonNr->currentText() != "none")
 	{
 		ui.btnDelButton->setEnabled(true);
-		DBButtonTable dbButton;
+		DBButtonTable dbButton(deploymentId);
 		dbButton.open();
-		actualButton = dbButton.readButton(ui.comboButtonNr->currentText());
+		actualButton = dbButton.getButtonByButtonNr(ui.comboButtonNr->currentText());
 		ButtonNr = ui.comboButtonNr->currentText();
 		dbButton.close();
 
-		if(actualButton.ButtonID!="")
+		if(actualButton.SerialNr!="")
 		{
-			QString bIDstr = actualButton.ButtonID.mid(0,2) + " "
-						+ actualButton.ButtonID.mid(2,2) + " "
-						+ actualButton.ButtonID.mid(4,2) + " "
-						+ actualButton.ButtonID.mid(6,2) + " "
-						+ actualButton.ButtonID.mid(8,2) + " "
-						+ actualButton.ButtonID.mid(10,2) + " "
-						+ actualButton.ButtonID.mid(12,2) + " "
-						+ actualButton.ButtonID.mid(14,2);
+			QString bIDstr = actualButton.SerialNr.mid(0,2) + " "
+						+ actualButton.SerialNr.mid(2,2) + " "
+						+ actualButton.SerialNr.mid(4,2) + " "
+						+ actualButton.SerialNr.mid(6,2) + " "
+						+ actualButton.SerialNr.mid(8,2) + " "
+						+ actualButton.SerialNr.mid(10,2) + " "
+						+ actualButton.SerialNr.mid(12,2) + " "
+						+ actualButton.SerialNr.mid(14,2);
 			ui.txtButtonID->setText(bIDstr);
 		}
 		else
@@ -284,20 +286,22 @@ bool DBManagementUI::deleteButton(QString buttonNr)
 
 	// Delete all the measurementProfiles to this iButton
 	DBMeasurementProfileTable dbProfile;
+	DBButtonTable dbButton(deploymentId);
 	dbProfile.open();
-	if(!dbProfile.deleteProfileByButtonNr(buttonNr))
+	dbButton.open();
+	int buttonId = dbButton.getButtonIdByButtonNr(buttonNr);
+	if(!dbProfile.deleteProfileByButtonId(buttonId))
 	{
 		dbProfile.close();
-		this->appendReport(QString("An Error occured, during deleting the Measurement Profiles from the database.")
+		dbButton.close();
+		this->appendReport(QString("An Error occurred, during deleting the Measurement Profiles from the database.")
 				+ "Summary:\nMeasurements: deleted\nMeasurementProfiles: not deleted\niButton: not deleted");
 		return false;
 	}
 	dbProfile.close();
 
 	// Delete the iButton entry itself
-	DBButtonTable dbButton;
-	dbButton.open();
-	if(!dbButton.deleteButtonByButtonNr(buttonNr))
+	if(!dbButton.deleteButtonByButtonId(buttonId))
 	{
 		dbButton.close();
 		this->appendReport(QString("An Error occured, during deleting the iButton from the database.")
@@ -312,7 +316,7 @@ bool DBManagementUI::deleteButton(QString buttonNr)
 bool DBManagementUI::deleteArea(QString area)
 {
 	// Get all buttons belonging to this area
-	DBButtonTable dbButton;
+	DBButtonTable dbButton(deploymentId);
 	dbButton.open();
 
 	QStringList buttonList = dbButton.getAllButtonNr(area);
@@ -335,7 +339,7 @@ bool DBManagementUI::deleteArea(QString area)
 	}
 
 	// Delete the Area itself
-	DBAreaTable dbArea;
+	DBAreaTable dbArea(deploymentId);
 	dbArea.open();
 	if(!dbArea.deleteArea(area))
 	{

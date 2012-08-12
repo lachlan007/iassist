@@ -28,6 +28,7 @@
 #include <qwt_plot_curve.h>
 #include "../database/DBMeasurementProfileTable.h"
 #include "../database/DBMeasurementTable.h"
+#include "../database/DBButtonTable.h"
 #include <QtCore>
 
 #define TEXT_NONE "none"
@@ -54,6 +55,8 @@ private:
     void initComboArea();
 
     QwtPlotCurve *curve1;
+
+    int deploymentId;
 
 private slots:
     /* Regenerate data plot */

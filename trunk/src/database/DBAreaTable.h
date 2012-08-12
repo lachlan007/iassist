@@ -35,7 +35,7 @@ public:
 	/**
 	 * Default constructor
 	 */
-	DBAreaTable();
+	DBAreaTable(int deploymentId);
 	/**
 	 * Default deconstructor
 	 */
@@ -79,6 +79,10 @@ public:
 	 * table is not existing it creates a table as well.
 	 */
 	bool open();
+
+private:
+
+	int deploymentId;
 
 };
 

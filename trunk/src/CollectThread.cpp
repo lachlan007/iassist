@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------
 #include "CollectThread.h"
 
-CollectThread::CollectThread(QObject *parent) {
+CollectThread::CollectThread(int deploymentId, QObject *parent) {
 	// Setup the values
 	measurement.cleanMeasurement();
 	measurementProfile.clearData();
@@ -35,9 +35,17 @@ CollectThread::CollectThread(QObject *parent) {
 	connect(this, SIGNAL(displayUserMessage(QString)),
 			this, SLOT(displayUserMessageSlt(QString)));
 
+	this->deploymentId = deploymentId;
+
+	dbProfile = new DBMeasurementProfileTable();
+	dbButton = new DBButtonTable(deploymentId);
+	dbMeasurement = new DBMeasurementTable();
 }
 
 CollectThread::~CollectThread() {
+    delete dbProfile;
+    delete dbButton;
+    delete dbMeasurement;
 }
 
 void CollectThread::run()
@@ -50,9 +58,9 @@ void CollectThread::run()
 	running = true;
 
 	// Open the databases
-	dbMeasurement.open();
-	dbButton.open();
-	dbProfile.open();
+	dbMeasurement->open();
+	dbButton->open();
+	dbProfile->open();
 
 	// Connect to the Button Reader
 	if(!buttonIO.openPort())
@@ -69,7 +77,7 @@ void CollectThread::run()
 		// attached and if a button is
 		// selected in the UI
 		//==========================
-		if(buttonIO.getConnectedButton(&SNum[0]) && button.ButtonID != "")
+		if(buttonIO.getConnectedButton(&SNum[0]) && button.SerialNr != "")
 		{
 			// emit setStatus("iButton found. Checking it.", STYLESHEETYELLOW);
 			// Wait till the iButton is really connected
@@ -77,7 +85,7 @@ void CollectThread::run()
 
 			// If a Button is found we check if its really a new button or if it's the wrong button
 			// Case 1: it's a new button and its ID matches to the button we are looking for
-			if(button.ButtonID == ButtonIO::buttonIDStr(&SNum[0]) && latestReadButtonID!=button.ButtonID)
+			if(button.SerialNr == ButtonIO::buttonIDStr(&SNum[0]) && latestReadButtonID!=button.SerialNr)
 			{
 				// emit setStatus("iButton found.", STYLESHEETYELLOW);
 				// Verify that mission was in progress
@@ -115,12 +123,15 @@ void CollectThread::run()
 				measurement.ButtonNr = button.ButtonNr;
 				measurement.missionData = missionData.samples;
 				measurement.size = missionData.numSamples;
-				measurement.MeasurementProfileID = dbProfile.getLatestAddedProfileIDByButtonNr(button.ButtonNr);
+
+				int buttonId = dbButton->getButtonIdBySerialNr(button.SerialNr);
+
+				measurement.MeasurementProfileID = dbProfile->getLatestAddedProfileIDByButtonId(buttonId);
 
 				// Get all the values to update the measurement profile table
 				// with the collecting time and so on.
-				measurementProfile.ButtonNr = button.ButtonNr;
-				measurementProfile.MeasurementProfileID = dbProfile.getLatestAddedProfileIDByButtonNr(button.ButtonNr);
+				measurementProfile.ButtonId = buttonId;
+				measurementProfile.MeasurementProfileID = measurement.MeasurementProfileID;
 				measurementProfile.CollectingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.TimeShift = missionData.collectTimeHost.secsTo(missionData.collectTimeButton);
 
@@ -129,7 +140,7 @@ void CollectThread::run()
 				// the measurement profile
 				//=================================================
 				emit this->setStatus("Writing mission data to database.", STYLESHEETYELLOW);
-				if(!this->addCollectedDataToDB(&measurement, &measurementProfile, &dbMeasurement, &dbProfile))
+				if(!this->addCollectedDataToDB(&measurement, &measurementProfile, dbMeasurement, dbProfile))
 				{
 					this->abort();
 					missionData.clear();
@@ -159,8 +170,8 @@ void CollectThread::run()
 					// Collect data to add a new Measurement
 					// Profile to this iButton
 					//========================================
-					measurementProfile.ButtonNr = button.ButtonNr;
-					measurementProfile.SessionNr = dbProfile.getLatestSessionNrByButtonNr(button.ButtonNr) + 1;
+					measurementProfile.ButtonId = buttonId;
+					measurementProfile.SessionNr = dbProfile->getLatestSessionNrByButtonId(buttonId) + 1;
 					measurementProfile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					if(mp.getSetMissionStartTime())
 					{
@@ -176,7 +187,7 @@ void CollectThread::run()
 					//========================================
 					// Add the measurementProfile to the button
 					//========================================
-					if(!this->addRedistributeDataToDB(&measurementProfile, &dbProfile))
+					if(!this->addRedistributeDataToDB(&measurementProfile, dbProfile))
 					{
 					    this->abort();
 						return;
@@ -189,7 +200,7 @@ void CollectThread::run()
 							+ ". Please select new iButton.", STYLESHEETGREEN);
 				}
 
-				latestReadButtonID=button.ButtonID;
+				latestReadButtonID=button.SerialNr;
 
 				// clean up the data, to be ready for new button
 				measurement.cleanMeasurement();
@@ -201,7 +212,7 @@ void CollectThread::run()
 				sleep(5);
 			}
 			// Case 2: It's a the same button like before
-			else if(latestReadButtonID==button.ButtonID)
+			else if(latestReadButtonID==button.SerialNr)
 			{
 				emit setStatus("Please select NEW iButton.", STYLESHEETGREEN);
 			}
@@ -231,9 +242,9 @@ void CollectThread::run()
 	buttonIO.closePort();
 
 	// Close the databases
-	dbMeasurement.close();
-	dbProfile.close();
-	dbButton.close();
+	dbMeasurement->close();
+	dbProfile->close();
+	dbButton->close();
 
 }
 
@@ -245,9 +256,9 @@ void CollectThread::stop()
 void CollectThread::abort()
 {
 	// Close the databases
-	dbMeasurement.close();
-	dbProfile.close();
-	dbButton.close();
+	dbMeasurement->close();
+	dbProfile->close();
+	dbButton->close();
 	buttonIO.closePort();
 	emit aborted();
 	emit this->setStatus("Stopped collecting iButtons.", STYLESHEETRED);

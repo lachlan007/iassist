@@ -36,7 +36,7 @@ CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	initComboArea();
 
 	// init collect Thread
-	collectThr = new CollectThread(this);
+	collectThr = new CollectThread(deploymentId, this);
 	collectThr->setRedistribute(ui.cbRedistribute->isChecked());
 
 	// connect signals and slots
@@ -52,6 +52,7 @@ CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	connect(collectThr, SIGNAL(aborted()), this, SLOT(threadAborted()));
 	connect(collectThr, SIGNAL(buttonFinished()), this, SLOT(nextButtonClicked()));
 
+	this->deploymentId = deploymentId;
 }
 
 CollectUI::~CollectUI()
@@ -61,7 +62,7 @@ CollectUI::~CollectUI()
 
 void CollectUI::initComboArea()
 {
-	DBAreaTable db;
+	DBAreaTable db(deploymentId);
 	db.open();
 	QStringList listNone;
 	listNone.append("none");
@@ -76,7 +77,7 @@ void CollectUI::initComboArea()
 void CollectUI::updateComboButtonNr()
 {
 	ui.comboButtonNr->clear();
-	DBButtonTable db;
+	DBButtonTable db(deploymentId);
 	db.open();
 	QStringList list;
 	list.append("none");
@@ -94,22 +95,22 @@ void CollectUI::areaChanged()
 
 void CollectUI::buttonNrChanged()
 {
-    DBButtonTable dbButton;
+    DBButtonTable dbButton(deploymentId);
     dbButton.open();
-    actualButton = dbButton.readButton(ui.comboButtonNr->currentText());
+    actualButton = dbButton.getButtonByButtonNr(ui.comboButtonNr->currentText());
     dbButton.close();
 
     // Display the actual iButton ID
-    if(actualButton.ButtonID!="")
+    if(actualButton.SerialNr != "")
     {
-        QString bIDstr = actualButton.ButtonID.mid(0,2) + " "
-                + actualButton.ButtonID.mid(2,2) + " "
-                + actualButton.ButtonID.mid(4,2) + " "
-                + actualButton.ButtonID.mid(6,2) + " "
-                + actualButton.ButtonID.mid(8,2) + " "
-                + actualButton.ButtonID.mid(10,2) + " "
-                + actualButton.ButtonID.mid(12,2) + " "
-                + actualButton.ButtonID.mid(14,2);
+        QString bIDstr = actualButton.SerialNr.mid(0,2) + " "
+                + actualButton.SerialNr.mid(2,2) + " "
+                + actualButton.SerialNr.mid(4,2) + " "
+                + actualButton.SerialNr.mid(6,2) + " "
+                + actualButton.SerialNr.mid(8,2) + " "
+                + actualButton.SerialNr.mid(10,2) + " "
+                + actualButton.SerialNr.mid(12,2) + " "
+                + actualButton.SerialNr.mid(14,2);
         ui.txtButtonID->setText(bIDstr);
     }
     else

@@ -21,8 +21,8 @@
 //---------------------------------------------------------------------------
 #include "DBAreaTable.h"
 
-DBAreaTable::DBAreaTable() {
-
+DBAreaTable::DBAreaTable(int deploymentId) : DBConnection() {
+    this->deploymentId = deploymentId;
 }
 
 DBAreaTable::~DBAreaTable() {
@@ -40,7 +40,7 @@ bool DBAreaTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ")
-				+ AREATABLENAME + QString(" (FootprintID char(10));"));
+				+ AREATABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER);"));
 		if(success)
 		{
 			Log::write("Created new Footprint Table in Database");
@@ -67,7 +67,7 @@ bool DBAreaTable::addArea(QString footprintID)
 
 	QSqlQuery query(this->getDB());
 
-	QString text = "INSERT INTO " + QString(AREATABLENAME) + " VALUES ( '" + footprintID + "');";
+	QString text = "INSERT INTO " + QString(AREATABLENAME) + " VALUES ('" + footprintID + "', " + QString::number(deploymentId) + ");";
 	bool success = query.exec(text);
 
 	if(!success)
@@ -87,8 +87,9 @@ bool DBAreaTable::addArea(QString footprintID)
 bool DBAreaTable::deleteArea(QString footprintID)
 {
 	QSqlQuery query(this->getDB());
-	QString text = QString("DELETE FROM ") + AREATABLENAME
-			+ QString(" WHERE FootprintID LIKE '") + footprintID + QString("';");
+	QString text =  QString("DELETE FROM ") + AREATABLENAME
+			+  QString(" WHERE DeploymentID = ") + QString::number(deploymentId) +
+			QString(" AND FootprintID LIKE '") + footprintID +  QString("';");
 
 	bool success = query.exec(text);
 
@@ -110,7 +111,7 @@ bool DBAreaTable::isAreaExisting(QString footprintID)
 	// Ask DB for this area
 	QSqlQuery query(this->getDB());
 	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME)
-		+ " WHERE FootprintID LIKE '" + footprintID + "'";
+		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND FootprintID LIKE '" + footprintID + "'";
 
 	bool success = query.exec(text);
 
@@ -141,7 +142,8 @@ QStringList DBAreaTable::getAllArea()
 	QSqlQuery query (this->getDB());
 	QStringList list;
 
-	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME) + ";";
+	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME) + " WHERE DeploymentID = " +
+	        QString::number(deploymentId) + ";";
 	//qDebug(text.toStdString().c_str());
 	bool success = query.exec(text);
 

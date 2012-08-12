@@ -33,7 +33,7 @@ void MeasurementProfile::clearData()
 {
 	MeasurementProfileID = -9999;
 	SessionNr = -9999;
-	ButtonNr = "";
+	ButtonId = -9999;
 	SamplingStartTime = "";
 	CollectingTime = "";
 	ProgrammingTime = "";

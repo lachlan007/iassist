@@ -110,6 +110,7 @@ private:
      */
     bool deleteArea(QString area);
 
+    int deploymentId;
 
 
 private slots:

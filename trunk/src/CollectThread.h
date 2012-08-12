@@ -54,7 +54,7 @@ public:
 	/**
 	 * Default constructor
 	 */
-	CollectThread(QObject *_parent);
+	CollectThread(int deploymentId, QObject *_parent);
 	/**
 	 * Default deconstructor
 	 */
@@ -122,6 +122,8 @@ signals:
 
 
 private:
+	int deploymentId;
+
 	//! is true if the thread is running, is set to false if the thread should stop
 	bool running;
 	//! is used to store all the button information
@@ -136,11 +138,11 @@ private:
 	//! is used to know if a button should be redistributed or only collected
 	bool redistribute;
 	//! manages the connection to the %MeasurementProfile table in the database
-	DBMeasurementProfileTable dbProfile;
+	DBMeasurementProfileTable* dbProfile;
 	//! manages the connection to the iButton table in the database
-	DBButtonTable dbButton;
+	DBButtonTable* dbButton;
 	//! manages the connection to the %Measurement table in the database
-	DBMeasurementTable dbMeasurement;
+	DBMeasurementTable* dbMeasurement;
 	//! used to communicate with the iButton Reader
 	ButtonIO buttonIO;
 	//! used to lock and stop the thread while a dialog box is displayed

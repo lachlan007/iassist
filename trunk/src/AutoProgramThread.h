@@ -55,7 +55,7 @@ public:
 	 *
 	 * @param parent	reference to the parent
 	 */
-	AutoProgramThread(QObject *parent);
+	AutoProgramThread(int deploymentId, QObject *parent);
 	/**
 	 * Default destructor.
 	 */
@@ -80,6 +80,8 @@ public slots:
 	void setFootprint(QString footprintID);
 
 private:
+	int deploymentId;
+
 	/**
 	 * Needed by the stop() function, to tell the while loop it should finish
 	 * the current loop and then stop.
@@ -131,7 +133,7 @@ private:
 	 * Keeps track of the last ButtonID. This is used to ensure a button isn't
 	 * programmed twice in a row.
 	 */
-	QString lastButtonID;
+	QString lastSerialNr;
 	//! used to lock and stop the thread while a dialog box is displayed
     QWaitCondition waitCondition;
     //! used to lock and stop the thread while a dialog box is displayed

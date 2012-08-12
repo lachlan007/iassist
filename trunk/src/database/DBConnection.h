@@ -137,15 +137,6 @@ public:
 	bool update(QString table, QString compCol, QString compVal, QString replCol, QString replVal);
 
 	/**
-	 * Reads one specific field in the database. If more than one hit is found, only the first
-	 * will be returned. It represents the following SQL statement:
-	 * SELECT getCOL FROM table WHERE compCol=compVal
-	 * @param table The table name of the DB
-	 * @param compCol the column which will be compared to compVal
-	 */
-	QString read(QString table, QString compCol, QString compVal, QString getCol);
-
-	/**
 	 * Checks if the SQLite Driver for QT is installed.
 	 * @return true if installed, false otherwise
 	 */
