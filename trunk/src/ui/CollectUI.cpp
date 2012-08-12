@@ -25,6 +25,7 @@ CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+    this->deploymentId = deploymentId;
 
 	ui.txtStatus->setText("Please select an iButton to look for and press start.");
 	ui.txtStatus->setStyleSheet(STYLESHEETWHITE);
@@ -52,7 +53,6 @@ CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	connect(collectThr, SIGNAL(aborted()), this, SLOT(threadAborted()));
 	connect(collectThr, SIGNAL(buttonFinished()), this, SLOT(nextButtonClicked()));
 
-	this->deploymentId = deploymentId;
 }
 
 CollectUI::~CollectUI()

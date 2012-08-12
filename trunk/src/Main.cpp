@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
     	return 1;
     }
 
+    // Let the user select a deployment
     DeploymentSelectUI d;
-
     if(d.exec())
     {
         w.setDeploymentId(d.getSelectedDeploymentId());

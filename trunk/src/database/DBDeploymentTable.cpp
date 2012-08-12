@@ -75,19 +75,19 @@ bool DBDeploymentTable::addDeployment(QString deploymentName, int &insertId)
 }
 
 
-bool DBDeploymentTable::deleteDeployment(int deploymentID)
+bool DBDeploymentTable::deleteDeployment(int deploymentId)
 {
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + DEPLOYMENTTABLENAME
-			+ QString(" WHERE DeploymentID = ") + QString::number(deploymentID) + QString(";");
+			+ QString(" WHERE DeploymentID = ") + QString::number(deploymentId) + QString(";");
 
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbDeploymentTable: Cannot delete deployment: " + QString::number(deploymentID) + " " + error);
-		this->appendError("Cannot delete deployment: " + QString::number(deploymentID));
+		Log::writeError("dbDeploymentTable: Cannot delete deployment: " + QString::number(deploymentId) + " " + error);
+		this->appendError("Cannot delete deployment: " + QString::number(deploymentId));
 		return false;
 	}
 	else
@@ -95,7 +95,6 @@ bool DBDeploymentTable::deleteDeployment(int deploymentID)
 		return true;
 	}
 }
-
 
 QVector<QPair<int,QString> > DBDeploymentTable::getAllDeployments()
 {
@@ -109,8 +108,8 @@ QVector<QPair<int,QString> > DBDeploymentTable::getAllDeployments()
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot get all Area as a list: " + error);
-		this->appendError("Cannot get Area list.");
+		Log::writeError("dbDeploymentTable: Cannot get all deployments as a list: " + error);
+		this->appendError("Cannot get deployment list.");
 	}
 	else
 	{
@@ -121,6 +120,31 @@ QVector<QPair<int,QString> > DBDeploymentTable::getAllDeployments()
 		}
 	}
 	return result;
+}
+
+QString DBDeploymentTable::getDeploymentName(int deploymentId)
+{
+    QSqlQuery query (this->getDB());
+
+    QString text = "SELECT Name FROM " + QString(DEPLOYMENTTABLENAME) + " WHERE DeploymentID = " + QString::number(deploymentId) + ";";
+    //qDebug(text.toStdString().c_str());
+    bool success = query.exec(text);
+
+    if(!success)
+    {
+        QString error = query.lastError().text();
+        Log::writeError("dbDeploymentTable: Cannot find name: " + error);
+        this->appendError("Cannot retrieve name.");
+        return "";
+    }
+    if(query.next())
+    {
+        return query.value(0).toString();
+    }
+    else
+    {
+        return "";
+    }
 }
 
 bool DBDeploymentTable::open()

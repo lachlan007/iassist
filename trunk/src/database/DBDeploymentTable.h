@@ -47,7 +47,9 @@ public:
 
 	bool addDeployment(QString deploymentName, int &insertId);
 
-	bool deleteDeployment(int deploymentID);
+	bool deleteDeployment(int deploymentId);
+
+	QString getDeploymentName(int deploymentId);
 
 	QVector<QPair<int,QString> > getAllDeployments();
 

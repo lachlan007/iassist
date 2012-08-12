@@ -39,8 +39,10 @@ bool DBButtonTable::createTable()
 	else
 	{
 		QSqlQuery query(this->getDB());
-		bool success = query.exec(QString("CREATE TABLE ")
-			+ BUTTONTABLENAME + QString(" (ButtonID INTEGER PRIMARY KEY, DeploymentID INTEGER, ButtonNr char(10), SerialNr char(25));"));
+		bool success = query.exec(QString("CREATE TABLE ") +
+		        BUTTONTABLENAME + QString(" (ButtonID INTEGER PRIMARY KEY, DeploymentID INTEGER, ") +
+		        QString("ButtonNr char(10), SerialNr char(25), FOREIGN KEY ") +
+		        QString("(DeploymentID) REFERENCES Deployments(DeploymentID));"));
 		if(success)
 		{
 			Log::write("Created new iButton Table in Database");
@@ -286,36 +288,6 @@ bool DBButtonTable::deleteButtonByArea(QString area)
 		return true;
 	}
 }
-
-/*
-bool DBButtonTable::isButtonExistingByButtonNr(QString buttonNr)
-{
-	// Ask DB for this ButtonNr
-	QSqlQuery query(this->getDB());
-	QString text = "SELECT ButtonNr FROM " + QString(BUTTONTABLENAME)
-		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND ButtonNr LIKE '" + buttonNr + "'";
-	bool success = query.exec(text);
-
-	if(!success)
-	{
-		Log::writeError("dbButtonTable: Cannot check if Button is existing: " + query.lastError().text());
-		this->appendError("Cannot check if Button is existing in DB");
-		return false;
-	}
-	// Workaround because SQLite does not support size of query
-	int size = 0;
-	while(query.next())
-	{
-		size++;
-	}
-
-	// Return true if it was found at least once
-	if(size>=1)
-		return true;
-	else
-		return false;
-}
-*/
 
 bool DBButtonTable::isButtonExistingBySerialNr(QString serialNr)
 {

@@ -29,6 +29,7 @@
 #include "ui/MissionParameterUI.h"
 #include "ui/DBManagementUI.h"
 #include "ui/DataPlotUI.h"
+#include "database/DBDeploymentTable.h"
 #include "SystemCommand.h"
 
 /**
@@ -56,7 +57,7 @@ public:
      */
     void initDir();
 
-    void setDeploymentId(int deploymentId) { this->deploymentId = deploymentId; }
+    void setDeploymentId(int deploymentId);
 
 private slots:
 

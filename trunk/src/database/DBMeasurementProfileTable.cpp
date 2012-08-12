@@ -41,7 +41,7 @@ bool DBMeasurementProfileTable::createTable()
 		bool success = query.exec(QString("CREATE TABLE ")
 			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonID INTEGER, SessionNr int,")
 			+ QString(" ProgrammingTime char(30), CollectingTime char(30), TimeShift int, SamplingRate int,")
-			+ QString(" SamplingStartTime char(30), Resolution int);"));
+			+ QString(" SamplingStartTime char(30), Resolution int, FOREIGN KEY(ButtonID) REFERENCES Buttons(ButtonID));"));
 		if(success)
 		{
 			Log::write("Created new MeasurementProfiles Table in Database");
@@ -61,14 +61,6 @@ bool DBMeasurementProfileTable::addProfile(MeasurementProfile profile)
 {
 	// Create the Query to add a complete Profile Measurement record to the database
 	QSqlQuery query(this->getDB());
-
-	// TODO check if profile not already entered
-	//if(this->isButtonExistingByButtonNr(button.ButtonNr))
-	//{
-	//	Log::writeError("DBButtonTable: Cannot add a button twice.");
-	//	this->appendError("Cannot add a button twice. " + button.ButtonNr + " already in DB");
-	//	return false;
-	//}
 
 	profile.SessionNr = this->getLatestSessionNrByButtonId(profile.ButtonId) + 1;
 
@@ -251,28 +243,6 @@ bool DBMeasurementProfileTable::open()
     return true;
 }
 
-bool DBMeasurementProfileTable::deleteProfileByArea(QString _area)
-{
-	bool success;
-
-	QSqlQuery query(this->getDB());
-	QString text = QString("DELETE FROM ") + MEASUREMENTPROFILETABLENAME
-			+ QString(" WHERE ButtonNr LIKE '") + _area + QString("%';");
-	success = query.exec(text);
-
-	if(!success)
-	{
-		Log::writeError("dbMeasurementProfileTable: Cannot delete Profiles of Area: " + _area);
-		Log::writeError("Error: " + query.lastError().text());
-		this->appendError("Cannot delete Profiles of Area: " + _area);
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
 bool DBMeasurementProfileTable::deleteProfileByButtonId(int buttonId)
 {
 	bool success;
@@ -303,6 +273,33 @@ QVector<MeasurementProfile> DBMeasurementProfileTable::getFinishedMeasurementPro
     QString text = "SELECT MeasurementProfileID FROM "
             + QString(MEASUREMENTPROFILETABLENAME) + " WHERE CollectingTime != '' "
             + "ORDER BY MeasurementProfileID ASC;";
+    //qDebug(text.toStdString().c_str());
+    bool success = query.exec(text);
+
+    if(!success)
+    {
+        QString error = query.lastError().text();
+        Log::writeError("dbMeasurementProfileTable: Cannot get all profiles as a list: " + error);
+        this->appendError("Cannot get measurement profile list.");
+    }
+    else
+    {
+        while(query.next())
+        {
+            profileVector.append(readProfile(query.value(0).toString()));
+        }
+    }
+    return profileVector;
+}
+
+QVector<MeasurementProfile> DBMeasurementProfileTable::getProfilesByButtonID(int buttonId)
+{
+    QVector<MeasurementProfile> profileVector;
+    QSqlQuery query (this->getDB());
+
+    QString text = "SELECT MeasurementProfileID FROM "
+            + QString(MEASUREMENTPROFILETABLENAME) + " WHERE ButtonID = "
+            + QString::number(buttonId) + " ORDER BY MeasurementProfileID ASC;";
     //qDebug(text.toStdString().c_str());
     bool success = query.exec(text);
 

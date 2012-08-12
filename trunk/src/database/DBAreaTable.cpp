@@ -39,8 +39,9 @@ bool DBAreaTable::createTable()
 	else
 	{
 		QSqlQuery query(this->getDB());
-		bool success = query.exec(QString("CREATE TABLE ")
-				+ AREATABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER);"));
+		bool success = query.exec(QString("CREATE TABLE ") +
+		        AREATABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER, FOREIGN ") +
+		        QString("KEY(DeploymentID) REFERENCES Deployments(DeploymentID));"));
 		if(success)
 		{
 			Log::write("Created new Footprint Table in Database");
