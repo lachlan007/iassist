@@ -89,6 +89,16 @@ void AutoProgramThread::run(){
     {
         QString cachedCurrentFootprint = currentFootprint;
 
+        // Check if mission start time is ok
+        if(mp.getSetMissionStartTime() && mp.getMissionStartTime() < QDateTime::currentDateTime().toTime_t())
+        {
+            this->abort();
+            emit writeStatus("Mission start time is in the past.");
+            emit setStatusColor(0);
+            Log::writeError("autoProgramThread: The mission start time is in the past.");
+            return;
+        }
+
         // Check if a Button is connected
         if(iButtonCon->getConnectedButton(&SNum[0]))
         {

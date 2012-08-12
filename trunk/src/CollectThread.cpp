@@ -71,6 +71,15 @@ void CollectThread::run()
 
 	while(running)
 	{
+
+        // Check if mission start time is ok
+        if(mp.getSetMissionStartTime() && mp.getMissionStartTime() < QDateTime::currentDateTime().toTime_t())
+        {
+            this->abort();
+            emit this->setStatus("ERROR: Mission start time is in the past.", STYLESHEETRED);
+            return;
+        }
+
 		//==========================
 		// Check if there is a button
 		// attached and if a button is

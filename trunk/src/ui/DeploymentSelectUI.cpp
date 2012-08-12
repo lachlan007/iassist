@@ -49,8 +49,8 @@ void DeploymentSelectUI::initUI()
     ui.selDeploymentLoad->clear();
     ui.selDeploymentDelete->clear();
 
-    ui.selDeploymentLoad->addItem("<Please select an item>");
-    ui.selDeploymentDelete->addItem("<Please select an item>");
+    ui.selDeploymentLoad->addItem("<Please select deployment>");
+    ui.selDeploymentDelete->addItem("<Please select deployment>");
 
     db.open();
     deployments = db.getAllDeployments();
@@ -58,8 +58,8 @@ void DeploymentSelectUI::initUI()
 
     for(int i=0; i <deployments.size(); i++)
     {
-        ui.selDeploymentLoad->addItem(deployments.at(i).second);
-        ui.selDeploymentDelete->addItem(deployments.at(i).second);
+        ui.selDeploymentLoad->addItem(deployments.at(i).second + " (ID " + QString::number(deployments.at(i).first) + ")");
+        ui.selDeploymentDelete->addItem(deployments.at(i).second + " (ID " + QString::number(deployments.at(i).first) + ")");
     }
 }
 
