@@ -22,7 +22,7 @@
 #ifndef DBCONNECTION_H_
 #define DBCONNECTION_H_
 
-#define DBNAME 			"iButtonDB"
+#define DBNAME 			"iassist.db"
 #define CONNECTIONNAME 	"dbConnection"
 
 #include <QFile>
