@@ -249,7 +249,7 @@ bool DBMeasurementProfileTable::deleteProfileByButtonId(int buttonId)
 
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + MEASUREMENTPROFILETABLENAME
-			+ QString(" WHERE ButtonId=") + QString::number(buttonId) + QString(";");
+			+ QString(" WHERE ButtonID=") + QString::number(buttonId) + QString(";");
 	success = query.exec(text);
 
 	if(!success)

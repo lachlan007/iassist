@@ -26,6 +26,7 @@
 
 #include "DBConnection.h"
 #include "../MeasurementProfile.h"
+#include <QVector>
 
 /**
  * This class provides access to the table MeasurementProfiles in the database.

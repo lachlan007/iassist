@@ -26,6 +26,7 @@
 
 #include "DBConnection.h"
 #include "../ButtonData.h"
+#include <QVector>
 
 /**
  * This class provides access to the table iButton in the database.
@@ -91,12 +92,7 @@ public:
 
 	bool deleteButtonByButtonId(int buttonId);
 
-	/**
-	 * Deletes all buttons which belong to a certain %Area.
-	 * @param area The %Area ID (e.g. AA)
-	 * @return true if successfully deleted, false otherwise
-	 */
-	bool deleteButtonByArea(QString area);
+	QVector<int> getButtonIdsByArea(QString area);
 
 	/**
 	 * Opens the Database. If no Database is existing, it creates one first. And if the

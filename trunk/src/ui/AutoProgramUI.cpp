@@ -63,17 +63,19 @@ void AutoProgramUI::setStatusColor(int color){
 void AutoProgramUI::buttonSwitch(){
 	if (autoProgramRunning) {
 		//Program running
-		autoProgramRunning = false;
+	    autoProgramRunning = false;
 		autoProg->stop();
 		while(!autoProg->isFinished())
-			usleep(100000);
+		    usleep(100000);
 		ui.btnStart->setText("Start");
+		ui.btnClose->setEnabled(true);
 	}
 	else {
-		//Program not running
-		autoProgramRunning = true;
-		autoProg->start();
-		ui.btnStart->setText("Stop");
+	    //Program not running
+	    ui.btnClose->setEnabled(false);
+	    autoProgramRunning = true;
+	    autoProg->start();
+	    ui.btnStart->setText("Stop");
 	}
 
 }

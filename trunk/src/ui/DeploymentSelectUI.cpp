@@ -113,11 +113,45 @@ void DeploymentSelectUI::deleteDeployment()
 
     if(UserDialog::question("Do you really want to delete the deployment " + deploymentName + " including all related data?"))
     {
-        DBDeploymentTable db;
-        db.open();
-        db.deleteDeployment(deploymentId);
-        db.close();
+        DBDeploymentTable dbDeploy;
+        DBAreaTable dbArea(deploymentId);
+        DBButtonTable dbButton(deploymentId);
+        DBMeasurementProfileTable dbMeasProf;
+        DBMeasurementTable dbMeas;
+        dbDeploy.open();
+        dbArea.open();
+        dbButton.open();
+        dbMeasProf.open();
+        dbMeas.open();
+
+        QStringList areas = dbArea.getAllArea();
+        for(int i=0; i<areas.size(); i++)
+        {
+            QString area = areas.at(i);
+            QVector<int> buttons = dbButton.getButtonIdsByArea(area);
+            for(int j=0; j<buttons.size(); j++)
+            {
+                int buttonId = buttons.at(j);
+                QVector<MeasurementProfile> measProf = dbMeasProf.getProfilesByButtonID(buttonId);
+                for(int k=0; k<measProf.size(); k++)
+                {
+                    dbMeas.deleteMeasurementsByMeasurementProfileID(measProf.at(k).MeasurementProfileID);
+                }
+                dbMeasProf.deleteProfileByButtonId(buttonId);
+                dbButton.deleteButtonByButtonId(buttonId);
+            }
+            dbArea.deleteArea(area);
+        }
+        dbDeploy.deleteDeployment(deploymentId);
+
+        dbDeploy.close();
+        dbArea.close();
+        dbButton.close();
+        dbMeasProf.close();
+        dbMeas.close();
+
         UserDialog::warning("Deployment has been deleted.");
+        // Reset deployment combo boxes
         initUI();
     }
 }

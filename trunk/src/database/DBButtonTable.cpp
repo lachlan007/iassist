@@ -251,7 +251,7 @@ bool DBButtonTable::deleteButtonByButtonId(int buttonId)
 
 	QSqlQuery query(this->getDB());
 	QString text = QString("DELETE FROM ") + BUTTONTABLENAME
-			+ QString(" WHERE ButtonID=") + QString::number(buttonId) + QString(";");
+			+ QString(" WHERE ButtonID = ") + QString::number(buttonId) + QString(";");
 	success = query.exec(text);
 
 	if(!success)
@@ -267,26 +267,31 @@ bool DBButtonTable::deleteButtonByButtonId(int buttonId)
 	}
 }
 
-bool DBButtonTable::deleteButtonByArea(QString area)
+QVector<int> DBButtonTable::getButtonIdsByArea(QString area)
 {
 	bool success;
+	QVector<int> result;
+
 
 	QSqlQuery query(this->getDB());
-	QString text =  QString("DELETE FROM ") + QString(BUTTONTABLENAME)
+	QString text =  QString("SELECT ButtonID FROM ") + QString(BUTTONTABLENAME)
 			+  QString(" WHERE DeploymentID = ") + QString::number(deploymentId) +  QString(" AND ButtonNr LIKE '") + area + QString("%';");
 	success = query.exec(text);
 
 	if(!success)
 	{
-		Log::writeError("dbButtonTable: Cannot delete Buttons of Area: " + area
+		Log::writeError("dbButtonTable: Cannot retrieve buttons of Area: " + area
 				+ " / Error indicated: " + query.lastError().text());
-		this->appendError("Cannot delete Buttons of Area: " + area);
-		return false;
+		this->appendError("Cannot retrieve Buttons of Area: " + area);
 	}
 	else
 	{
-		return true;
+	    while(query.next())
+	    {
+	        result.append(query.value(0).toInt());
+	    }
 	}
+	return result;
 }
 
 bool DBButtonTable::isButtonExistingBySerialNr(QString serialNr)
