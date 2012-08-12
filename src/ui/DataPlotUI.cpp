@@ -43,6 +43,8 @@ DataPlotUI::DataPlotUI(int deploymentId, QWidget *parent)
     curve1->setPen(QPen(Qt::black, 1, Qt::SolidLine));
 
     ui.plData->replot();
+
+    this->deploymentId = deploymentId;
 }
 
 DataPlotUI::~DataPlotUI() {
@@ -53,20 +55,24 @@ void DataPlotUI::initComboArea()
 {
     ui.cbMeasurementProfileID->clear();
 
+    DBButtonTable dbBut(deploymentId);
     DBMeasurementProfileTable db;
     db.open();
+    dbBut.open();
     QStringList listProfiles;
     QStringList listNone;
     QVector<MeasurementProfile> profileVector = db.getFinishedMeasurementProfiles();
     listNone.append(TEXT_NONE);
 
     for (int i = 0; i < profileVector.size(); ++i) {
+        ButtonData b = dbBut.getButtonByButtonId(profileVector.at(i).ButtonId);
         listProfiles.append("ProfileID: " + QString::number(profileVector.at(i).MeasurementProfileID)
-                        + ", ButtonNr: " + profileVector.at(i).ButtonNr
+                        + ", ButtonNr: " + b.ButtonNr
                         + ", SessionNr: " + QString::number(profileVector.at(i).SessionNr));
     }
     ui.cbMeasurementProfileID->addItems(listNone + listProfiles);
     db.close();
+    dbBut.close();
 
 }
 

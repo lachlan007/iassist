@@ -67,6 +67,8 @@ private:
      */
     void updateComboButtonNr();
 
+    int deploymentId;
+
 private slots:
 	/**
 	 * If the area in the comboBox changes this slot is called.

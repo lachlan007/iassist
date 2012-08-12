@@ -283,34 +283,6 @@ bool DBConnection::update(QString table, QString compCol, QString compVal, QStri
 	}
 }
 
-QString DBConnection::read(QString table, QString compCol, QString compVal, QString getCol)
-{
-	QSqlQuery query(iButtonDB);
-	QString text = QString("SELECT " + getCol + " FROM " + table
-			+ " WHERE " + compCol + "=" + compVal +";");
-
-	bool success = query.exec(text);
-
-	if(!success)
-	{
-		Log::writeError("dbConnection: Cannot read database for value: " + getCol
-				+ " / Error: " + query.lastError().text());
-		appendError("Cannot read database. Error is: " + query.lastError().text());
-		return "";
-	}
-	else
-	{
-		if(query.next())
-		{
-			return query.value(0).toString();
-		}
-		else
-		{
-			return "";
-		}
-	}
-}
-
 QString DBConnection::toSQLString(QString str)
 {
 	str = "'" + str + "'";

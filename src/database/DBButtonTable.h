@@ -22,7 +22,7 @@
 #ifndef DBBUTTONTABLE_H_
 #define DBBUTTONTABLE_H_
 
-#define BUTTONTABLENAME	"iButtons"
+#define BUTTONTABLENAME	"Buttons"
 
 #include "DBConnection.h"
 #include "../ButtonData.h"
@@ -35,7 +35,7 @@
 class DBButtonTable : public DBConnection {
 
 public:
-	DBButtonTable();
+	DBButtonTable(int deploymentId);
 	virtual ~DBButtonTable();
 
 	/**
@@ -48,28 +48,27 @@ public:
 	 * @param button a ButtonData Object which contains all the information to store in the database
 	 * @return true if successfully added to the database, false otherwise
 	 */
-	bool addButton(ButtonData button);
+	bool addButton(ButtonData button, int &insertId);
 
 	/**
 	 * Returns if the specified Button is existing in the iButton Table of the Database
 	 * @param buttonNr the button Number of a specified Button
 	 * @return true if found at least once, fals if not found
 	 */
-	bool isButtonExistingByButtonNr(QString buttonNr);
+	//bool isButtonExistingByButtonId(QString buttonNr);
 
 	/**
 	 * Returns if the specified Button is existing in the iButton Table of the Database
 	 * @param buttonNr the button's ID of a specified Button
-	 * @return true if found at least once, fals if not found
+	 * @return true if found at least once, false if not found
 	 */
-	bool isButtonExistingByButtonID(QString buttonID);
+	bool isButtonExistingBySerialNr(QString serialNr);
 
-	/**
-	 * Reads a Button with the given ButtonNr to a ButtonData Object and returns it.
-	 * @param _ButtonNr the Number of the Button
-	 * @return all the information which are stored in the database
-	 */
-	ButtonData readButton(QString _ButtonNr);
+	ButtonData getButtonBySerialNr(QString serialNr);
+
+	ButtonData getButtonByButtonNr(QString buttonNr);
+
+	ButtonData getButtonByButtonId(int buttonId);
 
 	/**
 	 * Returns a list of all the Buttons (ButtonNr) which are entered to the Database
@@ -90,12 +89,7 @@ public:
 	 */
 	int getLastAddedButtonNrInt(QString _area);
 
-	/**
-	 * Deletes a certain button. (Attention: Photos and Measurements have to be deleted as well)
-	 * @param buttonNr Nr of the button which should be deleted
-	 * @return true or false for the success state
-	 */
-	bool deleteButtonByButtonNr(QString buttonNr);
+	bool deleteButtonByButtonId(int buttonId);
 
 	/**
 	 * Deletes all buttons which belong to a certain %Area.
@@ -110,14 +104,28 @@ public:
 	 */
 	bool open();
 
+	int getButtonIdBySerialNr(QString serialNr);
+
+    int getButtonIdByButtonNr(QString buttonNr);
+
+    /**
+     * Reads one specific field in the database. If more than one hit is found, only the first
+     * will be returned. It represents the following SQL statement:
+     * SELECT getCOL FROM table WHERE compCol=compVal
+     * @param table The table name of the DB
+     * @param compCol the column which will be compared to compVal
+     */
+    QString read(QString table, QString compCol, QString compVal, QString getCol);
 
 
 private:
+	int deploymentId;
+
 	void convertButtonDataToSQL(ButtonData *button);
 
 	//iButton Table in iButtonDB
     QString ButtonNr;
-    QString ButtonID;
+    QString SerialNr;
  };
 
 #endif /* DBBUTTONTABLE_H_ */

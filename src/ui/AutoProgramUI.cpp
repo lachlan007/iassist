@@ -29,7 +29,7 @@ AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
 
 	ui.setupUi(this);
 
-	autoProg = new AutoProgramThread(this);
+	autoProg = new AutoProgramThread(deploymentId, this);
 	autoProgramRunning = false;
 
 	connect(ui.btnStart, SIGNAL(clicked()), this, SLOT(buttonSwitch()));
