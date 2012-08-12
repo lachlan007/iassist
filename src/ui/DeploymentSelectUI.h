@@ -23,6 +23,10 @@
 #include "ui_DeploymentSelectUI.h"
 #include "UserDialog.h"
 #include "../database/DBDeploymentTable.h"
+#include "../database/DBAreaTable.h"
+#include "../database/DBButtonTable.h"
+#include "../database/DBMeasurementProfileTable.h"
+#include "../database/DBMeasurementTable.h"
 
 /**
  * Displays a GUI to set the mission parameter for the iButton.

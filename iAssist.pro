@@ -4,6 +4,7 @@ CONFIG += console
 MOC_DIR = tmp/
 OBJECTS_DIR = tmp/
 UI_DIR = tmp/
+ICON = ico/icon.icns
 QT += core \
     gui \
     sql

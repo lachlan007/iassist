@@ -66,14 +66,6 @@ public:
 	bool open();
 
 	/**
-	 * Returns the latest used MeasurementProfileID to a certain ButtonNr. MeasurementProfileID
-	 * is the link to the detail information of a certain measurement session.
-	 * @param buttonNr buttonNr of the button we want to have the latest MeasurementProfileID
-	 * @return the MeasurementProfileID of a certain Button's latest measurement Session. Returns -1 for Error.
-	 */
-	int getLatestMeasurementProfileID(QString buttonNr);
-
-	/**
 	 * Returns measured values for a measurement with a specific profile ID
 	 * @param measurementProfileID measurement profile ID of requested measurement
 	 * @param values Pointer for returning the measurements

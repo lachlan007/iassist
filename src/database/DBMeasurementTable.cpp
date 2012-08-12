@@ -88,8 +88,8 @@ bool DBMeasurementTable::addMeasurement(Measurement meas)
 	db.transaction();
 
 	QString textBeg = "INSERT INTO " + QString(MEASUREMENTTABLENAME)
-			+ " (MeasurementProfileID , MeasurementNr, Measurement) VALUES( '"
-			+ "', " + QString::number(meas.MeasurementProfileID) + ", ";
+			+ " (MeasurementProfileID , MeasurementNr, Measurement) VALUES( "
+			+ QString::number(meas.MeasurementProfileID) + ", ";
 
 	// insert all measurements
 	for(int i=0; i<meas.size; i++)
@@ -121,36 +121,6 @@ bool DBMeasurementTable::open()
     }
 
     return true;
-}
-
-
-int DBMeasurementTable::getLatestMeasurementProfileID(QString buttonNr)
-{
-	QSqlQuery query(this->getDB());
-	int ret = -1;
-
-	QString text = "SELECT MeasurementProfileID FROM " + QString(MEASUREMENTTABLENAME)
-			+ " WHERE ButtonNr='" + buttonNr + "';";
-	if(!query.exec(text))
-	{
-		Log::writeError("dbMeasurementTable: Cannot get MeasurementProfile ID of Measurement to Button: " + buttonNr
-				+ " / Error: " + query.lastError().text());
-		this->appendError("Cannot get MeasurementProfile ID of Measurement to Button: " + buttonNr);
-	}
-	else
-	{
-		int temp=0;
-		while(query.next())
-		{
-			temp = query.value(0).toInt();
-			if(temp>ret)
-			{
-				ret = temp;
-			}
-		}
-	}
-
-	return ret;
 }
 
 int DBMeasurementTable::getMeasurementsByProfileID(QString measurementProfileID, double **values) {
