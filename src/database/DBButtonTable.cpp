@@ -140,7 +140,6 @@ ButtonData DBButtonTable::getButtonByButtonId(int buttonId)
     QString temp;
 
     // Get all the data and save them to ButtonData
-
     temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "ButtonNr");
     if(temp!="") data.ButtonNr = temp;
 

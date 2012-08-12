@@ -26,6 +26,8 @@ DataPlotUI::DataPlotUI(int deploymentId, QWidget *parent)
 : QDialog(parent) {
     ui.setupUi(this);
 
+    this->deploymentId = deploymentId;
+
     // init combo boxes
     initComboArea();
 
@@ -43,8 +45,6 @@ DataPlotUI::DataPlotUI(int deploymentId, QWidget *parent)
     curve1->setPen(QPen(Qt::black, 1, Qt::SolidLine));
 
     ui.plData->replot();
-
-    this->deploymentId = deploymentId;
 }
 
 DataPlotUI::~DataPlotUI() {
