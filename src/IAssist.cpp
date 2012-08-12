@@ -114,7 +114,8 @@ void IAssist::setDeploymentId(int deploymentId)
     DBDeploymentTable db;
     this->deploymentId = deploymentId;
     db.open();
-    ui.txtDeploymentName->setText("Deployment: " + db.getDeploymentName(deploymentId));
+    ui.txtDeploymentName->setText("Deployment: " + db.getDeploymentName(deploymentId) +
+            " (ID " + QString::number(deploymentId) + ")");
     db.close();
 }
 
