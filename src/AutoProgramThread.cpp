@@ -36,7 +36,7 @@ AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
             this, SLOT(replyIgnoreQuestion(QString, QMessageBox::StandardButton*)));
 
     dbButton = new DBButtonTable(deploymentId);
-    dbArea = new DBAreaTable(deploymentId);
+    dbFootprint = new DBFootprintTable(deploymentId);
     dbProfile = new DBMeasurementProfileTable();
 
     // Creating an instance for iButton I/O
@@ -46,7 +46,7 @@ AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
 
 AutoProgramThread::~AutoProgramThread(){
     delete dbButton;
-    delete dbArea;
+    delete dbFootprint;
     delete dbProfile;
     delete iButtonCon;
 }
@@ -80,7 +80,7 @@ void AutoProgramThread::run(){
 
     // Creating and opening databases
     dbButton->open();
-    dbArea->open();
+    dbFootprint->open();
     dbProfile->open();
 
     lastSerialNr="noID"; // No buttonID so far
@@ -191,10 +191,10 @@ void AutoProgramThread::run(){
                 }
 
                 // Check if the chosen Area is already existing
-                if(!dbArea->isAreaExisting(cachedCurrentFootprint))
+                if(!dbFootprint->isFootprintExisting(cachedCurrentFootprint))
                 {
                     // if not create it in the database
-                    if(!dbArea->addArea(cachedCurrentFootprint))
+                    if(!dbFootprint->addFootprint(cachedCurrentFootprint))
                     {
                         emit writeStatus("Programming iButton FAILED.");	// DB Error
                         emit setStatusColor(0);
@@ -222,7 +222,7 @@ void AutoProgramThread::run(){
 
      // Close the databases
     dbButton->close();
-    dbArea->close();
+    dbFootprint->close();
     dbProfile->close();
 
     // Terminate the iButton I/O
@@ -239,7 +239,7 @@ void AutoProgramThread::abort()
     emit buttonSwitch();
     // Close the databases
     dbButton->close();
-    dbArea->close();
+    dbFootprint->close();
     dbProfile->close();
 
     // Terminate the iButton I/O

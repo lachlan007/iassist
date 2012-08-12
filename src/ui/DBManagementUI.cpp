@@ -30,14 +30,14 @@ DBManagementUI::DBManagementUI(int deploymentId, QWidget *parent)
 	ui.txtStatus->setStyleSheet(STYLESHEETWHITE);
 
 	// init combo boxes
-	initComboArea();
+	initComboFootprint();
 
 	// connect signals and slots
-	connect(ui.comboArea, SIGNAL(currentIndexChanged(QString)), this, SLOT(areaChanged()));
+	connect(ui.comboFootprint, SIGNAL(currentIndexChanged(QString)), this, SLOT(footprintChanged()));
 	connect(ui.comboButtonNr, SIGNAL(currentIndexChanged(QString)), this, SLOT(buttonNrChanged()));
 	connect(ui.btnNextButton, SIGNAL(clicked()), this, SLOT(nextButtonPressed()));
 
-	connect(ui.btnDelArea, SIGNAL(clicked()), this, SLOT(deleteAreaClicked()));
+	connect(ui.btnDelFootprint, SIGNAL(clicked()), this, SLOT(deleteFootprintClicked()));
 	connect(ui.btnDelButton, SIGNAL(clicked()), this, SLOT(deleteButtonClicked()));
 
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
@@ -51,22 +51,22 @@ DBManagementUI::~DBManagementUI()
 }
 
 
-void DBManagementUI::initComboArea()
+void DBManagementUI::initComboFootprint()
 {
-	ui.comboArea->clear();
+	ui.comboFootprint->clear();
 
-	DBAreaTable db(deploymentId);
+	DBFootprintTable db(deploymentId);
 	db.open();
-	QStringList listArea;
+	QStringList listFootprint;
 	QStringList listNone;
 	listNone.append("none");
-	listArea = db.getAllArea();
-	listArea.sort();
-	ui.comboArea->addItems(listNone + listArea);
+	listFootprint = db.getAllFootprints();
+	listFootprint.sort();
+	ui.comboFootprint->addItems(listNone + listFootprint);
 	db.close();
 	updateComboButtonNr();
 
-	ui.btnDelArea->setEnabled(false);
+	ui.btnDelFootprint->setEnabled(false);
 }
 
 
@@ -77,7 +77,7 @@ void DBManagementUI::updateComboButtonNr()
 	db.open();
 	QStringList listNone;
 	listNone.append("none");
-	QStringList listButton = db.getAllButtonNr(ui.comboArea->currentText());
+	QStringList listButton = db.getAllButtonNr(ui.comboFootprint->currentText());
 
 	if(listButton.size() == 0)
 	{
@@ -97,16 +97,16 @@ void DBManagementUI::updateComboButtonNr()
 }
 
 
-void DBManagementUI::areaChanged()
+void DBManagementUI::footprintChanged()
 {
 	updateComboButtonNr();
-	if(ui.comboArea->currentText()=="none")
+	if(ui.comboFootprint->currentText()=="none")
 	{
-		ui.btnDelArea->setEnabled(false);
+		ui.btnDelFootprint->setEnabled(false);
 	}
 	else
 	{
-		ui.btnDelArea->setEnabled(true);
+		ui.btnDelFootprint->setEnabled(true);
 	}
 }
 
@@ -171,42 +171,42 @@ void DBManagementUI::nextButtonPressed()
 	}
 }
 
-void DBManagementUI::deleteAreaClicked()
+void DBManagementUI::deleteFootprintClicked()
 {
-	QString curArea = ui.comboArea->currentText();
-	int curIndex = ui.comboArea->currentIndex();
-	if(curIndex == (ui.comboArea->count()-1))
+	QString curFootprint = ui.comboFootprint->currentText();
+	int curIndex = ui.comboFootprint->currentIndex();
+	if(curIndex == (ui.comboFootprint->count()-1))
 	{
 		curIndex = 0;
 	}
 
 	if(!UserDialog::question("Do you really want to delete\n"
-							 "Footprint " + curArea + " and all\n"
+							 "Footprint " + curFootprint + " and all\n"
 							 "associated information?"))
 	{
 		return;
 	}
 
-	if(curArea=="none")
+	if(curFootprint=="none")
 	{
 		this->setStatusText("No footprint selected.", STYLESHEETRED);
 	}
 	else
 	{
-		if(this->deleteArea(curArea))
+		if(this->deleteFootprint(curFootprint))
 		{
-			this->setStatusText("Footprint " + curArea + " successfully deleted.", STYLESHEETGREEN);
+			this->setStatusText("Footprint " + curFootprint + " successfully deleted.", STYLESHEETGREEN);
 		}
 		else
 		{
-			this->setStatusText("Footprint " + curArea + " could not be deleted.", STYLESHEETRED);
-			UserDialog::warning("Could not delete Footprint " + curArea, this->getReport());
+			this->setStatusText("Footprint " + curFootprint + " could not be deleted.", STYLESHEETRED);
+			UserDialog::warning("Could not delete Footprint " + curFootprint, this->getReport());
 			this->clearReport();
 		}
 	}
 
-	this->initComboArea();
-	ui.comboArea->setCurrentIndex(curIndex);
+	this->initComboFootprint();
+	ui.comboFootprint->setCurrentIndex(curIndex);
 }
 
 void DBManagementUI::deleteButtonClicked()
@@ -320,13 +320,13 @@ bool DBManagementUI::deleteButton(QString buttonNr)
 	return true;
 }
 
-bool DBManagementUI::deleteArea(QString area)
+bool DBManagementUI::deleteFootprint(QString footprint)
 {
 	// Get all buttons belonging to this area
 	DBButtonTable dbButton(deploymentId);
 	dbButton.open();
 
-	QStringList buttonList = dbButton.getAllButtonNr(area);
+	QStringList buttonList = dbButton.getAllButtonNr(footprint);
 	dbButton.close();
 
 	// Delete all these buttons
@@ -345,14 +345,14 @@ bool DBManagementUI::deleteArea(QString area)
 		return false;
 	}
 
-	// Delete the Area itself
-	DBAreaTable dbArea(deploymentId);
-	dbArea.open();
-	if(!dbArea.deleteArea(area))
+	// Delete the footprint itself
+	DBFootprintTable dbFootprint(deploymentId);
+	dbFootprint.open();
+	if(!dbFootprint.deleteFootprint(footprint))
 	{
 		this->appendReport(QString("Could not delete Footprint from the Database.")
 				+ "Summary:\nPhotos iButton/Footprint: deleted\nMeasurements: deleted\nMeasurementProfiles: deleted\niButtons: deleted\nFootprint: not deleted");
-		dbArea.close();
+		dbFootprint.close();
 		return false;
 	}
 

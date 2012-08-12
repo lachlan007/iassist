@@ -34,14 +34,14 @@ CollectUI::CollectUI(int deploymentId, QWidget *parent)
 	ui.cbRedistribute->setChecked(true);
 
 	// init combo boxes
-	initComboArea();
+	initComboFootprint();
 
 	// init collect Thread
 	collectThr = new CollectThread(deploymentId, this);
 	collectThr->setRedistribute(ui.cbRedistribute->isChecked());
 
 	// connect signals and slots
-	connect(ui.comboArea, SIGNAL(currentIndexChanged(QString)), this, SLOT(areaChanged()));
+	connect(ui.comboFootprint, SIGNAL(currentIndexChanged(QString)), this, SLOT(footprintChanged()));
 	connect(ui.comboButtonNr, SIGNAL(currentIndexChanged(QString)), this, SLOT(buttonNrChanged()));
 	connect(ui.btnNextButton, SIGNAL(clicked()), this, SLOT(nextButtonClicked()));
 	connect(ui.cbRedistribute, SIGNAL(stateChanged(int)), this, SLOT(redistributeToggled(int)));
@@ -60,16 +60,16 @@ CollectUI::~CollectUI()
 
 }
 
-void CollectUI::initComboArea()
+void CollectUI::initComboFootprint()
 {
-	DBAreaTable db(deploymentId);
+	DBFootprintTable db(deploymentId);
 	db.open();
 	QStringList listNone;
 	listNone.append("none");
-	QStringList listArea;
-	listArea = db.getAllArea();
-	listArea.sort();
-	ui.comboArea->addItems(listNone +listArea);
+	QStringList listFootprints;
+	listFootprints = db.getAllFootprints();
+	listFootprints.sort();
+	ui.comboFootprint->addItems(listNone + listFootprints);
 	db.close();
 	updateComboButtonNr();
 }
@@ -81,14 +81,14 @@ void CollectUI::updateComboButtonNr()
 	db.open();
 	QStringList list;
 	list.append("none");
-	QStringList list2 =db.getAllButtonNr(ui.comboArea->currentText());
+	QStringList list2 =db.getAllButtonNr(ui.comboFootprint->currentText());
 	list2.sort();
 	ui.comboButtonNr->addItems(list+list2);
 	ui.comboButtonNr->setCurrentIndex(0);
 	db.close();
 }
 
-void CollectUI::areaChanged()
+void CollectUI::footprintChanged()
 {
 	updateComboButtonNr();
 }

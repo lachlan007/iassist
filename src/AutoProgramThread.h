@@ -30,7 +30,7 @@
 #include <QTextStream>
 #include "Log.h"
 #include "database/DBButtonTable.h"
-#include "database/DBAreaTable.h"
+#include "database/DBFootprintTable.h"
 #include "database/DBMeasurementProfileTable.h"
 #include "MeasurementProfile.h"
 #include "ButtonData.h"
@@ -100,7 +100,7 @@ private:
 	/**
 	 * Manages the database connection to the area table.
 	 */
-	DBAreaTable *dbArea;
+	DBFootprintTable *dbFootprint;
 	/**
 	 * Manages the database connection to the Measurement Profile table
 	 */

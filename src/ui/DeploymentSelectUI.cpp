@@ -30,6 +30,10 @@ DeploymentSelectUI::DeploymentSelectUI(QWidget *parent)
 	connect(ui.btnDeleteDeployment, SIGNAL(clicked()), this, SLOT(deleteDeployment()));
 	connect(ui.btnQuit, SIGNAL(clicked()), this, SLOT(quitApplication()));
 
+    // Set icon
+    QIcon title ("./ico/iassist.png");
+    this->setWindowIcon(title);
+
 	initUI();
 }
 
@@ -114,21 +118,21 @@ void DeploymentSelectUI::deleteDeployment()
     if(UserDialog::question("Do you really want to delete the deployment " + deploymentName + " including all related data?"))
     {
         DBDeploymentTable dbDeploy;
-        DBAreaTable dbArea(deploymentId);
+        DBFootprintTable dbFootprint(deploymentId);
         DBButtonTable dbButton(deploymentId);
         DBMeasurementProfileTable dbMeasProf;
         DBMeasurementTable dbMeas;
         dbDeploy.open();
-        dbArea.open();
+        dbFootprint.open();
         dbButton.open();
         dbMeasProf.open();
         dbMeas.open();
 
-        QStringList areas = dbArea.getAllArea();
-        for(int i=0; i<areas.size(); i++)
+        QStringList footprints = dbFootprint.getAllFootprints();
+        for(int i=0; i<footprints.size(); i++)
         {
-            QString area = areas.at(i);
-            QVector<int> buttons = dbButton.getButtonIdsByArea(area);
+            QString footprint = footprints.at(i);
+            QVector<int> buttons = dbButton.getButtonIdsByArea(footprint);
             for(int j=0; j<buttons.size(); j++)
             {
                 int buttonId = buttons.at(j);
@@ -140,12 +144,12 @@ void DeploymentSelectUI::deleteDeployment()
                 dbMeasProf.deleteProfileByButtonId(buttonId);
                 dbButton.deleteButtonByButtonId(buttonId);
             }
-            dbArea.deleteArea(area);
+            dbFootprint.deleteFootprint(footprint);
         }
         dbDeploy.deleteDeployment(deploymentId);
 
         dbDeploy.close();
-        dbArea.close();
+        dbFootprint.close();
         dbButton.close();
         dbMeasProf.close();
         dbMeas.close();

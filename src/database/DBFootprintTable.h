@@ -19,10 +19,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
-#ifndef DBAREATABLE_H_
-#define DBAREATABLE_H_
+#ifndef DBFOOTPRINTTABLE_H_
+#define DBFOOTPRINTTABLE_H_
 
-#define AREATABLENAME	"Footprints"
+#define FOOTPRINTTABLENAME	"Footprints"
 
 #include "DBConnection.h"
 
@@ -30,16 +30,16 @@
  * This class provides access to the table Footprints in the database.
  * It supplies all necessary functions to edit and read the database.
  */
-class DBAreaTable : public DBConnection {
+class DBFootprintTable : public DBConnection {
 public:
 	/**
 	 * Default constructor
 	 */
-	DBAreaTable(int deploymentId);
+	DBFootprintTable(int deploymentId);
 	/**
 	 * Default deconstructor
 	 */
-	virtual ~DBAreaTable();
+	virtual ~DBFootprintTable();
 
 	/**
 	 * Creates a new Footprint Table, if there's no one existing
@@ -51,28 +51,28 @@ public:
 	 * @param footprintID name of the footprint
 	 * @return true or false for the success state
 	 */
-	bool addArea(QString footprintID);
+	bool addFootprint(QString footprintID);
 
 	/**
-	 * Deletes a certain Footprint out of the Footprint (%Area) Table of the Database.
+	 * Deletes a certain Footprint out of the Footprint (%Footprint) Table of the Database.
 	 * Attention: Buttons, Photos and Measurements have to be deleted separately.
 	 * @param footprintID are which should be deleted
 	 * @return true or false for the success state
 	 */
-	bool deleteArea(QString footprintID);
+	bool deleteFootprint(QString footprintID);
 
 	/**
-	 * Returns if the specified %Area is already entered in the Footprint Table of the iButton Database
-	 * @param area %Area to look for
+	 * Returns if the specified %Footprint is already entered in the Footprint Table of the iButton Database
+	 * @param area %Footprint to look for
 	 * @return true if found at least once, false if not found
 	 */
-	bool isAreaExisting(QString footprintID);
+	bool isFootprintExisting(QString footprintID);
 
 	/**
-	 * Returns QStringList with all the Areas (Footprint ID).
+	 * Returns QStringList with all the Footprints (Footprint ID).
 	 * @return a list with all the FootprintIDs
 	 */
-	QStringList getAllArea();
+	QStringList getAllFootprints();
 
 	/**
 	 * Opens the Database. If no Database is existing, it creates one first. And if the
@@ -86,4 +86,4 @@ private:
 
 };
 
-#endif /* DBAREATABLE_H_ */
+#endif /* DBFOOTPRINTTABLE_H_ */

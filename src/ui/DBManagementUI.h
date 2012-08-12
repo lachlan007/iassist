@@ -25,7 +25,7 @@
 #include <QtGui/QDialog>
 #include <QFile>
 #include "ui_DBManagementUI.h"
-#include "../database/DBAreaTable.h"
+#include "../database/DBFootprintTable.h"
 #include "../database/DBButtonTable.h"
 #include "../database/DBMeasurementTable.h"
 #include "../database/DBMeasurementProfileTable.h"
@@ -71,7 +71,7 @@ private:
     /**
      * Initializes the ComboBox which displays the different Areas (Footprints)
      */
-    void initComboArea();
+    void initComboFootprint();
     /**
      * Updates the contents of the ComboBox which displays the iButtons to a certain Footprint.
      */
@@ -108,7 +108,7 @@ private:
      * @param area the ID of the footprint to delete
      * @return true if successfully deleted, false otherwise
      */
-    bool deleteArea(QString area);
+    bool deleteFootprint(QString footprint);
 
     int deploymentId;
 
@@ -118,7 +118,7 @@ private slots:
 	 * Call this if the ComboBox content has changed. It updates the iButton Combo was well and
 	 * changes the UI appearance.
 	 */
-	void areaChanged();
+	void footprintChanged();
 	/**
 	 * Displays information to this iButton and changes the UI appearance.
 	 */
@@ -130,7 +130,7 @@ private slots:
 	/**
 	 * Call this if delete Footprint Button was clicked. It starts deleting the selected footprint.
 	 */
-    void deleteAreaClicked();
+    void deleteFootprintClicked();
     /**
      * Call this if delete iButton was clicked. It starts deleting the selected iButton
      */

@@ -19,20 +19,20 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
-#include "DBAreaTable.h"
+#include "DBFootprintTable.h"
 
-DBAreaTable::DBAreaTable(int deploymentId) : DBConnection() {
+DBFootprintTable::DBFootprintTable(int deploymentId) : DBConnection() {
     this->deploymentId = deploymentId;
 }
 
-DBAreaTable::~DBAreaTable() {
+DBFootprintTable::~DBFootprintTable() {
 
 }
 
-bool DBAreaTable::createTable()
+bool DBFootprintTable::createTable()
 {
 	// check if a table exists
-	if(this->isTableExisting(AREATABLENAME))
+	if(this->isTableExisting(FOOTPRINTTABLENAME))
 	{
 		return true;
 	}
@@ -40,7 +40,7 @@ bool DBAreaTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ") +
-		        AREATABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER, FOREIGN ") +
+		        FOOTPRINTTABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER, FOREIGN ") +
 		        QString("KEY(DeploymentID) REFERENCES Deployments(DeploymentID));"));
 		if(success)
 		{
@@ -51,31 +51,31 @@ bool DBAreaTable::createTable()
 		{
 			QString error = query.lastError().text();
 			this->appendError("Cannot create Footprint table: " + error);
-			Log::writeError("dbAreaTable: Cannot create table: " + error);
+			Log::writeError("dbFootprintTable: Cannot create table: " + error);
 			return false;
 		}
 	}
 }
 
-bool DBAreaTable::addArea(QString footprintID)
+bool DBFootprintTable::addFootprint(QString footprintID)
 {
-	if(this->isAreaExisting(footprintID))
+	if(this->isFootprintExisting(footprintID))
 	{
-		Log::writeError("dbAreaTable: Cannot add Area twice: " + footprintID);
-		this->appendError("Cannot add Area twice: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot add Footprint twice: " + footprintID);
+		this->appendError("Cannot add Footprint twice: " + footprintID);
 		return false;
 	}
 
 	QSqlQuery query(this->getDB());
 
-	QString text = "INSERT INTO " + QString(AREATABLENAME) + " VALUES ('" + footprintID + "', " + QString::number(deploymentId) + ");";
+	QString text = "INSERT INTO " + QString(FOOTPRINTTABLENAME) + " VALUES ('" + footprintID + "', " + QString::number(deploymentId) + ");";
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot add Area: " + footprintID + " " + error);
-		this->appendError("Cannot add Area: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot add Footprint: " + footprintID + " " + error);
+		this->appendError("Cannot add Footprint: " + footprintID);
 		return false;
 	}
 	else
@@ -85,10 +85,10 @@ bool DBAreaTable::addArea(QString footprintID)
 }
 
 
-bool DBAreaTable::deleteArea(QString footprintID)
+bool DBFootprintTable::deleteFootprint(QString footprintID)
 {
 	QSqlQuery query(this->getDB());
-	QString text =  QString("DELETE FROM ") + AREATABLENAME
+	QString text =  QString("DELETE FROM ") + FOOTPRINTTABLENAME
 			+  QString(" WHERE DeploymentID = ") + QString::number(deploymentId) +
 			QString(" AND FootprintID LIKE '") + footprintID +  QString("';");
 
@@ -97,8 +97,8 @@ bool DBAreaTable::deleteArea(QString footprintID)
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot delete Area: " + footprintID + " " + error);
-		this->appendError("Cannot delete Area: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot delete Footprint: " + footprintID + " " + error);
+		this->appendError("Cannot delete Footprint: " + footprintID);
 		return false;
 	}
 	else
@@ -107,11 +107,11 @@ bool DBAreaTable::deleteArea(QString footprintID)
 	}
 }
 
-bool DBAreaTable::isAreaExisting(QString footprintID)
+bool DBFootprintTable::isFootprintExisting(QString footprintID)
 {
 	// Ask DB for this area
 	QSqlQuery query(this->getDB());
-	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME)
+	QString text = "SELECT FootprintID FROM " + QString(FOOTPRINTTABLENAME)
 		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND FootprintID LIKE '" + footprintID + "'";
 
 	bool success = query.exec(text);
@@ -119,8 +119,8 @@ bool DBAreaTable::isAreaExisting(QString footprintID)
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot detect if Area " + footprintID + " already entered: " + error);
-		this->appendError("Cannot detect if Area existing: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot detect if Footprint " + footprintID + " already entered: " + error);
+		this->appendError("Cannot detect if Footprint existing: " + footprintID);
 		return false;
 	}
 
@@ -138,12 +138,12 @@ bool DBAreaTable::isAreaExisting(QString footprintID)
 		return false;
 }
 
-QStringList DBAreaTable::getAllArea()
+QStringList DBFootprintTable::getAllFootprints()
 {
 	QSqlQuery query (this->getDB());
 	QStringList list;
 
-	QString text = "SELECT FootprintID FROM " + QString(AREATABLENAME) + " WHERE DeploymentID = " +
+	QString text = "SELECT FootprintID FROM " + QString(FOOTPRINTTABLENAME) + " WHERE DeploymentID = " +
 	        QString::number(deploymentId) + ";";
 	//qDebug(text.toStdString().c_str());
 	bool success = query.exec(text);
@@ -151,8 +151,8 @@ QStringList DBAreaTable::getAllArea()
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbAreaTable: Cannot get all Area as a list: " + error);
-		this->appendError("Cannot get Area list.");
+		Log::writeError("dbFootprintTable: Cannot get all Footprint as a list: " + error);
+		this->appendError("Cannot get Footprint list.");
 	}
 	else
 	{
@@ -164,14 +164,14 @@ QStringList DBAreaTable::getAllArea()
 	return list;
 }
 
-bool DBAreaTable::open()
+bool DBFootprintTable::open()
 {
     if(!this->openDatabase())
     {
         return false;
     }
 
-    if(!this->isTableExisting(AREATABLENAME))
+    if(!this->isTableExisting(FOOTPRINTTABLENAME))
     {
         return this->createTable();
     }

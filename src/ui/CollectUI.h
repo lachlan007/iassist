@@ -24,7 +24,7 @@
 
 #include <QtGui/QDialog>
 #include "ui_CollectUI.h"
-#include "../database/DBAreaTable.h"
+#include "../database/DBFootprintTable.h"
 #include "../database/DBButtonTable.h"
 #include "../CollectThread.h"
 
@@ -60,7 +60,7 @@ private:
     /**
      * Call this to initialize the comboBox which shows the %Area
      */
-    void initComboArea();
+    void initComboFootprint();
     /**
      * This is called every time the %Area in the comboBox changes. It
      * then shows the buttons belonging to this Footprint.
@@ -74,7 +74,7 @@ private slots:
 	 * If the area in the comboBox changes this slot is called.
 	 * This slot simply calls buttonNrChanged()
 	 */
-	void areaChanged();
+	void footprintChanged();
 	/**
 	 * This slot changes the actually selected button in the
 	 * thread which controls the collecting of the buttons. And it
