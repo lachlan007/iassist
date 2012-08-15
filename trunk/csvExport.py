@@ -16,7 +16,7 @@ csvOutput = open(fileName, 'w')
 
 csvOutput.write('# TIME,TEMP,BUTTONNR,SESSIONNR,RESOLUTION'+'\n')
 
-conn = sqlite3.connect('iButtonDB')
+conn = sqlite3.connect('iassist.db')
 c = conn.cursor()
 for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE DeploymentID = ?', (results.deployment_id, )):
 	c2 = conn.cursor()
@@ -30,7 +30,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE Deployment
 		c3 = conn.cursor()
 		c3.execute('SELECT MAX(MeasurementNr) FROM Measurement WHERE MeasurementProfileID=?', t)
 		# Clock drift compensation
-		numMeas = c2.fetchone()[0]
+		numMeas = c3.fetchone()[0]
 		if numMeas == None:
 			print 'No data for button ' + row[1] + '?'
 			continue;
