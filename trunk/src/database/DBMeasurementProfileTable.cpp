@@ -135,7 +135,7 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "ProgrammingTime", ProgrammingTime);
 	if(SamplingStartTime!="''" && success)
 	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingStartTime", SamplingStartTime);
-	if(TempCalibUsed!="''" && success)
+	if(TempCalibUsed!="NULL" && success)
 	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "TempCalibUsed", TempCalibUsed);
 
 	if(!success)
