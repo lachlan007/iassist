@@ -42,8 +42,8 @@ public:
 	 */
 	void clearData();
 
-	//! ButtonNr of the Button e.g. AA0001
-	QString ButtonNr;
+	//! ButtonNr of the Button (3-digit footprint prefix, 3-digit suffix) e.g. 123456
+	int ButtonNr;
 	//! Serial number of the iButton e.g. 00:A2:00:00:B2:04:72:1B
 	QString SerialNr;
 };

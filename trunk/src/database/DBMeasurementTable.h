@@ -22,7 +22,7 @@
 #ifndef DBMEASUREMENTTABLE_H_
 #define DBMEASUREMENTTABLE_H_
 
-#define MEASUREMENTTABLENAME "Measurement"
+#define MEASUREMENTTABLENAME "Measurements"
 
 #include "DBConnection.h"
 #include "../Measurement.h"

@@ -40,7 +40,7 @@ bool DBFootprintTable::createTable()
 	{
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ") +
-		        FOOTPRINTTABLENAME + QString(" (FootprintID char(10), DeploymentID INTEGER, FOREIGN ") +
+		        FOOTPRINTTABLENAME + QString(" (DeploymentID INTEGER, FootprintPrefix INTEGER, FOREIGN ") +
 		        QString("KEY(DeploymentID) REFERENCES Deployments(DeploymentID));"));
 		if(success)
 		{
@@ -57,25 +57,26 @@ bool DBFootprintTable::createTable()
 	}
 }
 
-bool DBFootprintTable::addFootprint(QString footprintID)
+bool DBFootprintTable::addFootprint(int footprintPrefix)
 {
-	if(this->isFootprintExisting(footprintID))
+	if(this->isFootprintExisting(footprintPrefix))
 	{
-		Log::writeError("dbFootprintTable: Cannot add Footprint twice: " + footprintID);
-		this->appendError("Cannot add Footprint twice: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot add Footprint twice: " + QString::number(footprintPrefix));
+		this->appendError("Cannot add Footprint twice: " + QString::number(footprintPrefix));
 		return false;
 	}
 
 	QSqlQuery query(this->getDB());
 
-	QString text = "INSERT INTO " + QString(FOOTPRINTTABLENAME) + " VALUES ('" + footprintID + "', " + QString::number(deploymentId) + ");";
+	QString text = "INSERT INTO " + QString(FOOTPRINTTABLENAME) + " VALUES ("
+	        + QString::number(deploymentId) + ", " + QString::number(footprintPrefix) + ");";
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbFootprintTable: Cannot add Footprint: " + footprintID + " " + error);
-		this->appendError("Cannot add Footprint: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot add Footprint: " + QString::number(footprintPrefix) + " " + error);
+		this->appendError("Cannot add Footprint: " + QString::number(footprintPrefix));
 		return false;
 	}
 	else
@@ -85,20 +86,20 @@ bool DBFootprintTable::addFootprint(QString footprintID)
 }
 
 
-bool DBFootprintTable::deleteFootprint(QString footprintID)
+bool DBFootprintTable::deleteFootprint(int footprintPrefix)
 {
 	QSqlQuery query(this->getDB());
 	QString text =  QString("DELETE FROM ") + FOOTPRINTTABLENAME
 			+  QString(" WHERE DeploymentID = ") + QString::number(deploymentId) +
-			QString(" AND FootprintID LIKE '") + footprintID +  QString("';");
+			QString(" AND FootprintPrefix = ") + QString::number(footprintPrefix) +  QString(";");
 
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbFootprintTable: Cannot delete Footprint: " + footprintID + " " + error);
-		this->appendError("Cannot delete Footprint: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot delete Footprint: " + QString::number(footprintPrefix) + " " + error);
+		this->appendError("Cannot delete Footprint: " + QString::number(footprintPrefix));
 		return false;
 	}
 	else
@@ -107,20 +108,20 @@ bool DBFootprintTable::deleteFootprint(QString footprintID)
 	}
 }
 
-bool DBFootprintTable::isFootprintExisting(QString footprintID)
+bool DBFootprintTable::isFootprintExisting(int footprintPrefix)
 {
 	// Ask DB for this area
 	QSqlQuery query(this->getDB());
-	QString text = "SELECT FootprintID FROM " + QString(FOOTPRINTTABLENAME)
-		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND FootprintID LIKE '" + footprintID + "'";
+	QString text = "SELECT FootprintPrefix FROM " + QString(FOOTPRINTTABLENAME)
+		+ " WHERE DeploymentID = " + QString::number(deploymentId) + " AND FootprintPrefix = " + QString::number(footprintPrefix) + ";";
 
 	bool success = query.exec(text);
 
 	if(!success)
 	{
 		QString error = query.lastError().text();
-		Log::writeError("dbFootprintTable: Cannot detect if Footprint " + footprintID + " already entered: " + error);
-		this->appendError("Cannot detect if Footprint existing: " + footprintID);
+		Log::writeError("dbFootprintTable: Cannot detect if Footprint " + QString::number(footprintPrefix) + " already entered: " + error);
+		this->appendError("Cannot detect if Footprint existing: " + QString::number(footprintPrefix));
 		return false;
 	}
 
@@ -138,13 +139,13 @@ bool DBFootprintTable::isFootprintExisting(QString footprintID)
 		return false;
 }
 
-QStringList DBFootprintTable::getAllFootprints()
+QVector<int> DBFootprintTable::getAllFootprints()
 {
 	QSqlQuery query (this->getDB());
-	QStringList list;
+	QVector<int> list;
 
-	QString text = "SELECT FootprintID FROM " + QString(FOOTPRINTTABLENAME) + " WHERE DeploymentID = " +
-	        QString::number(deploymentId) + ";";
+	QString text = "SELECT FootprintPrefix FROM " + QString(FOOTPRINTTABLENAME) + " WHERE DeploymentID = " +
+	        QString::number(deploymentId) + " ORDER BY FootprintPrefix ASC;";
 	//qDebug(text.toStdString().c_str());
 	bool success = query.exec(text);
 
@@ -158,7 +159,7 @@ QStringList DBFootprintTable::getAllFootprints()
 	{
 		while(query.next())
 		{
-			list.append(query.value(0).toString());
+			list.append(query.value(0).toInt());
 		}
 	}
 	return list;

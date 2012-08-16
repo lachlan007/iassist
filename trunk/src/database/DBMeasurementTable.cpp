@@ -41,7 +41,7 @@ bool DBMeasurementTable::createTable()
 	    QSqlQuery query(this->getDB());
 	    bool success = query.exec(QString("CREATE TABLE ") +
 	            MEASUREMENTTABLENAME + QString(" (MeasurementID INTEGER PRIMARY KEY,") +
-	            QString(" MeasurementProfileID int, MeasurementNr int, Measurement int, FOREIGN KEY(MeasurementProfileID) ") +
+	            QString(" MeasurementProfileID INTEGER, MeasurementNr INTEGER, Measurement REAL, FOREIGN KEY(MeasurementProfileID) ") +
 	            QString(" REFERENCES MeasurementProfiles(MeasurementProfileID));"));
 		if(success)
 		{

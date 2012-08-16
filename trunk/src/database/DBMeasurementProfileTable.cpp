@@ -40,8 +40,8 @@ bool DBMeasurementProfileTable::createTable()
 		QSqlQuery query(this->getDB());
 		bool success = query.exec(QString("CREATE TABLE ")
 			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonID INTEGER, SessionNr int,")
-			+ QString(" ProgrammingTime char(30), CollectingTime char(30), TimeShift int, SamplingRate int,")
-			+ QString(" SamplingStartTime char(30), Resolution int, FOREIGN KEY(ButtonID) REFERENCES Buttons(ButtonID));"));
+			+ QString(" ProgrammingTime char(20), CollectingTimeHost char(20), CollectingTimeButton char(20), SamplingRate int,")
+			+ QString(" SamplingStartTime char(20), Resolution int, TempCalibUsed int, FOREIGN KEY(ButtonID) REFERENCES Buttons(ButtonID));"));
 		if(success)
 		{
 			Log::write("Created new MeasurementProfiles Table in Database");
@@ -69,10 +69,10 @@ bool DBMeasurementProfileTable::addProfile(MeasurementProfile profile)
 
 	// Create query
 	QString sqlText("INSERT INTO ");
-	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonID, SessionNr, ProgrammingTime, CollectingTime, "
-			+ "TimeShift, SamplingRate, SamplingStartTime, Resolution) VALUES ( " + ButtonId + ", " + SessionNr + ", "
-			+ ProgrammingTime + ", " + CollectingTime + ", " + TimeShift + ", " + SamplingRate + ", " + SamplingStartTime
-			+ ", " + Resolution + " );";
+	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonID, SessionNr, ProgrammingTime, CollectingTimeHost, CollectingTimeButton, "
+			+ "SamplingRate, SamplingStartTime, Resolution, TempCalibUsed) VALUES ( " + ButtonId + ", " + SessionNr + ", "
+			+ ProgrammingTime + ", " + CollectingTimeHost + ", " + CollectingTimeButton + ", " + SamplingRate + ", " + SamplingStartTime
+			+ ", " + Resolution + ", " + TempCalibUsed + " );";
 
 	// Send the query
 	bool success = query.exec(sqlText);
@@ -93,19 +93,20 @@ void DBMeasurementProfileTable::convertDataToSQL(MeasurementProfile *profile)
 	// Give all the digits "NULL" as value.
 	SessionNr = "NULL";
 	MeasurementProfileID = "NULL";
-	TimeShift ="NULL";
 	SamplingRate ="NULL";
 	Resolution = "NULL";
+	TempCalibUsed = "NULL";
 
 	this->ButtonId = QString::number(profile->ButtonId);
 	if(profile->SessionNr!=-9999) this->SessionNr= QString::number(profile->SessionNr);
 	if(profile->Resolution!=-9999) this->Resolution= QString::number(profile->Resolution);
 	if(profile->SamplingRate!=-9999) this->SamplingRate = QString::number(profile->SamplingRate);
-	if(profile->TimeShift!=-9999) this->TimeShift = QString::number(profile->TimeShift);
 	if(profile->MeasurementProfileID!=-9999) this->MeasurementProfileID = QString::number(profile->MeasurementProfileID);
-	this->CollectingTime = "'" + profile->CollectingTime + "'";
+	this->CollectingTimeHost = "'" + profile->CollectingTimeHost + "'";
+	this->CollectingTimeButton = "'" + profile->CollectingTimeButton + "'";
 	this->ProgrammingTime = "'" + profile->ProgrammingTime + "'";
 	this->SamplingStartTime = "'" + profile->SamplingStartTime + "'";
+	if(profile->TempCalibUsed!=9999) this->TempCalibUsed = QString::number(profile->TempCalibUsed);
 
 }
 
@@ -121,19 +122,21 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 	}
 
 	if(SessionNr!="NULL" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SessionNr", SessionNr);
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SessionNr", SessionNr);
 	if(Resolution!="NULL" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "Resolution", Resolution);
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "Resolution", Resolution);
 	if(SamplingRate!="NULL" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingRate", SamplingRate);
-	if(TimeShift!="NULL" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "TimeShift", TimeShift);
-	if(CollectingTime!="''" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "CollectingTime", CollectingTime);
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingRate", SamplingRate);
+	if(CollectingTimeHost!="''" && success)
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "CollectingTimeHost", CollectingTimeHost);
+	if(CollectingTimeButton!="''" && success)
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "CollectingTimeButton", CollectingTimeButton);
 	if(ProgrammingTime!="''" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "ProgrammingTime", ProgrammingTime);
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "ProgrammingTime", ProgrammingTime);
 	if(SamplingStartTime!="''" && success)
-		success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingStartTime", SamplingStartTime);
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingStartTime", SamplingStartTime);
+	if(TempCalibUsed!="''" && success)
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "TempCalibUsed", TempCalibUsed);
 
 	if(!success)
 	{
@@ -164,17 +167,20 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementPr
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingRate");
 	if(temp!="") data.SamplingRate = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "TimeShift");
-	if(temp!="") data.TimeShift = temp.toInt();
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "CollectingTimeHost");
+	if(temp!="") data.CollectingTimeHost = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "CollectingTime");
-	if(temp!="") data.CollectingTime = temp;
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "CollectingTimeButton");
+	if(temp!="") data.CollectingTimeButton = temp;
 
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ProgrammingTime");
 	if(temp!="") data.ProgrammingTime = temp;
 
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingStartTime");
 	if(temp!="") data.SamplingStartTime = temp;
+
+    temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "TempCalibUsed");
+    if(temp!="") data.TempCalibUsed = temp.toInt();
 
 	return data;
 }

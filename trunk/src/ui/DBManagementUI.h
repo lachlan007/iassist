@@ -24,6 +24,7 @@
 
 #include <QtGui/QDialog>
 #include <QFile>
+#include <QVector>
 #include "ui_DBManagementUI.h"
 #include "../database/DBFootprintTable.h"
 #include "../database/DBButtonTable.h"
@@ -101,14 +102,14 @@ private:
      * @param buttonNr The number of the chosen iButton
      * @return true if successfully deleted, false otherwise.
      */
-    bool deleteButton(QString buttonNr);
+    bool deleteButton(int buttonNr);
     /**
      * Deletes a Footprint and all it's related information from the database and the HDD.
      * Failures are stored in the report.
      * @param area the ID of the footprint to delete
      * @return true if successfully deleted, false otherwise
      */
-    bool deleteFootprint(QString footprint);
+    bool deleteFootprint(int footprint);
 
     int deploymentId;
 

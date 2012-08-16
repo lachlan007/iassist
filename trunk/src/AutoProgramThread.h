@@ -41,6 +41,11 @@
 #include <QtCore>
 #include "MissionParameterFile.h"
 
+#define STYLESHEETRED       "background-color: rgb(255, 181, 181);"
+#define STYLESHEETYELLOW    "background-color: rgb(255, 246, 207);"
+#define STYLESHEETGREEN     "background-color: rgb(190, 255, 196);"
+#define STYLESHEETWHITE     "background-color: rgb(255, 255, 255);"
+
 /**
  * This is the thread class for the automatic programming of iButtons at home.
  * It connects to the iButton reader and chcecks whether an iButton is present
@@ -75,9 +80,17 @@ public slots:
 	 * Receives the updated area from AutoProgramUI, when the user has changed it
 	 * on the GUI.
 	 *
-	 * @oaram area	new area
+	 * @param prefix	Footprint prefix
 	 */
-	void setFootprint(QString footprintID);
+	void setFootprintPrefix(int prefix);
+
+    /**
+     * Receives the updated area from AutoProgramUI, when the user has changed it
+     * on the GUI.
+     *
+     * @param suffix    ButtonNr suffix
+     */
+	void setButtonNrSuffix(int suffix);
 
 private:
 	int deploymentId;
@@ -87,12 +100,19 @@ private:
 	 * the current loop and then stop.
 	 */
 	bool threadEnabled;
+
 	/**
-	 * Keeps track of the current area. This value must be synchronized between
+	 * Keeps track of the current ButtonNr prefix. This value must be synchronized between
 	 * AutoProgramThread and its parent AutoProgramUI. AutoProgramThread updates
-	 * it via the SLOT setArea().
+	 * it via the SLOT setButtonNrPrefix().
 	 */
-	QString currentFootprint;
+	int footprintPrefix;
+
+	/**
+	 * Keeps track of the current ButtonNr suffix. If set, an existing ButtonNr is assigned. If set to -1, an auto-incremented suffix is chosen.
+	 */
+	int buttonNrSuffix;
+
 	/**
 	 * Manages the database connection to the button table.
 	 */
@@ -178,38 +198,29 @@ signals:
 	 * thread has to be stopped)
 	 */
 	void buttonSwitch();
-	/**
-	 * Sends a signal to the AutoProgramUI informing it about the status of
-	 * the autoProgram object, so it can be displayed on the GUI.
-	 *
-	 * @param status	current status
-	 */
-	void writeStatus(QString status);
+
 	/**
 	 * Sends a signal to the AutoProgramUI informing it about the current
 	 * ButtonNr of the autoProgram object, so it can be displayed on the GUI.
 	 *
 	 * @param ButtonNr	current ButtonNr
 	 */
-	void writeButtonNr(QString ButtonNr);
+	void writeButtonNr(QString buttonNr);
+
 	/**
 	 * Sends a signal to the AutoProgramUI informing it about the current
-	 * ButtonID of the autoProgram object, so it can be displayed on the GUI.
+	 * SerialNr of the autoProgram object, so it can be displayed on the GUI.
 	 *
-	 * @param ButtonID	current ButtonID
+	 * @param serialNr	current SerialNr
 	 */
-	void writeButtonID(QString ButtonID);
-	/**
-	 * Sends a signal to the AutoProgramUI to change the background color of
-	 * the status field.<br>
-	 * <br>
-	 * 0	=	red<br>
-	 * 1	=	yellow<br>
-	 * 2	=	green<br>
-	 *
-	 * @param ButtonID	current ButtonID
-	 */
-	void setStatusColor(int);
+	void writeSerialNr(QString serialNr);
+
+    /**
+     * Emits a text which describes the collect status. A stylesheet could be sent as well.
+     * @param text the text which describes the collect status.
+     * @param styleSheet a StyleSheet representation
+     */
+    void setStatus(QString text, QString styleSheet = "");
 
 	/**
 	 * Signal used to ask the user a Retry-Ignore-Abort Question.
@@ -217,6 +228,8 @@ signals:
 	 * @param button here will the answer be stored
 	 */
 	void askIgnoreQuestion(QString question, QMessageBox::StandardButton *button);
+
+	void resetButtonNrSuffix();
 
 };
 

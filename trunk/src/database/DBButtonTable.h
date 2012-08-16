@@ -53,13 +53,6 @@ public:
 
 	/**
 	 * Returns if the specified Button is existing in the iButton Table of the Database
-	 * @param buttonNr the button Number of a specified Button
-	 * @return true if found at least once, fals if not found
-	 */
-	//bool isButtonExistingByButtonId(QString buttonNr);
-
-	/**
-	 * Returns if the specified Button is existing in the iButton Table of the Database
 	 * @param buttonNr the button's ID of a specified Button
 	 * @return true if found at least once, false if not found
 	 */
@@ -67,32 +60,32 @@ public:
 
 	ButtonData getButtonBySerialNr(QString serialNr);
 
-	ButtonData getButtonByButtonNr(QString buttonNr);
+	ButtonData getButtonByButtonNr(int buttonNr);
 
 	ButtonData getButtonByButtonId(int buttonId);
 
 	/**
 	 * Returns a list of all the Buttons (ButtonNr) which are entered to the Database
-	 * @return QStringList with all the ButtonNr in it
+	 * @return QVector with all the ButtonNr in it
 	 */
-	QStringList getAllButtonNr();
+	QVector<int> getAllButtonNr();
 
 	/**
-	 * Returns a list of all the Buttons (ButtonNr) to a certain %Area
-	 * @return QStringList with all the ButtonNr to a certain %Area
+	 * Returns a list of all the Buttons (ButtonNr) for a certain footprint
+	 * @return QVector with all the ButtonNr to a certain %Area
 	 */
-	QStringList getAllButtonNr(QString _area);
+	QVector<int> getAllButtonNr(int footprintPrefix);
 
 	/**
-	 * Returns the highest Number of all the Buttons to a certain area (e.g. AA004 -> 4)
-	 * @param _area the area, we want to have the highest ButtonNr
+	 * Returns the highest Number of all the Buttons to a certain footprint
+	 * @param footprintPrefix the footprint for which we want to have the highest ButtonNr
 	 * @return The highest Number of all the Buttons which are in the Database
 	 */
-	int getLastAddedButtonNrInt(QString _area);
+	int getLastAddedButtonNr(int footprintPrefix);
 
 	bool deleteButtonByButtonId(int buttonId);
 
-	QVector<int> getButtonIdsByArea(QString area);
+	QVector<int> getButtonIdsByFootprint(int footprintPrefix);
 
 	/**
 	 * Opens the Database. If no Database is existing, it creates one first. And if the
@@ -102,7 +95,7 @@ public:
 
 	int getButtonIdBySerialNr(QString serialNr);
 
-    int getButtonIdByButtonNr(QString buttonNr);
+    int getButtonIdByButtonNr(int buttonNr);
 
     /**
      * Reads one specific field in the database. If more than one hit is found, only the first
@@ -117,11 +110,6 @@ public:
 private:
 	int deploymentId;
 
-	void convertButtonDataToSQL(ButtonData *button);
-
-	//iButton Table in iButtonDB
-    QString ButtonNr;
-    QString SerialNr;
  };
 
 #endif /* DBBUTTONTABLE_H_ */

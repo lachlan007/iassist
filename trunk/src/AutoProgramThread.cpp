@@ -23,15 +23,15 @@
 
 AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
 
-    currentFootprint = "AA";
     this->deploymentId = deploymentId;
     threadEnabled = false;
     connect(this, SIGNAL(buttonSwitch()), parent, SLOT(buttonSwitch()));
-    connect(this, SIGNAL(writeStatus(QString)), parent, SLOT(readStatus(QString)));
-    connect(this, SIGNAL(writeButtonNr(QString)), parent, SLOT(readButtonNr(QString)));
-    connect(this, SIGNAL(writeButtonID(QString)), parent, SLOT(readButtonID(QString)));
-    connect(parent, SIGNAL(setArea(QString)), this, SLOT(setFootprint(QString)));
-    connect(this, SIGNAL(setStatusColor(int)), parent, SLOT(setStatusColor(int)));
+    connect(this, SIGNAL(setStatus(QString, QString)), parent, SLOT(setStatusText(QString, QString)));
+    connect(this, SIGNAL(writeButtonNr(QString)), parent, SLOT(writeButtonNr(QString)));
+    connect(this, SIGNAL(writeSerialNr(QString)), parent, SLOT(writeSerialNr(QString)));
+    connect(parent, SIGNAL(setFootprintPrefix(int)), this, SLOT(setFootprintPrefix(int)));
+    connect(parent, SIGNAL(setButtonNrSuffix(int)), this, SLOT(setButtonNrSuffix(int)));
+    connect(this, SIGNAL(resetButtonNrSuffix()), parent, SLOT(resetButtonNrSuffixCombo()));
     connect(this, SIGNAL(askIgnoreQuestion(QString, QMessageBox::StandardButton*)),
             this, SLOT(replyIgnoreQuestion(QString, QMessageBox::StandardButton*)));
 
@@ -41,6 +41,10 @@ AutoProgramThread::AutoProgramThread(int deploymentId, QObject *parent){
 
     // Creating an instance for iButton I/O
     iButtonCon = new ButtonIO();
+
+    // By default, the next ButtonNr is assigned using an auto-incremented value
+    footprintPrefix = 1;
+    buttonNrSuffix = -1;
 
 }
 
@@ -63,8 +67,7 @@ void AutoProgramThread::run(){
     if(!mp.loadMissionParameters())
     {
         this->abort();
-        emit writeStatus("Check Mission Parameter file."); // Parameter file is not correct
-        emit setStatusColor(0);
+        emit setStatus("Check Mission Parameter file.", STYLESHEETRED); // Parameter file is not correct
         Log::writeError("autoProgramThread: The Mission Parameter file is missing or corrupt.");
         return;
     }
@@ -73,8 +76,7 @@ void AutoProgramThread::run(){
     if (!iButtonCon->openPort())
     {
         this->abort();
-        emit writeStatus("ERROR: No reader connected!");
-        emit setStatusColor(0);
+        emit setStatus("ERROR: No reader connected!", STYLESHEETRED);
         return;
     }
 
@@ -87,14 +89,11 @@ void AutoProgramThread::run(){
 
     while (threadEnabled)
     {
-        QString cachedCurrentFootprint = currentFootprint;
-
         // Check if mission start time is ok
         if(mp.getSetMissionStartTime() && mp.getMissionStartTime() < QDateTime::currentDateTime().toTime_t())
         {
             this->abort();
-            emit writeStatus("Mission start time is in the past.");
-            emit setStatusColor(0);
+            emit setStatus("Mission start time is in the past.", STYLESHEETRED);
             Log::writeError("autoProgramThread: The mission start time is in the past.");
             return;
         }
@@ -114,13 +113,12 @@ void AutoProgramThread::run(){
             // Check if it is really a new button
             if ((button.SerialNr == lastSerialNr) || (button.SerialNr=="failed"))
             {
-                emit writeStatus("Please insert NEW iButton.");
+                emit setStatus("Please insert NEW iButton.", STYLESHEETYELLOW);
             }
             else
             {
 
-                emit setStatusColor(1);
-                emit writeStatus("Starting to program ...");
+                emit setStatus("Starting to program ...", STYLESHEETYELLOW);
 
                 //====================================
                 // If a mission is running, stop it
@@ -128,14 +126,12 @@ void AutoProgramThread::run(){
                 int res=1;
                 if(iButtonCon->isMissionInProgress(&SNum[0]))
                 {
-                    emit setStatusColor(1);
-                    emit writeStatus("Mission was running, stopping it.");
+                    emit setStatus("Mission was running, stopping it.", STYLESHEETYELLOW);
                     res = this->stopMissionOnButton(iButtonCon, &SNum[0]);
                     if(res==-1)
                     {
                         this->abort();
-                        emit setStatusColor(0);
-                        emit writeStatus("Cannot stop running mission.");
+                        emit setStatus("Cannot stop running mission.", STYLESHEETRED);
                         Log::writeError("AutoProgramThread: Cannot stop running mission: " + button.SerialNr);
                         return;
                     }
@@ -148,8 +144,7 @@ void AutoProgramThread::run(){
                 if(res==-1)
                 {
                     this->abort();
-                    emit writeStatus("Programming iButton FAILED.");
-                    emit setStatusColor(0);
+                    emit setStatus("Programming iButton FAILED.", STYLESHEETRED);
                     Log::writeError("AutoProgramThread: The mission could not be started: " + button.SerialNr);
                     return;
                 }
@@ -160,15 +155,19 @@ void AutoProgramThread::run(){
                 // Store settings to DB
                 //===============================
                 // Calculate next ButtonNr for the selected area and save to button
-                QString ButtonNrRight = QString::number(dbButton->getLastAddedButtonNrInt(cachedCurrentFootprint) + 1);
-                ButtonNrRight = ButtonNrRight.rightJustified(3,'0');
-                button.ButtonNr = cachedCurrentFootprint + ButtonNrRight;
+                if(buttonNrSuffix == 0)
+                {
+                    button.ButtonNr = dbButton->getLastAddedButtonNr(footprintPrefix)+1;
+                }
+                else
+                {
+                    button.ButtonNr = 1000*footprintPrefix+buttonNrSuffix;
+                }
 
                 int insertId;
                 if (!dbButton->addButton(button, insertId))
                 {
-                    emit writeStatus("Programming iButton FAILED.");
-                    emit setStatusColor(0);
+                    emit setStatus("Programming iButton FAILED.", STYLESHEETRED);
                     this->abort();
                     Log::writeError("autoProgram: Tried to call dbButton::addButton() - returned false.");
                     return;
@@ -188,34 +187,32 @@ void AutoProgramThread::run(){
                 profile.ButtonId = insertId;
                 profile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 
-                emit writeButtonNr(button.ButtonNr);
-                emit writeButtonID(button.SerialNr);
+                emit writeButtonNr(QString::number(button.ButtonNr).rightJustified(6, '0').insert(3, ' '));
+                emit writeSerialNr(button.SerialNr);
 
                 if (!dbProfile->addProfile(profile))
                 {
-                    emit writeStatus("Programming iButton FAILED.");
-                    emit setStatusColor(0);
+                    emit setStatus("Programming iButton FAILED.", STYLESHEETRED);
                     this->abort();
                     Log::writeError("autoProgram: Tried to call dbProfile::addProfile() - returned false.");
                     return;
                 }
 
                 // Check if the chosen Area is already existing
-                if(!dbFootprint->isFootprintExisting(cachedCurrentFootprint))
+                if(!dbFootprint->isFootprintExisting(footprintPrefix))
                 {
                     // if not create it in the database
-                    if(!dbFootprint->addFootprint(cachedCurrentFootprint))
+                    if(!dbFootprint->addFootprint(footprintPrefix))
                     {
-                        emit writeStatus("Programming iButton FAILED.");	// DB Error
-                        emit setStatusColor(0);
+                        emit setStatus("Programming iButton FAILED.", STYLESHEETRED);	// DB Error
                         this->abort();
                         Log::writeError("autoProgram: Tried to call dbArea::addArea() - returned false.");
                         return;
                     }
                 }
 
-                emit writeStatus("Programming iButton DONE.");
-                emit setStatusColor(2);
+                emit setStatus("Programming iButton DONE.", STYLESHEETGREEN);
+                emit resetButtonNrSuffix();
                 QApplication::beep();
                 sleep(2);
             }
@@ -223,8 +220,7 @@ void AutoProgramThread::run(){
         // There is no iButton in the Reader
         else
         {
-            emit writeStatus("Please insert iButton.");
-            emit setStatusColor(2);
+            emit setStatus("Please insert iButton.", STYLESHEETYELLOW);
         }
 
         msleep(1000);
@@ -245,7 +241,8 @@ void AutoProgramThread::abort()
 {
     this->stop();
     emit writeButtonNr("");
-    emit writeButtonID("");
+    emit writeSerialNr("");
+    emit resetButtonNrSuffix();
     emit buttonSwitch();
     // Close the databases
     dbButton->close();
@@ -260,12 +257,16 @@ void AutoProgramThread::stop(){
     threadEnabled=false;
 }
 
-
-void AutoProgramThread::setFootprint(QString footprintID){
-    currentFootprint = footprintID;
+void AutoProgramThread::setFootprintPrefix(int prefix)
+{
+    footprintPrefix = prefix;
     button.clearData();
-    emit writeButtonNr("");
-    emit writeButtonID("");
+}
+
+void AutoProgramThread::setButtonNrSuffix(int suffix)
+{
+    buttonNrSuffix = suffix;
+    button.clearData();
 }
 
 int AutoProgramThread::stopMissionOnButton(ButtonIO *buttonIO, uchar* SNum)

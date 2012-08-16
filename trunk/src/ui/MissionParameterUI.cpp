@@ -21,10 +21,6 @@
 //---------------------------------------------------------------------------
 #include "MissionParameterUI.h"
 
-#define RED	"background-color: rgb(255, 181, 181);" // red
-#define YELLOW "background-color: rgb(255, 246, 207);" // yellow
-#define GREEN "background-color: rgb(190, 255, 196);" // green
-
 using namespace std;
 
 MissionParameterUI::MissionParameterUI(QWidget *parent)
@@ -45,15 +41,15 @@ MissionParameterUI::MissionParameterUI(QWidget *parent)
 
 	MissionParameterFile& mp = MissionParameterFile::Instance();
 
-	ui.txtStatus->setStyleSheet(YELLOW);
+	ui.txtStatus->setStyleSheet(STYLESHEETYELLOW);
 	ui.txtStatus->setText("Loading mission parameter file.");
 
 	if(!mp.loadMissionParameters()){
-		ui.txtStatus->setStyleSheet(RED);
+		ui.txtStatus->setStyleSheet(STYLESHEETRED);
 		ui.txtStatus->setText("Could not load mission parameter file.");
 	}
 	else{
-		ui.txtStatus->setStyleSheet(GREEN);
+		ui.txtStatus->setStyleSheet(STYLESHEETGREEN);
 		ui.txtStatus->setText("Mission parameter file loaded.");
 	}
 	initUI();
@@ -86,7 +82,7 @@ void MissionParameterUI::initUI()
 bool MissionParameterUI::storeMissionParameters()
 {
     MissionParameterFile& mp = MissionParameterFile::Instance();
-	ui.txtStatus->setStyleSheet(YELLOW);
+	ui.txtStatus->setStyleSheet(STYLESHEETYELLOW);
 	ui.txtStatus->setText("Saving mission parameter file.");
 
 	// Copy window status to missionParameter array
@@ -103,7 +99,7 @@ bool MissionParameterUI::storeMissionParameters()
 	mp.setMissionStartTime(missionStart.toTime_t());
 
 	mp.storeMissionParameters();
-	ui.txtStatus->setStyleSheet(GREEN);
+	ui.txtStatus->setStyleSheet(STYLESHEETGREEN);
 	ui.txtStatus->setText("Mission parameter file saved.");
 	return true;
 }
@@ -112,7 +108,7 @@ void MissionParameterUI::setStatusChangesMade()
 {
     if(initDone)
     {
-        ui.txtStatus->setStyleSheet(YELLOW);
+        ui.txtStatus->setStyleSheet(STYLESHEETYELLOW);
         ui.txtStatus->setText("Changes have been made. Please save or they will be lost.");
         toggleSelectableParam();
     }
