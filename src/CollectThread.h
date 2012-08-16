@@ -54,7 +54,7 @@ public:
 	/**
 	 * Default constructor
 	 */
-	CollectThread(int deploymentId, QObject *_parent);
+	CollectThread(int deploymentId, QObject *parent);
 	/**
 	 * Default deconstructor
 	 */
@@ -74,7 +74,7 @@ public:
 	 * Is used to set the button, which should actually be attached.
 	 * @param _button the button which should be attached next.
 	 */
-	void setButton(ButtonData _button);
+	void setButton(ButtonData button);
 
 	/**
 	 * Switch between redistribute or simply collect the buttons.
@@ -88,7 +88,6 @@ public:
 	void stop();
 
 signals:
-
 	/**
 	 * Emits a text which describes the collect status. A stylesheet could be sent as well.
 	 * @param text the text which describes the collect status.

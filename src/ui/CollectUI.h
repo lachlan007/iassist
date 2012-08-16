@@ -23,6 +23,7 @@
 #define COLLECTUI_H
 
 #include <QtGui/QDialog>
+#include <QVector>
 #include "ui_CollectUI.h"
 #include "../database/DBFootprintTable.h"
 #include "../database/DBButtonTable.h"
@@ -98,7 +99,7 @@ public slots:
 	 * @param styleSheet chose a stylesheet string representation if the
 	 * appearance should change. If it doesn't have to change chose an empty string ""
 	 */
-	void setStatusText(QString text, QString styleSheet);
+	void setStatusText(QString text, QString styleSheet = "");
 	/**
 	 * Selects the next button in the combo box
 	 */

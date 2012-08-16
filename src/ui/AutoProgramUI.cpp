@@ -24,40 +24,55 @@
 AutoProgramUI::AutoProgramUI(int deploymentId, QWidget *parent)
     : QDialog(parent)
 {
-	currentFootprint="AA";
-
-	ui.setupUi(this);
+    ui.setupUi(this);
 
 	autoProg = new AutoProgramThread(deploymentId, this);
 	autoProgramRunning = false;
 
 	connect(ui.btnStart, SIGNAL(clicked()), this, SLOT(buttonSwitch()));
-	connect(ui.btnDecFootprint, SIGNAL(clicked()), this, SLOT(decFootprint()));
-	connect(ui.btnIncFootprint, SIGNAL(clicked()), this, SLOT(incFootprint()));
-	connect(ui.btnDecFootprintMore, SIGNAL(clicked()), this, SLOT(decFootprintMore()));
-	connect(ui.btnIncFootprintMore, SIGNAL(clicked()), this, SLOT(incFootprintMore()));
+	connect(ui.cbFootprintPrefix, SIGNAL(currentIndexChanged(int)), this, SLOT(footprintPrefixChanged(int)));
+	connect(ui.cbButtonNrSuffix, SIGNAL(currentIndexChanged(QString)), this, SLOT(buttonNrSuffixChanged(QString)));
 	connect(ui.btnClose, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
+	dbButton = new DBButtonTable(deploymentId);
+
+	setupPrefixSelect();
+	setupSuffixSelect(1);
 }
 
 AutoProgramUI::~AutoProgramUI()
 {
-
+    delete dbButton;
 }
 
-void AutoProgramUI::setStatusColor(int color){
+void AutoProgramUI::setupPrefixSelect() {
+    QStringList prefixList;
+    // Initialize prefix combo box
+    for(int i=1; i<=999; i++)
+    {
+        QString item = QString::number(i);
+        item = item.rightJustified(3, '0');
+        prefixList.append(item);
+    }
+    ui.cbFootprintPrefix->clear();
+    ui.cbFootprintPrefix->addItems(prefixList);
+}
 
-	switch(color){
-	case 0: // red
-		ui.txtStatus->setStyleSheet("background-color: rgb(255, 181, 181);"); // red
-		break;
-	case 1: // yellow
-		ui.txtStatus->setStyleSheet("background-color: rgb(255, 246, 207);"); // yellow
-		break;
-	case 2: // green
-		ui.txtStatus->setStyleSheet("background-color: rgb(190, 255, 196);"); // green
-		break;
-	}
+void AutoProgramUI::setupSuffixSelect(int footprintPrefix)
+{
+    QStringList items;
+    items.append(QString(AUTOINCREMENTTEXT));
+    dbButton->open();
+    QVector<int> existing = dbButton->getAllButtonNr(footprintPrefix);
+    dbButton->close();
+    for(int i=0; i<existing.size(); i++)
+    {
+        items.append(QString::number(existing.at(i)-footprintPrefix*1000).rightJustified(3, '0'));
+    }
+    ui.cbButtonNrSuffix->clear();
+    ui.cbButtonNrSuffix->addItems(items);
+    emit setButtonNrSuffix(0); // auto-increment
+    currentButtonNrPrefixIdx = 0;
 }
 
 void AutoProgramUI::buttonSwitch(){
@@ -77,7 +92,8 @@ void AutoProgramUI::buttonSwitch(){
 	    autoProg->start();
 	    ui.btnStart->setText("Stop");
 	}
-
+    writeButtonNr("");
+    writeSerialNr("");
 }
 
 void AutoProgramUI::closeClicked()
@@ -90,157 +106,68 @@ void AutoProgramUI::closeClicked()
 	this->close();
 }
 
-void AutoProgramUI::readStatus(QString status){
-	ui.txtStatus->setText(status.toStdString().c_str());
+void AutoProgramUI::footprintPrefixChanged(int selected)
+{
+    writeButtonNr("");
+    writeSerialNr("");
+    setupSuffixSelect(selected+1);
+    emit setFootprintPrefix(selected+1);
 }
 
-void AutoProgramUI::readButtonNr(QString ButtonNr){
+void AutoProgramUI::buttonNrSuffixChanged(QString selected)
+{
+    if(selected != "" && selected != QString(AUTOINCREMENTTEXT))
+    {
+        if(UserDialog::question("Do you really want to replace button " + selected + "?"))
+        {
+            emit setButtonNrSuffix(selected.toInt());
+            currentButtonNrPrefixIdx = ui.cbButtonNrSuffix->currentIndex();
+        }
+        else
+        {
+            ui.cbButtonNrSuffix->setCurrentIndex(currentButtonNrPrefixIdx);
+        }
+    }
+    else
+    {
+        // 0 = auto-increment
+        emit setButtonNrSuffix(0);
+        currentButtonNrPrefixIdx = 0;
+    }
+}
+
+void AutoProgramUI::resetButtonNrSuffixCombo()
+{
+    setupSuffixSelect(ui.cbFootprintPrefix->currentIndex()+1);
+}
+
+
+void AutoProgramUI::writeButtonNr(QString ButtonNr){
 	ui.txtButtonNr->setText(ButtonNr);
 }
 
-void AutoProgramUI::readButtonID(QString ButtonID){
-	if(ButtonID.size()<=16)
+void AutoProgramUI::writeSerialNr(QString SerialNr){
+	if(SerialNr.size()<=16)
 	{
-		QString bIDstr = ButtonID.mid(0,2) + " "
-					+ ButtonID.mid(2,2) + " "
-					+ ButtonID.mid(4,2) + " "
-					+ ButtonID.mid(6,2) + " "
-					+ ButtonID.mid(8,2) + " "
-					+ ButtonID.mid(10,2) + " "
-					+ ButtonID.mid(12,2) + " "
-					+ ButtonID.mid(14,2);
+		QString bIDstr = SerialNr.mid(0,2) + " "
+					+ SerialNr.mid(2,2) + " "
+					+ SerialNr.mid(4,2) + " "
+					+ SerialNr.mid(6,2) + " "
+					+ SerialNr.mid(8,2) + " "
+					+ SerialNr.mid(10,2) + " "
+					+ SerialNr.mid(12,2) + " "
+					+ SerialNr.mid(14,2);
 		ui.txtButtonID->setText(bIDstr);
 	}
 	else
 	{
-		ui.txtButtonID->setText(ButtonID);
+		ui.txtButtonID->setText(SerialNr);
 	}
 }
 
-void AutoProgramUI::incFootprint(){
-	currentFootprint = ui.lblFootprint->text();
-
-	// Increase the area by 1
-
-	QChar charAr1 = currentFootprint[0];
-	QChar charAr2 = currentFootprint[1];
-	ushort value1 = charAr1.unicode();
-	ushort value2 = charAr2.unicode();
-
-	if(value2<65)	// If value2 < (Capital ASCII letters)
-	{
-		currentFootprint.replace(1,1, QString("A")); // Set to A
-	}
-	else if(value2>=90)	// If value2 > (Capital ASCII letters) OR "Z"
-	{
-		currentFootprint.replace(1,1, QString("A")); // Set to A
-
-		if(value1<65)	// If value1 < (Capital ASCII letters)
-		{
-			currentFootprint.replace(0,1, QString("A")); // Set to A
-		}
-		else if(value1>=90)	// If value1 > (capital ASCII letters) OR "Z"
-		{
-			currentFootprint.replace(0,1, QString("A")); // Set to A
-		}
-		else // If value1 == (Capital ASCII letter)
-		{
-			currentFootprint.replace(0,1, QString(QChar(value1+1))); // Increase by 1
-		}
-	}
-	else // If value2 == (Capital ASCII letter)
-	{
-		currentFootprint.replace(1,1, QString(QChar(value2+1))); // Increase by 1
-	}
-
-	ui.lblFootprint->setText(currentFootprint);
-	emit setArea(currentFootprint);
+void AutoProgramUI::setStatusText(QString text, QString styleSheet)
+{
+    ui.txtStatus->setText(text);
+    if(styleSheet!="") ui.txtStatus->setStyleSheet(styleSheet);
 }
 
-void AutoProgramUI::decFootprint(){
-	currentFootprint = ui.lblFootprint->text();
-
-	// Decrease the area by 1
-	QChar charAr1 = currentFootprint[0];
-	QChar charAr2 = currentFootprint[1];
-	ushort value1 = charAr1.unicode();
-	ushort value2 = charAr2.unicode();
-
-	if(value2<=65)
-	{
-		currentFootprint.replace(1 , 1, QString("Z"));
-		if(value1<=65)
-		{
-			currentFootprint.replace(0, 1, QString("Z"));
-		}
-		else if(value1>90)
-		{
-			currentFootprint.replace(0, 1, QString("Z"));
-		}
-		else
-		{
-			currentFootprint.replace(0, 1, QString(QChar(value1-1)));
-		}
-	}
-	else if(value2>90)
-	{
-		currentFootprint.replace(1 , 1, QString("Z"));
-	}
-	else
-	{
-		currentFootprint.replace(1, 1, QString(QChar(value2-1)));
-	}
-
-	ui.lblFootprint->setText(currentFootprint);
-	emit setArea(currentFootprint);
-}
-
-
-void AutoProgramUI::incFootprintMore(){
-	currentFootprint = ui.lblFootprint->text();
-
-	// Increase the area by 26 (left letter)
-
-	QChar charAr1 = currentFootprint[0];
-	ushort value1 = charAr1.unicode();
-
-		if(value1<65)	// If value1 < (Capital ASCII letters)
-		{
-			currentFootprint.replace(0,1, QString("A")); // Set to A
-		}
-		else if(value1>=90)	// If value1 > (capital ASCII letters) OR "Z"
-		{
-			currentFootprint.replace(0,1, QString("A")); // Set to A
-		}
-		else // If value1 == (Capital ASCII letter)
-		{
-			currentFootprint.replace(0,1, QString(QChar(value1+1))); // Increase by 1
-		}
-
-	ui.lblFootprint->setText(currentFootprint);
-	emit setArea(currentFootprint);
-}
-
-void AutoProgramUI::decFootprintMore(){
-	currentFootprint = ui.lblFootprint->text();
-
-	// Decrease the area by 26 (left letter)
-	QChar charAr1 = currentFootprint[0];
-	ushort value1 = charAr1.unicode();
-
-		if(value1<=65)
-		{
-			currentFootprint.replace(0, 1, QString("Z"));
-		}
-		else if(value1>90)
-		{
-			currentFootprint.replace(0, 1, QString("Z"));
-		}
-		else
-		{
-			currentFootprint.replace(0, 1, QString(QChar(value1-1)));
-		}
-
-	ui.lblFootprint->setText(currentFootprint);
-	emit setArea(currentFootprint);
-}

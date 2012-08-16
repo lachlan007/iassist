@@ -121,11 +121,12 @@ private:
 	QString SessionNr;
 	QString MeasurementProfileID;
 	QString ProgrammingTime;
-	QString CollectingTime;
-	QString TimeShift;
+	QString CollectingTimeHost;
+	QString CollectingTimeButton;
 	QString SamplingRate;
 	QString SamplingStartTime;
 	QString Resolution;
+	QString TempCalibUsed;
 
 };
 

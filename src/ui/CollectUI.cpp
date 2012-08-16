@@ -64,26 +64,32 @@ void CollectUI::initComboFootprint()
 {
 	DBFootprintTable db(deploymentId);
 	db.open();
-	QStringList listNone;
-	listNone.append("none");
-	QStringList listFootprints;
-	listFootprints = db.getAllFootprints();
-	listFootprints.sort();
-	ui.comboFootprint->addItems(listNone + listFootprints);
+	QStringList listCombo;
+	listCombo.append("none");
+	QVector<int> listFootprints = db.getAllFootprints();
+	for(int i=0; i<listFootprints.size(); i++)
+	{
+	    listCombo.append(QString::number(listFootprints.at(i)).rightJustified(3, '0'));
+	}
+	ui.comboFootprint->addItems(listCombo);
 	db.close();
 	updateComboButtonNr();
 }
 
 void CollectUI::updateComboButtonNr()
 {
+    int footprintPrefix = ui.comboFootprint->currentText().toInt();
 	ui.comboButtonNr->clear();
 	DBButtonTable db(deploymentId);
 	db.open();
 	QStringList list;
 	list.append("none");
-	QStringList list2 =db.getAllButtonNr(ui.comboFootprint->currentText());
-	list2.sort();
-	ui.comboButtonNr->addItems(list+list2);
+	QVector<int> buttons = db.getAllButtonNr(footprintPrefix);
+	for(int i=0; i<buttons.size(); i++)
+	{
+	    list.append(QString::number(buttons.at(i)-footprintPrefix*1000).rightJustified(3, '0'));
+	}
+	ui.comboButtonNr->addItems(list);
 	ui.comboButtonNr->setCurrentIndex(0);
 	db.close();
 }
@@ -97,7 +103,8 @@ void CollectUI::buttonNrChanged()
 {
     DBButtonTable dbButton(deploymentId);
     dbButton.open();
-    actualButton = dbButton.getButtonByButtonNr(ui.comboButtonNr->currentText());
+    int buttonNr = 1000*ui.comboFootprint->currentText().toInt()+ui.comboButtonNr->currentText().toInt();
+    actualButton = dbButton.getButtonByButtonNr(buttonNr);
     dbButton.close();
 
     // Display the actual iButton ID

@@ -35,7 +35,6 @@ DBConnection::DBConnection(QString _connectionName)
 	{
 		connectionName = _connectionName;
 	}
-
 }
 
 DBConnection::~DBConnection() {

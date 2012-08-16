@@ -35,9 +35,10 @@ void MeasurementProfile::clearData()
 	SessionNr = -9999;
 	ButtonId = -9999;
 	SamplingStartTime = "";
-	CollectingTime = "";
+	CollectingTimeHost = "";
+	CollectingTimeButton = "";
 	ProgrammingTime = "";
-	TimeShift = -9999;
 	SamplingRate = -9999;
 	Resolution = -9999;
+	TempCalibUsed = -9999;
 }

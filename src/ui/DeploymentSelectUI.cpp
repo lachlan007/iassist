@@ -128,11 +128,11 @@ void DeploymentSelectUI::deleteDeployment()
         dbMeasProf.open();
         dbMeas.open();
 
-        QStringList footprints = dbFootprint.getAllFootprints();
+        QVector<int> footprints = dbFootprint.getAllFootprints();
         for(int i=0; i<footprints.size(); i++)
         {
-            QString footprint = footprints.at(i);
-            QVector<int> buttons = dbButton.getButtonIdsByArea(footprint);
+            int footprint = footprints.at(i);
+            QVector<int> buttons = dbButton.getButtonIdsByFootprint(footprint);
             for(int j=0; j<buttons.size(); j++)
             {
                 int buttonId = buttons.at(j);

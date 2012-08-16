@@ -35,6 +35,6 @@ ButtonData::~ButtonData() {
  */
 void ButtonData::clearData()
 {
-	ButtonNr = "";
+	ButtonNr = 0;
 	SerialNr = "";
 }

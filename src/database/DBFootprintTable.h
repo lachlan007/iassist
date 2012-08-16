@@ -48,31 +48,30 @@ public:
 
 	/**
 	 * Adds a Footprint to the Database
-	 * @param footprintID name of the footprint
+	 * @param footprintPrefix name of the footprint
 	 * @return true or false for the success state
 	 */
-	bool addFootprint(QString footprintID);
+	bool addFootprint(int footprintPrefix);
 
 	/**
 	 * Deletes a certain Footprint out of the Footprint (%Footprint) Table of the Database.
 	 * Attention: Buttons, Photos and Measurements have to be deleted separately.
-	 * @param footprintID are which should be deleted
+	 * @param footprintPrefix are which should be deleted
 	 * @return true or false for the success state
 	 */
-	bool deleteFootprint(QString footprintID);
+	bool deleteFootprint(int footprintPrefix);
 
 	/**
 	 * Returns if the specified %Footprint is already entered in the Footprint Table of the iButton Database
-	 * @param area %Footprint to look for
 	 * @return true if found at least once, false if not found
 	 */
-	bool isFootprintExisting(QString footprintID);
+	bool isFootprintExisting(int footprintPrefix);
 
 	/**
-	 * Returns QStringList with all the Footprints (Footprint ID).
-	 * @return a list with all the FootprintIDs
+	 * Returns QStringList with all the Footprints (FootprintPrefix).
+	 * @return a list with all the FootprintPrefix
 	 */
-	QStringList getAllFootprints();
+	QVector<int> getAllFootprints();
 
 	/**
 	 * Opens the Database. If no Database is existing, it creates one first. And if the

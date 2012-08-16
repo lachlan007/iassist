@@ -54,15 +54,16 @@ DBManagementUI::~DBManagementUI()
 void DBManagementUI::initComboFootprint()
 {
 	ui.comboFootprint->clear();
-
 	DBFootprintTable db(deploymentId);
 	db.open();
-	QStringList listFootprint;
-	QStringList listNone;
-	listNone.append("none");
-	listFootprint = db.getAllFootprints();
-	listFootprint.sort();
-	ui.comboFootprint->addItems(listNone + listFootprint);
+	QStringList listCombo;
+	listCombo.append("none");
+	QVector<int> listFootprint = db.getAllFootprints();
+	for(int i=0; i<listFootprint.size(); i++)
+	{
+	    listCombo.append(QString::number(listFootprint.at(i)).rightJustified(3, '0'));
+	}
+	ui.comboFootprint->addItems(listCombo);
 	db.close();
 	updateComboButtonNr();
 
@@ -75,9 +76,14 @@ void DBManagementUI::updateComboButtonNr()
 	ui.comboButtonNr->clear();
 	DBButtonTable db(deploymentId);
 	db.open();
-	QStringList listNone;
-	listNone.append("none");
-	QStringList listButton = db.getAllButtonNr(ui.comboFootprint->currentText());
+	QStringList listCombo;
+	int footprintPrefix = ui.comboFootprint->currentText().toInt();
+	listCombo.append("none");
+	QVector<int> listButton = db.getAllButtonNr(footprintPrefix);
+	for(int i=0; i<listButton.size(); i++)
+	{
+	    listCombo.append(QString::number(listButton.at(i)-footprintPrefix*1000).rightJustified(3, '0'));
+	}
 
 	if(listButton.size() == 0)
 	{
@@ -90,8 +96,7 @@ void DBManagementUI::updateComboButtonNr()
 		ui.btnNextButton->setEnabled(true);
 	}
 
-	listButton.sort();
-	ui.comboButtonNr->addItems(listNone+listButton);
+	ui.comboButtonNr->addItems(listCombo);
 	ui.comboButtonNr->setCurrentIndex(0);
 	db.close();
 }
@@ -118,7 +123,7 @@ void DBManagementUI::buttonNrChanged()
 		ui.btnDelButton->setEnabled(true);
 		DBButtonTable dbButton(deploymentId);
 		dbButton.open();
-		actualButton = dbButton.getButtonByButtonNr(ui.comboButtonNr->currentText());
+		actualButton = dbButton.getButtonByButtonNr(ui.comboButtonNr->currentText().toInt()+1000*ui.comboFootprint->currentText().toInt());
 		ButtonNr = ui.comboButtonNr->currentText();
 		dbButton.close();
 
@@ -175,6 +180,7 @@ void DBManagementUI::deleteFootprintClicked()
 {
 	QString curFootprint = ui.comboFootprint->currentText();
 	int curIndex = ui.comboFootprint->currentIndex();
+	// resets combo box when last item is deleted
 	if(curIndex == (ui.comboFootprint->count()-1))
 	{
 		curIndex = 0;
@@ -193,7 +199,7 @@ void DBManagementUI::deleteFootprintClicked()
 	}
 	else
 	{
-		if(this->deleteFootprint(curFootprint))
+		if(this->deleteFootprint(curFootprint.toInt()))
 		{
 			this->setStatusText("Footprint " + curFootprint + " successfully deleted.", STYLESHEETGREEN);
 		}
@@ -211,7 +217,7 @@ void DBManagementUI::deleteFootprintClicked()
 
 void DBManagementUI::deleteButtonClicked()
 {
-	QString curButton = ui.comboButtonNr->currentText();
+	QString curButton = ui.comboFootprint->currentText() + " " + ui.comboButtonNr->currentText();
 
 	if(!UserDialog::question("Do you really want to delete\n"
 							"Button " + curButton + " and all\n"
@@ -226,7 +232,7 @@ void DBManagementUI::deleteButtonClicked()
 	}
 	else
 	{
-		if(this->deleteButton(curButton))
+		if(this->deleteButton(1000*ui.comboFootprint->currentText().toInt()+ui.comboButtonNr->currentText().toInt()))
 		{
 			this->setStatusText("iButton " + curButton + " successfully deleted.", STYLESHEETGREEN);
 		}
@@ -238,8 +244,9 @@ void DBManagementUI::deleteButtonClicked()
 		}
 	}
 
-	// update apperance
+	// update appearance
 	int curIndex = ui.comboButtonNr->currentIndex();
+	// resets combo box when last item is deleted
 	if(curIndex == (ui.comboButtonNr->count()-1))
 	{
 		curIndex = 0;
@@ -270,7 +277,7 @@ QString DBManagementUI::getReport()
 	return report;
 }
 
-bool DBManagementUI::deleteButton(QString buttonNr)
+bool DBManagementUI::deleteButton(int buttonNr)
 {
 	// Delete all the measurements to this iButton
 	DBMeasurementTable dbMeas;
@@ -320,13 +327,13 @@ bool DBManagementUI::deleteButton(QString buttonNr)
 	return true;
 }
 
-bool DBManagementUI::deleteFootprint(QString footprint)
+bool DBManagementUI::deleteFootprint(int footprint)
 {
 	// Get all buttons belonging to this area
 	DBButtonTable dbButton(deploymentId);
 	dbButton.open();
 
-	QStringList buttonList = dbButton.getAllButtonNr(footprint);
+	QVector<int> buttonList = dbButton.getAllButtonNr(footprint);
 	dbButton.close();
 
 	// Delete all these buttons
@@ -341,7 +348,7 @@ bool DBManagementUI::deleteFootprint(QString footprint)
 
 	if(!success)
 	{
-		this->appendReport("Could not delete all iButtons, therefore this Footprint and its Photos will not be deleted.");
+		this->appendReport("Could not delete all iButtons, therefore this Footprint will not be deleted.");
 		return false;
 	}
 

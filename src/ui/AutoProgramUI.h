@@ -23,8 +23,16 @@
 #define AUTOPROGRAMUI_H
 
 #include <QtGui/QDialog>
+#include <QVector>
 #include "ui_AutoProgramUI.h"
 #include "../AutoProgramThread.h"
+#include "../database/DBButtonTable.h"
+#include "UserDialog.h"
+
+#define AUTOINCREMENTTEXT   "<auto>"
+#define STYLESHEETRED   "background-color: rgb(255, 181, 181);" // red
+#define STYLESHEETYELLOW "background-color: rgb(255, 246, 207);" // yellow
+#define STYLESHEETGREEN "background-color: rgb(190, 255, 196);" // green
 
 /**
  * This is the GUI class for the automatic programming of iButtons at home.
@@ -47,44 +55,38 @@ public:
     ~AutoProgramUI();
 
 public slots:
-	/**
-	 * Receives the desired color as a signal and sets the background of the
-	 * status field to that color.<br>
-	 * <br>
-	 * 0	=	red<br>
-	 * 1	=	yellow<br>
-	 * 2	=	green<br>
-	 *
-	 * @param color	desired background color
-	 */
-	void setStatusColor(int color);
-	/**
+    /**
+     * Call this slot to set the Text of the status display
+     * @param text the text to display
+     * @param styleSheet chose a stylesheet string representation if the
+     * appearance should change. If it doesn't have to change chose an empty string ""
+     */
+    void setStatusText(QString text, QString styleSheet = "");
+
+    /**
 	 *  Recieves a signal when the Start/Stop button has been pushed.
 	 *  Toggles the Button between Start <-> Stop and starts/stops the
 	 *  AutoProgramThread thread.
 	 */
 	void buttonSwitch();
-	/**
-	 * Receives and passes the status from AutoProgramThread to the GUI.
-	 *
-	 * @param status	received status
-	 */
-	void readStatus(QString status);
+
 	/**
 	 * Receives and passes the current ButtonNr from AutoProgramThread
 	 * to the GUI.
 	 *
 	 * @param ButtonNr	received ButtonNr
 	 */
-	void readButtonNr(QString ButtonNr);
+	void writeButtonNr(QString ButtonNr);
+
 	/**
-	 * Receives and passes the current ButtonID from AutoProgramThread
+	 * Receives and passes the current SerialNr from AutoProgramThread
 	 * to the GUI.
 	 *
-	 * @param ButtonID	received ButtonID
+	 * @param SerialNr	received SerialNr
 	 */
-	void readButtonID(QString ButtonID);
+	void writeSerialNr(QString SerialNr);
 
+	void resetButtonNrSuffixCombo();
 
 private:
     Ui::AutoProgramUIClass ui;
@@ -97,50 +99,36 @@ private:
 	 * This is needed to know if the Button should spell 'Stop' or 'Start'.
 	 */
 	bool autoProgramRunning;
+
 	/**
-	 * Keeps track of the currently set area.
+	 * Keeps track of the currently set ButtonNr prefix
 	 */
-	QString currentFootprint;
+	int currentButtonNrPrefixIdx;
+
+	void setupPrefixSelect();
+
+	void setupSuffixSelect(int footprintPrefix);
+
+	DBButtonTable* dbButton;
 
 private slots:
 	/**
-	 * Receives a sinal when the close-button has been pushed.
+	 * Receives a signal when the close-button has been pushed.
 	 * Closes the window.
 	 */
 	void closeClicked();
-	/**
-	 * Receives a signal when the Area-Increase-Button has been pushed.
-	 * Increases the area displayed on the GUI by 1 and informs AutoDistributeThread
-	 * about the new area.
-	 */
-	void incFootprint();
-	/**
-	 * Receives a signal when the Area-Decrease-Button has been pushed.
-	 * Decreses the area displayed on the GUI by 1 and informs AutoDistributeThread
-	 * about the new area.
-	 */
-	void decFootprint();
-	/**
-	 * Receives a signal when the Area-Increase-More-Button has been pushed.
-	 * Increases the area displayed on the GUI by 26 (i.e. first letter changes) and informs AutoDistributeThread
-	 * about the new area.
-	 */
-	void incFootprintMore();
-	/**
-	 * Receives a signal when the Area-Decrease-More-Button has been pushed.
-	 * Decreses the area displayed on the GUI by 26 (i.e. first letter changes) and informs AutoDistributeThread
-	 * about the new area.
-	 */
-	void decFootprintMore();
+
+	void footprintPrefixChanged(int selected);
+
+	void buttonNrSuffixChanged(QString selected);
 
 signals:
 	/**
-	 * Sends a signal to the AutoProgramThread to inform it about the
-	 * changed currentArea.
-	 *
-	 * @param area	new area
+	 * Sends a signal to the AutoProgramThread
 	 */
-	void setArea(QString area);
+	void setFootprintPrefix(int prefix);
+
+	void setButtonNrSuffix(int suffix);
 
 
 };

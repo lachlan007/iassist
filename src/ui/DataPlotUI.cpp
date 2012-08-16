@@ -66,13 +66,13 @@ void DataPlotUI::initComboArea()
 
     for (int i = 0; i < profileVector.size(); ++i) {
         ButtonData b = dbBut.getButtonByButtonId(profileVector.at(i).ButtonId);
-        if(b.ButtonNr == "")
+        if(b.ButtonNr == 0)
         {
             // Button belongs to other deployment
             continue;
         }
         listProfiles.append("ProfileID: " + QString::number(profileVector.at(i).MeasurementProfileID)
-                        + ", ButtonNr: " + b.ButtonNr
+                        + ", ButtonNr: " + QString::number(b.ButtonNr)
                         + ", SessionNr: " + QString::number(profileVector.at(i).SessionNr));
     }
     ui.cbMeasurementProfileID->addItems(listNone + listProfiles);

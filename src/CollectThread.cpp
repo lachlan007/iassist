@@ -140,8 +140,9 @@ void CollectThread::run()
 				// with the collecting time and so on.
 				measurementProfile.ButtonId = buttonId;
 				measurementProfile.MeasurementProfileID = measurement.MeasurementProfileID;
-				measurementProfile.CollectingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
-				measurementProfile.TimeShift = missionData.collectTimeHost.secsTo(missionData.collectTimeButton);
+				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toString("dd.MM.yyyy hh:mm:ss");
+				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toString("dd.MM.yyyy hh:mm:ss");
+				measurementProfile.TempCalibUsed = mp.getEnableAutoTempCalib();
 
 				//=================================================
 				// Enter the measurement to the database and update
@@ -204,7 +205,7 @@ void CollectThread::run()
 				}
 				else
 				{
-					emit setStatus("Successfully read data of iButton " + button.ButtonNr
+					emit setStatus("Successfully read data of iButton " + QString::number(button.ButtonNr)
 							+ ". Please select new iButton.", STYLESHEETGREEN);
 				}
 
@@ -272,16 +273,16 @@ void CollectThread::abort()
 	emit this->setStatus("Stopped collecting iButtons.", STYLESHEETRED);
 }
 
-void CollectThread::setButton(ButtonData _button) //TODO protect with semaphore
+void CollectThread::setButton(ButtonData button) //TODO protect with semaphore
 {
-	button = _button;
-	if(button.ButtonNr == "")
+    this->button = button;
+	if(button.ButtonNr == 0)
 	{
 		emit setStatus("Please select an iButton to look for and press start.", "");
 	}
 	else
 	{
-		emit setStatus("Looking for iButton: " + _button.ButtonNr, "");
+		emit setStatus("Looking for iButton: " + QString::number(button.ButtonNr).rightJustified(6, '0').insert(3, ' '), "");
 	}
 }
 
@@ -321,7 +322,7 @@ int CollectThread::verifyMissionRunningOnButton(ButtonIO *buttonIO, uchar* SNum)
 
 	while((!buttonIO->isMissionInProgress(SNum)) && (answer == QMessageBox::Retry))
 	{
-		Log::write("WARNING: iButton " + button.ButtonNr + " was NOT running a mission.");
+		Log::write("WARNING: iButton " + QString::number(button.ButtonNr) + " was NOT running a mission.");
 		QMutexLocker locker(&mutex);
 		emit askIgnoreQuestion(QString("On this iButton was no mission in progress, therefore ")
 				+ "\nit will not contain measurement data. Please choose what to do: "

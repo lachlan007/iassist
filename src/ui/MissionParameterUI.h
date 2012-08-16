@@ -22,6 +22,11 @@
 #ifndef MISSIONPARAMETERUI_H
 #define MISSIONPARAMETERUI_H
 
+#define STYLESHEETRED   "background-color: rgb(255, 181, 181);" // red
+#define STYLESHEETYELLOW "background-color: rgb(255, 246, 207);" // yellow
+#define STYLESHEETGREEN "background-color: rgb(190, 255, 196);" // green
+
+
 #include <QtGui/QDialog>
 #include "ui_MissionParameterUI.h"
 #include "../Log.h"

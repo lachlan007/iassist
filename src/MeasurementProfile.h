@@ -47,15 +47,17 @@ public:
 	//! The Time when the button starts the measurement
 	QString SamplingStartTime;
 	//! Time when the Button was collected again (End of the measurement)
-	QString CollectingTime;
+	QString CollectingTimeHost;
+	//! Time when the Button was collected again (End of the measurement)
+	QString CollectingTimeButton;
 	//! Time when the Button was distributed
 	QString ProgrammingTime;
-	//! Timeshift between the time on the button and the time on the system
-	int TimeShift;
 	//! Sampling Rate
 	int SamplingRate;
 	//! Enabled high resolution mode
 	int Resolution;
+	//! Software temperature calibration was enabled when reading values
+	int TempCalibUsed;
 
 	/**
 	 * Clears all the Data
