@@ -142,7 +142,7 @@ void CollectThread::run()
 				measurementProfile.MeasurementProfileID = measurement.MeasurementProfileID;
 				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toString("dd.MM.yyyy hh:mm:ss");
-				measurementProfile.TempCalibUsed = mp.getEnableAutoTempCalib();
+				measurementProfile.TempCalibUsed = buttonIO.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
 
 				//=================================================
 				// Enter the measurement to the database and update
