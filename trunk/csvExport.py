@@ -21,26 +21,28 @@ c = conn.cursor()
 for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE DeploymentID = ?', (results.deployment_id, )):
 	c2 = conn.cursor()
 	for profile in c2.execute('SELECT MeasurementProfileID, SessionNr, SamplingStartTime, '
-		'SamplingRate, TimeShift, Resolution, CollectingTime '
+		'SamplingRate, CollectingTimeHost, CollectingTimeButton, Resolution '
 		'FROM MeasurementProfiles WHERE ButtonID = ?', (button[0],)):
 		# Not yet collected
-		if profile[6] == None or profile[6] == "":
+		if profile[5] == None or profile[5] == "":
 			continue
 		t = (profile[0],)
 		c3 = conn.cursor()
-		c3.execute('SELECT MAX(MeasurementNr) FROM Measurement WHERE MeasurementProfileID=?', t)
+		c3.execute('SELECT MAX(MeasurementNr) FROM Measurements WHERE MeasurementProfileID=?', t)
 		# Clock drift compensation
 		numMeas = c3.fetchone()[0]
 		if numMeas == None:
-			print 'No data for button ' + row[1] + '?'
+			print 'No data for measurement profile ' + str(profile[0]) + '?'
 			continue;
 		sampleStart = datetime.strptime(str(profile[2]), '%d.%m.%Y %H:%M:%S')
+		collectingTimeHost = datetime.strptime(str(profile[4]), '%d.%m.%Y %H:%M:%S')
+		collectingTimeButton = datetime.strptime(str(profile[5]), '%d.%m.%Y %H:%M:%S')
 		samplingRate = int(profile[3])
 		samplingDurationNoDrift = samplingRate * (numMeas-1)
-		timeShift = int(profile[4])
+		timeShift = (collectingTimeButton-collectingTimeHost).total_seconds()
 		samplingDurationWithDrift = samplingDurationNoDrift+timeShift
 		samplingRateReal = float(samplingDurationWithDrift) / (numMeas-1)
-		for meas in c3.execute('SELECT MeasurementNr,Measurement FROM Measurement WHERE MeasurementProfileID=?', t):
+		for meas in c3.execute('SELECT MeasurementNr,Measurement FROM Measurements WHERE MeasurementProfileID=?', t):
 			out = []
 			ts = sampleStart+timedelta(0, (int(meas[0])-1)*samplingRateReal)
 			# Timestamp
@@ -52,7 +54,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE Deployment
 			# Session Nr
 			out.append(str(profile[2])), out.append(',')
 			# Resolution
-			out.append(str(profile[5]))
+			out.append(str(profile[6]))
 			csvOutput.write(''.join(out)+'\n')
 		c3.close()
 	c2.close()
