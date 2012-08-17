@@ -55,7 +55,7 @@ public:
 	//! Sampling Rate
 	int SamplingRate;
 	//! Enabled high resolution mode
-	int Resolution;
+	int HighResolutionEn;
 	//! Software temperature calibration was enabled when reading values
 	int TempCalibUsed;
 

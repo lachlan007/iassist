@@ -191,7 +191,7 @@ void CollectThread::run()
 					    measurementProfile.SamplingStartTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					}
 					measurementProfile.SamplingRate = mp.getSamplingRate();
-					measurementProfile.Resolution = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
+					measurementProfile.HighResolutionEn = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
 
 					//========================================
 					// Add the measurementProfile to the button

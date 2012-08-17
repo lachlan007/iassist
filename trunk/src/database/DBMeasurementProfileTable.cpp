@@ -41,7 +41,7 @@ bool DBMeasurementProfileTable::createTable()
 		bool success = query.exec(QString("CREATE TABLE ")
 			+ MEASUREMENTPROFILETABLENAME + QString(" (MeasurementProfileID INTEGER PRIMARY KEY, ButtonID INTEGER, SessionNr int,")
 			+ QString(" ProgrammingTime char(20), CollectingTimeHost char(20), CollectingTimeButton char(20), SamplingRate int,")
-			+ QString(" SamplingStartTime char(20), Resolution int, TempCalibUsed int, FOREIGN KEY(ButtonID) REFERENCES Buttons(ButtonID));"));
+			+ QString(" SamplingStartTime char(20), HighResolutionEn int, TempCalibUsed int, FOREIGN KEY(ButtonID) REFERENCES Buttons(ButtonID));"));
 		if(success)
 		{
 			Log::write("Created new MeasurementProfiles Table in Database");
@@ -70,9 +70,9 @@ bool DBMeasurementProfileTable::addProfile(MeasurementProfile profile)
 	// Create query
 	QString sqlText("INSERT INTO ");
 	sqlText = sqlText + MEASUREMENTPROFILETABLENAME + " ( ButtonID, SessionNr, ProgrammingTime, CollectingTimeHost, CollectingTimeButton, "
-			+ "SamplingRate, SamplingStartTime, Resolution, TempCalibUsed) VALUES ( " + ButtonId + ", " + SessionNr + ", "
+			+ "SamplingRate, SamplingStartTime, HighResolutionEn, TempCalibUsed) VALUES ( " + ButtonId + ", " + SessionNr + ", "
 			+ ProgrammingTime + ", " + CollectingTimeHost + ", " + CollectingTimeButton + ", " + SamplingRate + ", " + SamplingStartTime
-			+ ", " + Resolution + ", " + TempCalibUsed + " );";
+			+ ", " + HighResolutionEn + ", " + TempCalibUsed + " );";
 
 	// Send the query
 	bool success = query.exec(sqlText);
@@ -94,12 +94,12 @@ void DBMeasurementProfileTable::convertDataToSQL(MeasurementProfile *profile)
 	SessionNr = "NULL";
 	MeasurementProfileID = "NULL";
 	SamplingRate ="NULL";
-	Resolution = "NULL";
+	HighResolutionEn = "NULL";
 	TempCalibUsed = "NULL";
 
 	this->ButtonId = QString::number(profile->ButtonId);
-	if(profile->SessionNr!=-9999) this->SessionNr= QString::number(profile->SessionNr);
-	if(profile->Resolution!=-9999) this->Resolution= QString::number(profile->Resolution);
+	if(profile->SessionNr!=-9999) this->SessionNr = QString::number(profile->SessionNr);
+	if(profile->HighResolutionEn!=-9999) this->HighResolutionEn = QString::number(profile->HighResolutionEn);
 	if(profile->SamplingRate!=-9999) this->SamplingRate = QString::number(profile->SamplingRate);
 	if(profile->MeasurementProfileID!=-9999) this->MeasurementProfileID = QString::number(profile->MeasurementProfileID);
 	this->CollectingTimeHost = "'" + profile->CollectingTimeHost + "'";
@@ -123,8 +123,8 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 
 	if(SessionNr!="NULL" && success)
 	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SessionNr", SessionNr);
-	if(Resolution!="NULL" && success)
-	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "Resolution", Resolution);
+	if(HighResolutionEn!="NULL" && success)
+	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "HighResolutionEn", HighResolutionEn);
 	if(SamplingRate!="NULL" && success)
 	    success = update(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", MeasurementProfileID, "SamplingRate", SamplingRate);
 	if(CollectingTimeHost!="''" && success)
@@ -161,8 +161,8 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementPr
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SessionNr");
 	if(temp!="") data.SessionNr = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "Resolution");
-	if(temp!="") data.Resolution = temp.toInt();
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "HighResolutionEn");
+	if(temp!="") data.HighResolutionEn = temp.toInt();
 
 	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingRate");
 	if(temp!="") data.SamplingRate = temp.toInt();

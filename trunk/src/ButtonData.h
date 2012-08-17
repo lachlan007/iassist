@@ -46,6 +46,12 @@ public:
 	int ButtonNr;
 	//! Serial number of the iButton e.g. 00:A2:00:00:B2:04:72:1B
 	QString SerialNr;
+
+	// Factory-set calibration coefficients for DS1922
+	double CalibCoeffA;
+	double CalibCoeffB;
+	double CalibCoeffC;
+
 };
 
 #endif /* BUTTONDATA_H_ */
