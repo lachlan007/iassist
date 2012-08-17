@@ -277,7 +277,7 @@ QVector<MeasurementProfile> DBMeasurementProfileTable::getFinishedMeasurementPro
     QSqlQuery query (this->getDB());
 
     QString text = "SELECT MeasurementProfileID FROM "
-            + QString(MEASUREMENTPROFILETABLENAME) + " WHERE CollectingTime != '' "
+            + QString(MEASUREMENTPROFILETABLENAME) + " WHERE CollectingTimeHost != '' "
             + "ORDER BY MeasurementProfileID ASC;";
     //qDebug(text.toStdString().c_str());
     bool success = query.exec(text);
