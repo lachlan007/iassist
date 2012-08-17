@@ -39,6 +39,6 @@ void MeasurementProfile::clearData()
 	CollectingTimeButton = "";
 	ProgrammingTime = "";
 	SamplingRate = -9999;
-	Resolution = -9999;
+	HighResolutionEn = -9999;
 	TempCalibUsed = -9999;
 }

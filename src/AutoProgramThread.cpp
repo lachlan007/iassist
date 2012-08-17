@@ -183,7 +183,7 @@ void AutoProgramThread::run(){
                     profile.SamplingStartTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
                 }
                 profile.SamplingRate = mp.getSamplingRate();
-                profile.Resolution = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
+                profile.HighResolutionEn = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
                 profile.ButtonId = insertId;
                 profile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 

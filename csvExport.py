@@ -1,9 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+"""csvExport.py: Script for exporting measurements collected into a CSV file."""
+
+__author__      = "Matthias Keller"
+__copyright__   = "Copyright 2012, Computer Engineering and Networks Laboratory, ETH Zurich"
+__license__     = "GPL"
 
 import sqlite3
 from datetime import datetime, timedelta
 import argparse
-import sys
 
 parser = argparse.ArgumentParser(description='Export iButton data to a CSV file.')
 parser.add_argument('-d', action='store', dest='deployment_id',
@@ -14,21 +19,20 @@ results = parser.parse_args()
 fileName = datetime.now().strftime('%Y%m%d%H%M%S')+'-export.txt'
 csvOutput = open(fileName, 'w')
 
-csvOutput.write('# TIME,TEMP,BUTTONNR,SESSIONNR,RESOLUTION'+'\n')
+csvOutput.write('# TIME,TEMP,BUTTONNR,SESSIONNR,HIGH RESOLUTION'+'\n')
 
 conn = sqlite3.connect('iassist.db')
 c = conn.cursor()
 for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE DeploymentID = ?', (results.deployment_id, )):
 	c2 = conn.cursor()
 	for profile in c2.execute('SELECT MeasurementProfileID, SessionNr, SamplingStartTime, '
-		'SamplingRate, CollectingTimeHost, CollectingTimeButton, Resolution '
+		'SamplingRate, CollectingTimeHost, CollectingTimeButton, HighResolutionEn '
 		'FROM MeasurementProfiles WHERE ButtonID = ?', (button[0],)):
 		# Not yet collected
 		if profile[5] == None or profile[5] == "":
 			continue
-		t = (profile[0],)
 		c3 = conn.cursor()
-		c3.execute('SELECT MAX(MeasurementNr) FROM Measurements WHERE MeasurementProfileID=?', t)
+		c3.execute('SELECT MAX(MeasurementNr) FROM Measurements WHERE MeasurementProfileID=?', (profile[0],))
 		# Clock drift compensation
 		numMeas = c3.fetchone()[0]
 		if numMeas == None:
@@ -42,7 +46,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE Deployment
 		timeShift = (collectingTimeButton-collectingTimeHost).total_seconds()
 		samplingDurationWithDrift = samplingDurationNoDrift+timeShift
 		samplingRateReal = float(samplingDurationWithDrift) / (numMeas-1)
-		for meas in c3.execute('SELECT MeasurementNr,Measurement FROM Measurements WHERE MeasurementProfileID=?', t):
+		for meas in c3.execute('SELECT MeasurementNr,Measurement FROM Measurements WHERE MeasurementProfileID=?', (profile[0],)):
 			out = []
 			ts = sampleStart+timedelta(0, (int(meas[0])-1)*samplingRateReal)
 			# Timestamp

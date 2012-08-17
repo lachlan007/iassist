@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=iAssist
+GenericName=iAssist
+Comment=Start iAssist
+Keywords=util;productivity
+Exec=bash -c "cd /home/ibutton/iAssist && /home/ibutton/iAssist/iAssist"
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=/home/ibutton/iAssist/ico/iassist.png

@@ -105,6 +105,15 @@ ButtonData DBButtonTable::getButtonByButtonNr(int buttonNr)
 	temp = this->read(BUTTONTABLENAME, "ButtonNr", QString::number(buttonNr), "SerialNr");
 	if(temp!="") data.SerialNr = temp;
 
+    temp = this->read(BUTTONTABLENAME, "ButtonNr", QString::number(buttonNr), "CalibCoeffA");
+    if(temp!="") data.CalibCoeffA = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "ButtonNr", QString::number(buttonNr), "CalibCoeffB");
+    if(temp!="") data.CalibCoeffB = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "ButtonNr", QString::number(buttonNr), "CalibCoeffC");
+    if(temp!="") data.CalibCoeffC = temp.toDouble();
+
 	return data;
 }
 
@@ -121,6 +130,15 @@ ButtonData DBButtonTable::getButtonBySerialNr(QString serialNr)
     temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "SerialNr");
     if(temp!="") data.SerialNr = temp;
 
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "CalibCoeffA");
+    if(temp!="") data.CalibCoeffA = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "CalibCoeffB");
+    if(temp!="") data.CalibCoeffB = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "SerialNr", this->toSQLString(serialNr), "CalibCoeffC");
+    if(temp!="") data.CalibCoeffC = temp.toDouble();
+
     return data;
 }
 
@@ -135,6 +153,15 @@ ButtonData DBButtonTable::getButtonByButtonId(int buttonId)
 
     temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "SerialNr");
     if(temp!="") data.SerialNr = temp;
+
+    temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "CalibCoeffA");
+    if(temp!="") data.CalibCoeffA = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "CalibCoeffB");
+    if(temp!="") data.CalibCoeffB = temp.toDouble();
+
+    temp = this->read(BUTTONTABLENAME, "ButtonID", QString::number(buttonId), "CalibCoeffC");
+    if(temp!="") data.CalibCoeffC = temp.toDouble();
 
     return data;
 }
@@ -357,4 +384,9 @@ QString DBButtonTable::read(QString table, QString compCol, QString compVal, QSt
         }
     }
 }
+
+/*void DBButtonTable::setTempCalibCoeff(double coeffA, double coeffB, double coeffC)
+{
+}*/
+
 

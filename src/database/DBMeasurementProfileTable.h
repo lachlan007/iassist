@@ -125,7 +125,7 @@ private:
 	QString CollectingTimeButton;
 	QString SamplingRate;
 	QString SamplingStartTime;
-	QString Resolution;
+	QString HighResolutionEn;
 	QString TempCalibUsed;
 
 };
