@@ -59,7 +59,7 @@ for footprint in cOld.execute("SELECT FootprintID FROM Footprints ORDER BY Footp
 	for button in cOld2.execute("SELECT ButtonNr, ButtonID FROM iButtons WHERE ButtonNr LIKE ?", (str(footprint[0])+'%',)):
 		buttonNr = str(button[0])
 		cNew.execute("INSERT INTO Buttons (DeploymentID, ButtonNr, SerialNr) VALUES (?, ?, ?)", (deploymentId, 
-			footprintPrefix*1000+int(buttonNr[2:5]), str(button[1])))
+			footprintPrefix*1000+int(buttonNr[2:5]), str(button[1]).strip().replace(' ','')))
 		buttonId = cNew.lastrowid
 		cOld3 = connOld.cursor()
 		for profile in cOld3.execute("SELECT MeasurementProfileID, ButtonNr, SessionNr, DistributingTime, CollectingTime, "
@@ -67,7 +67,7 @@ for footprint in cOld.execute("SELECT FootprintID FROM Footprints ORDER BY Footp
 								"ButtonNr LIKE ?", (str(button[0]),)):
 			if profile[4] != None and str(profile[4]) != "":
 				collectingTimeHost = datetime.strptime(str(profile[4]), '%d.%m.%Y %H:%M:%S')
-				if int(profile[5]) > -20000 and int(profile[5]) < 60000:
+				if profile[5] != None and int(profile[5]) > -20000 and int(profile[5]) < 60000:
 					collectingTimeButton = collectingTimeHost + timedelta(0, int(profile[5]))
 				else:
 					collectingTimeButton = collectingTimeHost
@@ -80,6 +80,12 @@ for footprint in cOld.execute("SELECT FootprintID FROM Footprints ORDER BY Footp
 								str(profile[7]), profile[6]))
 			profileId = cNew.lastrowid
 			cOld4 = connOld.cursor()
+			# Check if Measurement table exists, is only created once buttons are collected
+			cOld4.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ('Measurement',))
+			n = cOld4.fetchone()
+			if n == None:
+				connNew.commit()
+				continue
 			for measurement in cOld4.execute("SELECT MeasurementNr, Measurement FROM Measurement WHERE MeasurementProfileID = ?", 
 												(profile[0], )):
 				cNew.execute("INSERT INTO Measurements (MeasurementProfileID, MeasurementNr, Measurement) VALUES (?, ?, ?)", 
@@ -94,14 +100,14 @@ cNew.close()
 connNew.close()
 
 # Show mapping between old and new footprints
-print "-------------------------------"
-print "DEPLOYMENT: " + results.deploymentName
+print "# -------------------------------"
+print "# DEPLOYMENT: " + results.deploymentName
 footprintPrefix = 0
 for footprint in cOld.execute("SELECT FootprintID FROM Footprints ORDER BY FootprintID ASC"):
 	footprintPrefix += 1
-	print footprint[0] + " -> " + '{:03d}'.format(footprintPrefix)
+	print "# " + footprint[0] + " -> " + '{:03d}'.format(footprintPrefix)
 
-print "-------------------------------"
+print "# -------------------------------"
 
 cOld.close()
 connOld.close()
