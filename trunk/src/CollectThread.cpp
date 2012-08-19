@@ -61,6 +61,17 @@ void CollectThread::run()
 	dbButton->open();
 	dbProfile->open();
 
+    //===========================
+    // Checking the ParameterFile
+    //===========================
+    if(!mp.loadMissionParameters())
+    {
+        this->abort();
+        emit setStatus("Check Mission Parameter file.", STYLESHEETRED); // Parameter file is not correct
+        Log::writeError("collectThread: The Mission Parameter file is missing or corrupt.");
+        return;
+    }
+
 	// Connect to the Button Reader
 	if(!buttonIO.openPort())
 	{
