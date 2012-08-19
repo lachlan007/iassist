@@ -71,7 +71,7 @@ public:
 	 * @param _measurementProfileID the id of the desired profile in the database
 	 * @return a MeasurementProfile object
 	 */
-	MeasurementProfile readProfile(QString _measurementProfileID);
+	MeasurementProfile readProfile(QString measurementProfileID);
 
 	int getLatestAddedProfileIDByButtonId(int buttonId);
 
