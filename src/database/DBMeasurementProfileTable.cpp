@@ -145,41 +145,41 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 	return success;
 }
 
-MeasurementProfile DBMeasurementProfileTable::readProfile(QString _measurementProfileID)
+MeasurementProfile DBMeasurementProfileTable::readProfile(QString measurementProfileID)
 {
 	MeasurementProfile data;
 	QString temp;
-	QString measurementID = this->toSQLString(_measurementProfileID);
+	measurementProfileID = this->toSQLString(measurementProfileID);
 
 	// Get all the data and save them to MeasurementProfile
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "MeasurementProfileID");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "MeasurementProfileID");
 	if(temp!="") data.MeasurementProfileID = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ButtonID");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "ButtonID");
 	if(temp!="") data.ButtonId = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SessionNr");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SessionNr");
 	if(temp!="") data.SessionNr = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "HighResolutionEn");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "HighResolutionEn");
 	if(temp!="") data.HighResolutionEn = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingRate");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SamplingRate");
 	if(temp!="") data.SamplingRate = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "CollectingTimeHost");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "CollectingTimeHost");
 	if(temp!="") data.CollectingTimeHost = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "CollectingTimeButton");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "CollectingTimeButton");
 	if(temp!="") data.CollectingTimeButton = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "ProgrammingTime");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "ProgrammingTime");
 	if(temp!="") data.ProgrammingTime = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "SamplingStartTime");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SamplingStartTime");
 	if(temp!="") data.SamplingStartTime = temp;
 
-    temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementID, "TempCalibUsed");
+    temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "TempCalibUsed");
     if(temp!="") data.TempCalibUsed = temp.toInt();
 
 	return data;
