@@ -80,18 +80,32 @@ void CollectUI::updateComboButtonNr()
 {
     int footprintPrefix = ui.comboFootprint->currentText().toInt();
 	ui.comboButtonNr->clear();
-	DBButtonTable db(deploymentId);
-	db.open();
+	DBButtonTable dbButton(deploymentId);
+	DBMeasurementProfileTable dbProfile;
+	dbButton.open();
+	dbProfile.open();
 	QStringList list;
 	list.append("none");
-	QVector<int> buttons = db.getAllButtonNr(footprintPrefix);
+	QVector<int> buttons = dbButton.getAllButtonNr(footprintPrefix);
 	for(int i=0; i<buttons.size(); i++)
 	{
+	    // Only display buttons that currently have a mission running
+	    int buttonId = dbButton.getButtonIdByButtonNr(buttons.at(i));
+	    int measurementProfileId = dbProfile.getLatestAddedProfileIDByButtonId(buttonId);
+	    if(measurementProfileId == -1)
+	    {
+	        continue;
+	    }
+	    MeasurementProfile measProf = dbProfile.readProfile(measurementProfileId);
+	    if(measProf.CollectingTimeHost != "")
+	    {
+	        continue;
+	    }
 	    list.append(QString::number(buttons.at(i)-footprintPrefix*1000).rightJustified(3, '0'));
 	}
 	ui.comboButtonNr->addItems(list);
 	ui.comboButtonNr->setCurrentIndex(0);
-	db.close();
+	dbButton.close();
 }
 
 void CollectUI::footprintChanged()

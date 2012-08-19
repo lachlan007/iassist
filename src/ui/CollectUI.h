@@ -27,7 +27,9 @@
 #include "ui_CollectUI.h"
 #include "../database/DBFootprintTable.h"
 #include "../database/DBButtonTable.h"
+#include "../database/DBMeasurementProfileTable.h"
 #include "../CollectThread.h"
+#include "../MeasurementProfile.h"
 
 #define STYLESHEETRED 		"background-color: rgb(255, 181, 181);"
 #define STYLESHEETYELLOW 	"background-color: rgb(255, 246, 207);"
