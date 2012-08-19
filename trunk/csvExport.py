@@ -56,7 +56,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE Deployment
 			# Button Nr
 			out.append(str(button[1])), out.append(',')
 			# Session Nr
-			out.append(str(profile[2])), out.append(',')
+			out.append(str(profile[1])), out.append(',')
 			# Resolution
 			out.append(str(profile[6]))
 			csvOutput.write(''.join(out)+'\n')
