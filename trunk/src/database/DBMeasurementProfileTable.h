@@ -68,10 +68,10 @@ public:
 
 	/**
 	 * Reads a profile according to a ID from the database and returns it as a %MeasurementProfile object.
-	 * @param _measurementProfileID the id of the desired profile in the database
+	 * @param measurementProfileID the id of the desired profile in the database
 	 * @return a MeasurementProfile object
 	 */
-	MeasurementProfile readProfile(QString measurementProfileID);
+	MeasurementProfile readProfile(int measurementProfileID);
 
 	int getLatestAddedProfileIDByButtonId(int buttonId);
 

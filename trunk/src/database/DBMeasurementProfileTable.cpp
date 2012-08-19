@@ -145,41 +145,40 @@ bool DBMeasurementProfileTable::updateProfile(MeasurementProfile profile)
 	return success;
 }
 
-MeasurementProfile DBMeasurementProfileTable::readProfile(QString measurementProfileID)
+MeasurementProfile DBMeasurementProfileTable::readProfile(int measurementProfileID)
 {
 	MeasurementProfile data;
 	QString temp;
-	measurementProfileID = this->toSQLString(measurementProfileID);
 
 	// Get all the data and save them to MeasurementProfile
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "MeasurementProfileID");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "MeasurementProfileID");
 	if(temp!="") data.MeasurementProfileID = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "ButtonID");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "ButtonID");
 	if(temp!="") data.ButtonId = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SessionNr");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "SessionNr");
 	if(temp!="") data.SessionNr = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "HighResolutionEn");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "HighResolutionEn");
 	if(temp!="") data.HighResolutionEn = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SamplingRate");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "SamplingRate");
 	if(temp!="") data.SamplingRate = temp.toInt();
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "CollectingTimeHost");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "CollectingTimeHost");
 	if(temp!="") data.CollectingTimeHost = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "CollectingTimeButton");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "CollectingTimeButton");
 	if(temp!="") data.CollectingTimeButton = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "ProgrammingTime");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "ProgrammingTime");
 	if(temp!="") data.ProgrammingTime = temp;
 
-	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "SamplingStartTime");
+	temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "SamplingStartTime");
 	if(temp!="") data.SamplingStartTime = temp;
 
-    temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", measurementProfileID, "TempCalibUsed");
+    temp = this->read(MEASUREMENTPROFILETABLENAME, "MeasurementProfileID", QString::number(measurementProfileID), "TempCalibUsed");
     if(temp!="") data.TempCalibUsed = temp.toInt();
 
 	return data;
@@ -188,23 +187,18 @@ MeasurementProfile DBMeasurementProfileTable::readProfile(QString measurementPro
 int DBMeasurementProfileTable::getLatestAddedProfileIDByButtonId(int buttonId)
 {
 	QSqlQuery query(this->getDB());
-	QString text = QString("SELECT MeasurementProfileID FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonID = ") + QString::number(buttonId) + QString(";");
+	QString text = QString("SELECT MAX(MeasurementProfileID) FROM ") + MEASUREMENTPROFILETABLENAME + QString(" WHERE ButtonID = ") + QString::number(buttonId) + QString(";");
 
 	int nr = 0;
-	int temp = 0;
 	if(!query.exec(text))
 	{
 		Log::writeError("DBMeasurementProfileTable: Cannot get latest added ProfileID: " + query.lastError().text());
 		return 0;
 	}
 
-	while(query.next())
+	if(query.next())
 	{
-		temp = query.value(0).toInt();
-		if(temp > nr)
-		{
-			nr = temp;
-		}
+		nr = query.value(0).toInt();
 	}
 	return nr;
 }
@@ -292,7 +286,7 @@ QVector<MeasurementProfile> DBMeasurementProfileTable::getFinishedMeasurementPro
     {
         while(query.next())
         {
-            profileVector.append(readProfile(query.value(0).toString()));
+            profileVector.append(readProfile(query.value(0).toInt()));
         }
     }
     return profileVector;
@@ -319,7 +313,7 @@ QVector<MeasurementProfile> DBMeasurementProfileTable::getProfilesByButtonID(int
     {
         while(query.next())
         {
-            profileVector.append(readProfile(query.value(0).toString()));
+            profileVector.append(readProfile(query.value(0).toInt()));
         }
     }
     return profileVector;
