@@ -73,7 +73,7 @@ void CollectThread::run()
     }
 
 	// Connect to the Button Reader
-	if(!buttonIO.openPort())
+	if(!iButtonCon.openPort())
 	{
 		emit this->setStatus("ERROR: Cannot connect to Reader.", STYLESHEETRED);
 		this->abort();
@@ -96,7 +96,7 @@ void CollectThread::run()
 		// attached and if a button is
 		// selected in the UI
 		//==========================
-		if(buttonIO.getConnectedButton(&SNum[0]) && button.SerialNr != "")
+		if(iButtonCon.getConnectedButton(&SNum[0]) && button.SerialNr != "")
 		{
 			// emit setStatus("iButton found. Checking it.", STYLESHEETYELLOW);
 			// Wait till the iButton is really connected
@@ -108,7 +108,7 @@ void CollectThread::run()
 			{
 				// emit setStatus("iButton found.", STYLESHEETYELLOW);
 				// Verify that mission was in progress
-				int res = this->verifyMissionRunningOnButton(&buttonIO, &SNum[0]);
+				int res = this->verifyMissionRunningOnButton(&iButtonCon, &SNum[0]);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not detect a running mission on iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -117,7 +117,7 @@ void CollectThread::run()
 				}
 
 				// Stop the running mission, but only if res is not 0
-				if(res!=0) res = this->stopMissionOnButton(&buttonIO, &SNum[0]);
+				if(res!=0) res = this->stopMissionOnButton(&iButtonCon, &SNum[0]);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not stop the mission on iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -127,7 +127,7 @@ void CollectThread::run()
 
 				// Get the mission data
 				emit this->setStatus("Reading mission data.", STYLESHEETYELLOW);
-				res = this->getMissionDataFromButton(&buttonIO, &SNum[0], missionData);
+				res = this->getMissionDataFromButton(&iButtonCon, &SNum[0], missionData);
 				if(res==-1)
 				{
 					emit this->setStatus("ERROR: Could not get mission data of iButton: " + button.ButtonNr, STYLESHEETRED);
@@ -153,7 +153,7 @@ void CollectThread::run()
 				measurementProfile.MeasurementProfileID = measurement.MeasurementProfileID;
 				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toString("dd.MM.yyyy hh:mm:ss");
-				measurementProfile.TempCalibUsed = buttonIO.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
+				measurementProfile.TempCalibUsed = iButtonCon.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
 
 				//=================================================
 				// Enter the measurement to the database and update
@@ -179,7 +179,7 @@ void CollectThread::run()
 					//========================================
 					// restart a new session
 					//========================================
-					res = this->startMissionOnButton(&buttonIO, &SNum[0]);
+					res = this->startMissionOnButton(&iButtonCon, &SNum[0]);
 					if(res==-1)
 					{
 						this->abort();
@@ -222,6 +222,16 @@ void CollectThread::run()
 
 				latestReadButtonID=button.SerialNr;
 
+                // Store calibration coefficients of DS1922 buttons
+                if(ButtonIO::isThermoHygrochron(&SNum[0]))
+                {
+                    double coeffA, coeffB, coeffC;
+                    if(iButtonCon.getCalibrationCoefficients(&SNum[0], button.CalibCoeffA, button.CalibCoeffB, button.CalibCoeffC))
+                    {
+                        dbButton->storeTempCalibCoeff(button);
+                    }
+                }
+
 				// clean up the data, to be ready for new button
 				measurement.cleanMeasurement();
 				measurementProfile.clearData();
@@ -259,7 +269,7 @@ void CollectThread::run()
 	}
 
 	// Close the reader port
-	buttonIO.closePort();
+	iButtonCon.closePort();
 
 	// Close the databases
 	dbMeasurement->close();
@@ -279,7 +289,7 @@ void CollectThread::abort()
 	dbMeasurement->close();
 	dbProfile->close();
 	dbButton->close();
-	buttonIO.closePort();
+	iButtonCon.closePort();
 	emit aborted();
 	emit this->setStatus("Stopped collecting iButtons.", STYLESHEETRED);
 }

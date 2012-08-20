@@ -430,3 +430,36 @@ bool ThermoHygrochronButton::downloadMissionData(int portnum, uchar* SNum, int& 
      return true;
 }
 
+bool ThermoHygrochronButton::getCalibrationCoefficients(int portnum, uchar* SNum, double& coeffA, double& coeffB, double& coeffC)
+{
+    uchar state[96];
+    configLog config;
+
+    usleep(5000);
+    // Check if USB port is open
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ThermoHygrochronButton::getCalibrationCoefficients: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false))) // Check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ThermoHygrochronButton::getCalibrationCoefficients: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    usleep(2000);
+    // read the register content
+    if(!readDevice(portnum,SNum,&state[0],&config))
+    {
+        Log::writeError("ThermoHygrochronButton::getCalibrationCoefficients: Cannot read device.");
+        return false;
+    }
+
+    coeffA = config.tempCoeffA;
+    coeffB = config.tempCoeffB;
+    coeffC = config.tempCoeffC;
+
+    return true;
+}
+

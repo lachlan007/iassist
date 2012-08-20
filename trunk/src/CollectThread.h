@@ -143,7 +143,7 @@ private:
 	//! manages the connection to the %Measurement table in the database
 	DBMeasurementTable* dbMeasurement;
 	//! used to communicate with the iButton Reader
-	ButtonIO buttonIO;
+	ButtonIO iButtonCon;
 	//! used to lock and stop the thread while a dialog box is displayed
     QWaitCondition waitCondition;
     //! used to lock and stop the thread while a dialog box is displayed

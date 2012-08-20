@@ -314,3 +314,29 @@ bool ButtonIO::isThermoHygrochron(uchar *SNum)
     return false;
 }
 
+bool ButtonIO::getCalibrationCoefficients(uchar* SNum, double& coeffA, double& coeffB, double& coeffC)
+{
+    if(portnum < 0)
+    {
+        Log::writeError("ButtonIO::getCalibrationCoefficients: USB port is closed.");
+        return false;
+    }
+
+    if(SNum[0] == FAMILY_THERMOHYG)
+    {
+        return ThermoHygrochronButton::getCalibrationCoefficients(portnum, &SNum[0], coeffA, coeffB, coeffC);
+    }
+    else if(SNum[0] == FAMILY_THERMO)
+    {
+        // Function not supported by this button family
+        return false;
+    }
+    else
+    {
+        Log::writeError("ButtonIO::getCalibrationCoefficients: Unsupported button family.");
+    }
+
+    return false;
+}
+
+

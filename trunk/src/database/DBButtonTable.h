@@ -106,6 +106,8 @@ public:
      */
     QString read(QString table, QString compCol, QString compVal, QString getCol);
 
+    bool storeTempCalibCoeff(ButtonData button);
+
 
 private:
 	int deploymentId;

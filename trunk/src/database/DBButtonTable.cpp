@@ -98,7 +98,6 @@ ButtonData DBButtonTable::getButtonByButtonNr(int buttonNr)
 	QString temp;
 
 	// Get all the data and save them to ButtonData
-
 	temp = this->read(BUTTONTABLENAME, "ButtonNr", QString::number(buttonNr), "ButtonNr");
 	if(temp!="") data.ButtonNr = temp.toInt();
 
@@ -385,8 +384,30 @@ QString DBButtonTable::read(QString table, QString compCol, QString compVal, QSt
     }
 }
 
-/*void DBButtonTable::setTempCalibCoeff(double coeffA, double coeffB, double coeffC)
+bool DBButtonTable::storeTempCalibCoeff(ButtonData button)
 {
-}*/
+    bool success = true;
+
+    if(button.SerialNr == "")
+    {
+        Log::writeError("dbButtonTable: Cannot update button data, because SerialNr is missing.");
+        return false;
+    }
+
+    // Updating by SerialNr is find since calibration coefficients are factory-made device-specific values
+    if(button.CalibCoeffA != -9999.0 && success)
+        success = update(BUTTONTABLENAME, "SerialNr", "'"+button.SerialNr+"'", "CalibCoeffA", QString::number(button.CalibCoeffA));
+    if(button.CalibCoeffB != -9999.0 && success)
+        success = update(BUTTONTABLENAME, "SerialNr", "'"+button.SerialNr+"'", "CalibCoeffB", QString::number(button.CalibCoeffB));
+    if(button.CalibCoeffC != -9999.0 && success)
+        success = update(BUTTONTABLENAME, "SerialNr", "'"+button.SerialNr+"'", "CalibCoeffC", QString::number(button.CalibCoeffC));
+
+    if(!success)
+    {
+        Log::writeError("dbButtonTable: Cannot update button data, unspecified error.");
+    }
+
+    return success;
+}
 
 

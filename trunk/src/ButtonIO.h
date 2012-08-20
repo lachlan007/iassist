@@ -107,6 +107,8 @@ class ButtonIO
 
 		static bool isThermoHygrochron(uchar *SNum);
 
+		bool getCalibrationCoefficients(uchar* SNum, double& coeffA, double& coeffB, double& coeffC);
+
 	private:
 
 		int portnum;
