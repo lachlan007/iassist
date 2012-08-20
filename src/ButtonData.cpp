@@ -37,7 +37,7 @@ void ButtonData::clearData()
 {
 	ButtonNr = 0;
 	SerialNr = "";
-	CalibCoeffA = -1.0;
-	CalibCoeffB = -1.0;
-	CalibCoeffC = -1.0;
+	CalibCoeffA = -9999.0;
+	CalibCoeffB = -9999.0;
+	CalibCoeffC = -9999.0;
 }

@@ -43,6 +43,8 @@ public:
 
     static bool downloadMissionData(int portnum, uchar* SNum, int& numSamples, double*& samples);
 
+    static bool getCalibrationCoefficients(int portnum, uchar* SNum, double& coeffA, double& coeffB, double& coeffC);
+
 };
 
 #endif /* THERMOHYGROCHRONBUTTON_H_ */
