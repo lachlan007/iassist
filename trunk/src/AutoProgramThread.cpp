@@ -176,16 +176,16 @@ void AutoProgramThread::run(){
                 // Save mission information for button
                 if(mp.getSetMissionStartTime())
                 {
-                    profile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toString("dd.MM.yyyy hh:mm:ss");
+                    profile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toUTC().toString("dd.MM.yyyy hh:mm:ss");
                 }
                 else
                 {
-                    profile.SamplingStartTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+                    profile.SamplingStartTime = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss");
                 }
                 profile.SamplingRate = mp.getSamplingRate();
                 profile.HighResolutionEn = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
                 profile.ButtonId = insertId;
-                profile.ProgrammingTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+                profile.ProgrammingTime = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss");
 
                 emit writeButtonNr(QString::number(button.ButtonNr).rightJustified(6, '0').insert(3, ' '));
                 emit writeSerialNr(button.SerialNr);
