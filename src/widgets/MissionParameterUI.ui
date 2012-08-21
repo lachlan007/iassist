@@ -275,7 +275,7 @@ high temperature resolution:	16 bit</string>
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Start Time</string>
+        <string>Start Time (local time zone)</string>
        </property>
       </widget>
      </item>
