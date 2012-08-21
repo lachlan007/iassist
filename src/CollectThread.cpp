@@ -27,6 +27,7 @@ CollectThread::CollectThread(int deploymentId, QObject *parent) {
 	measurement.cleanMeasurement();
 	measurementProfile.clearData();
 	button.clearData();
+	redistribute = true;
 
 	latestReadButtonID = "";
 
@@ -84,7 +85,7 @@ void CollectThread::run()
 	{
 
         // Check if mission start time is ok
-        if(mp.getSetMissionStartTime() && mp.getMissionStartTime() < QDateTime::currentDateTime().toTime_t())
+        if(redistribute && mp.getSetMissionStartTime() && mp.getMissionStartTime() < QDateTime::currentDateTime().toTime_t())
         {
             this->abort();
             emit this->setStatus("ERROR: Mission start time is in the past.", STYLESHEETRED);
