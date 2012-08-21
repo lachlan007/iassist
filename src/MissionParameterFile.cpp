@@ -21,7 +21,6 @@
 
 MissionParameterFile::MissionParameterFile()
 {
-
     fieldDescriptions.insert(SAMPLING_RATE, "sampling rate [s]\t\t\t\t\t\t\t\t[1,982800]");
     fieldDescriptions.insert(EN_ROLLOVER, "enable rollover\t\t\t\t\t\t\t\t[0,1]");
     fieldDescriptions.insert(HIGH_TEMP_RES, "high temperature resolution\t\t\t\t\t\t[0,1]\t0: 8 Bit | 1: 16 Bit");
@@ -32,7 +31,10 @@ MissionParameterFile::MissionParameterFile()
     QStringList fieldDescriptions; //!> List containing all descriptions of the different values that can be set.
     configSamplingRate = 60;
     configMissionStartTime = QDateTime::currentDateTime().toTime_t();
-
+    configEnableAutoTempCalib = false;
+    configEnableRollover = false;
+    configHighTemperatureResolution = false;
+    configSetMissionStartTime = false;
 }
 
 MissionParameterFile::~MissionParameterFile()

@@ -117,45 +117,42 @@ private:
 	 * Manages the database connection to the button table.
 	 */
 	DBButtonTable *dbButton;
+
 	/**
 	 * Manages the database connection to the area table.
 	 */
 	DBFootprintTable *dbFootprint;
+
 	/**
 	 * Manages the database connection to the Measurement Profile table
 	 */
 	DBMeasurementProfileTable *dbProfile;
+
 	/**
 	 * ButtonIO instance used for the communication to the iButton reader.
 	 */
 	ButtonIO *iButtonCon;
-	/**
-	 * If the connection to the iButton reader can't be opened this bool is
-	 * set to false for further reference.
-	 */
-	bool readerAvailable;
-	/**
-	 * If an error occures while programming the iButton this bool is set to
-	 * true. This is needed for the following programming operations, so that
-	 * they aren't executed.
-	 */
-	bool error;
+
 	/**
 	 * Object keeping track of informations about the currently present iButton.
 	 * Needed to pass the informations as one piece.
 	 */
 	ButtonData button;
+
 	/**
 	 * Object keeping track of informations about the currently used Measurement profile
 	 */
 	MeasurementProfile profile;
+
 	/**
 	 * Keeps track of the last ButtonID. This is used to ensure a button isn't
 	 * programmed twice in a row.
 	 */
 	QString lastSerialNr;
+
 	//! used to lock and stop the thread while a dialog box is displayed
     QWaitCondition waitCondition;
+
     //! used to lock and stop the thread while a dialog box is displayed
     QMutex mutex;
 

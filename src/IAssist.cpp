@@ -22,33 +22,35 @@
 #include "IAssist.h"
 
 IAssist::IAssist(QWidget *parent)
-    : QDialog(parent)
+: QDialog(parent)
 {
-	ui.setupUi(this);
+    ui.setupUi(this);
 
-	// Connect the exit button with a slot to exit IAssist
-	connect(ui.btnExit, SIGNAL(clicked()), this, SLOT(exitButtonClicked()));
+    // Connect the exit button with a slot to exit IAssist
+    connect(ui.btnExit, SIGNAL(clicked()), this, SLOT(exitButtonClicked()));
 
-	// Connect the Programm Button with a slot to start the programming of buttons
-	connect(ui.btnProgram, SIGNAL(clicked()), this, SLOT(programButtonClicked()));
+    // Connect the Programm Button with a slot to start the programming of buttons
+    connect(ui.btnProgram, SIGNAL(clicked()), this, SLOT(programButtonClicked()));
 
-	// Connect the Collect Button with a slot to start the collecting of buttons
-	connect(ui.btnCollect, SIGNAL(clicked()), this, SLOT(collectButtonClicked()));
+    // Connect the Collect Button with a slot to start the collecting of buttons
+    connect(ui.btnCollect, SIGNAL(clicked()), this, SLOT(collectButtonClicked()));
 
-	// Connect the Mission Parameter Button with a slot to start the Mission Parameter Settings
-	connect(ui.btnMissionParameter, SIGNAL(clicked()), this, SLOT(missionParameterButtonClicked()));
+    // Connect the Mission Parameter Button with a slot to start the Mission Parameter Settings
+    connect(ui.btnMissionParameter, SIGNAL(clicked()), this, SLOT(missionParameterButtonClicked()));
 
-	// Connect the Remove Database Content Button with a slot to start the Remove DB Content UI
-	connect(ui.btnRemoveDbCont, SIGNAL(clicked()), this, SLOT(removeDbContClicked()));
+    // Connect the Remove Database Content Button with a slot to start the Remove DB Content UI
+    connect(ui.btnRemoveDbCont, SIGNAL(clicked()), this, SLOT(removeDbContClicked()));
 
-	connect(ui.btnDataPlot, SIGNAL(clicked()), this, SLOT(dataPlotButtonClicked()));
+    connect(ui.btnDataPlot, SIGNAL(clicked()), this, SLOT(dataPlotButtonClicked()));
 
-	// Initialize the Log file (create, clear)
-	Log::logfile_init();
+    // Initialize the Log file (create, clear)
+    Log::logfile_init();
 
-	// Set icon
-	QIcon title ("./ico/iassist.png");
-	this->setWindowIcon(title);
+    // Set icon
+    QIcon title ("./ico/iassist.png");
+    this->setWindowIcon(title);
+
+    deploymentId = -1;
 
 }
 
@@ -58,37 +60,49 @@ IAssist::~IAssist()
 
 void IAssist::programButtonClicked()
 {
-	AutoProgramUI *program = new AutoProgramUI(deploymentId, this);
-	program->show();
-	program->activateWindow();
+    if(deploymentId != -1)
+    {
+        AutoProgramUI *program = new AutoProgramUI(deploymentId, this);
+        program->show();
+        program->activateWindow();
+    }
 }
 
 void IAssist::collectButtonClicked()
 {
-	CollectUI *collect = new CollectUI(deploymentId, this);
-	collect->show();
-	collect->activateWindow();
+    if(deploymentId != -1)
+    {
+        CollectUI *collect = new CollectUI(deploymentId, this);
+        collect->show();
+        collect->activateWindow();
+    }
 }
 
 void IAssist::missionParameterButtonClicked()
 {
-	MissionParameterUI *missionParam = new MissionParameterUI(this);
-	missionParam->show();
-	missionParam->activateWindow();
+    MissionParameterUI *missionParam = new MissionParameterUI(this);
+    missionParam->show();
+    missionParam->activateWindow();
 }
 
 void IAssist::removeDbContClicked()
 {
-	DBManagementUI *dbManUI = new DBManagementUI(deploymentId, this);
-	dbManUI->show();
-	dbManUI->activateWindow();
+    if(deploymentId != -1)
+    {
+        DBManagementUI *dbManUI = new DBManagementUI(deploymentId, this);
+        dbManUI->show();
+        dbManUI->activateWindow();
+    }
 }
 
 void IAssist::dataPlotButtonClicked()
 {
-    DataPlotUI *dataPlot = new DataPlotUI(deploymentId, this);
-    dataPlot->show();
-    dataPlot->activateWindow();
+    if(deploymentId != -1)
+    {
+        DataPlotUI *dataPlot = new DataPlotUI(deploymentId, this);
+        dataPlot->show();
+        dataPlot->activateWindow();
+    }
 }
 
 /*
@@ -96,17 +110,16 @@ void IAssist::dataPlotButtonClicked()
  */
 void IAssist::exitButtonClicked()
 {
-	exit(0);
+    exit(0);
 }
 
 void IAssist::initDir()
 {
-	QDir log("log");
-	QDir dir(QDir::current());
+    QDir log("log");
+    QDir dir(QDir::current());
 
-	if(!log.exists())
-		dir.mkdir("log");
-
+    if(!log.exists())
+        dir.mkdir("log");
 }
 
 void IAssist::setDeploymentId(int deploymentId)
