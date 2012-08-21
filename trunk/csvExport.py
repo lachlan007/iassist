@@ -19,7 +19,7 @@ results = parser.parse_args()
 fileName = datetime.now().strftime('%Y%m%d%H%M%S')+'-export.txt'
 csvOutput = open(fileName, 'w')
 
-csvOutput.write('# TIME,TEMP,BUTTONNR,SESSIONNR,HIGH RESOLUTION'+'\n')
+csvOutput.write('# TIME,TEMP,BUTTONNR,SESSIONNR,HIGH RESOLUTION\n')
 
 conn = sqlite3.connect('iassist.db')
 c = conn.cursor()
