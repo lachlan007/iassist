@@ -360,7 +360,7 @@ QString DBButtonTable::read(QString table, QString compCol, QString compVal, QSt
 {
     QSqlQuery query(this->getDB());
     QString text = QString("SELECT " + getCol + " FROM " + table
-            + " WHERE DeploymentID = " + QString::number(deploymentId) + " AND " + compCol + "=" + compVal +";");
+            + " WHERE DeploymentID = " + QString::number(deploymentId) + " AND " + compCol + "=" + compVal +" ORDER BY ButtonID DESC;");
 
     bool success = query.exec(text);
 
