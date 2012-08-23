@@ -38,7 +38,7 @@
     <string>iButton:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="txtButtonID">
+  <widget class="QLineEdit" name="txtSerialNr">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -64,7 +64,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Button ID</string>
+    <string>Serial Nr</string>
    </property>
   </widget>
   <widget class="QComboBox" name="comboFootprint">
