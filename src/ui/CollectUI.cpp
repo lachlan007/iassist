@@ -132,11 +132,11 @@ void CollectUI::buttonNrChanged()
                 + actualButton.SerialNr.mid(10,2) + " "
                 + actualButton.SerialNr.mid(12,2) + " "
                 + actualButton.SerialNr.mid(14,2);
-        ui.txtButtonID->setText(bIDstr);
+        ui.txtSerialNr->setText(bIDstr);
     }
     else
     {
-        ui.txtButtonID->setText("");
+        ui.txtSerialNr->setText("");
     }
     // Tell the thread what iButton is selected
     collectThr->setButton(actualButton);
