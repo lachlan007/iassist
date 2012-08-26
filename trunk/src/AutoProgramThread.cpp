@@ -128,7 +128,7 @@ void AutoProgramThread::run(){
                     if(diffSecs > (65535*60))
                     {
                         this->abort();
-                        emit setStatus("Used device does not support start delays larger than 65535 minutes.", STYLESHEETRED);
+                        emit setStatus("Start delay must be smaller than 65535 minutes.", STYLESHEETRED);
                         Log::writeError("autoProgramThread: Used device does not support start delays larger than 65535 minutes.");
                         return;
                     }

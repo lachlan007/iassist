@@ -106,10 +106,23 @@ void CollectThread::run()
 
 			// If a Button is found we check if its really a new button or if it's the wrong button
 			// Case 1: it's a new button and its ID matches to the button we are looking for
-			if(button.SerialNr == ButtonIO::buttonIDStr(&SNum[0]) && latestReadButtonID!=button.SerialNr)
+			if(button.SerialNr == ButtonIO::buttonIDStr(&SNum[0]) && latestReadButtonID != button.SerialNr)
 			{
-				// emit setStatus("iButton found.", STYLESHEETYELLOW);
-				// Verify that mission was in progress
+                // Check if the start delay is within the allowed range of the device
+                // DS1921 etc. do only support at most 65535 minutes delay
+                if(redistribute && mp.getSetMissionStartTime() && !ButtonIO::isThermoHygrochron(&SNum[0]))
+                {
+                    int diffSecs = mp.getMissionStartTime()-QDateTime::currentDateTime().toTime_t();
+                    if(diffSecs > (65535*60))
+                    {
+                        this->abort();
+                        emit setStatus("Start delay must be smaller than 65535 minutes.", STYLESHEETRED);
+                        Log::writeError("collectThread: Used device does not support start delays larger than 65535 minutes.");
+                        return;
+                    }
+                }
+
+			    // Verify that mission was in progress
 				int res = this->verifyMissionRunningOnButton(&iButtonCon, &SNum[0]);
 				if(res==-1)
 				{
