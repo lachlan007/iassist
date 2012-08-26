@@ -83,11 +83,11 @@ private:
 
     bool configSetMissionStartTime;
 
-    long configMissionStartTime;
+    unsigned int configMissionStartTime;
 
-    bool checkAndSetValue(int index, long value);
+    bool checkAndSetValue(int index, unsigned int value);
 
-    long getValue(int index);
+    unsigned int getValue(int index);
 
     enum configLines { SAMPLING_RATE, EN_ROLLOVER, HIGH_TEMP_RES, SET_MISSION_START_TIME, MISSION_START_TIME, EN_AUTO_TEMP_CALIB, CONFIG_END };
 

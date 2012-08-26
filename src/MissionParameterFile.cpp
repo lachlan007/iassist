@@ -71,7 +71,7 @@ bool MissionParameterFile::loadMissionParameters()
 
 }
 
-bool MissionParameterFile::checkAndSetValue(int index, long value)
+bool MissionParameterFile::checkAndSetValue(int index, unsigned int value)
 {
     switch(index)
     {
@@ -143,26 +143,26 @@ bool MissionParameterFile::checkAndSetValue(int index, long value)
 
 }
 
-long MissionParameterFile::getValue(int index)
+unsigned int MissionParameterFile::getValue(int index)
 {
     int retVal = -1;
 
     switch(index)
     {
     case EN_AUTO_TEMP_CALIB:
-        retVal = (long)configEnableAutoTempCalib;
+        retVal = (unsigned int)configEnableAutoTempCalib;
         break;
     case SAMPLING_RATE:
-        retVal = (long)configSamplingRate;
+        retVal = (unsigned int)configSamplingRate;
         break;
     case EN_ROLLOVER:
-        retVal = (long)configEnableRollover;
+        retVal = (unsigned int)configEnableRollover;
         break;
     case HIGH_TEMP_RES:
-        retVal = (long)configHighTemperatureResolution;
+        retVal = (unsigned int)configHighTemperatureResolution;
         break;
     case SET_MISSION_START_TIME:
-        retVal = (long)configSetMissionStartTime;
+        retVal = (unsigned int)configSetMissionStartTime;
         break;
     case MISSION_START_TIME:
         retVal = configMissionStartTime;

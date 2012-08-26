@@ -120,6 +120,20 @@ void AutoProgramThread::run(){
 
                 emit setStatus("Starting to program ...", STYLESHEETYELLOW);
 
+                // Check if the start delay is within the allowed range of the device
+                // DS1921 etc. do only support at most 65535 minutes delay
+                if(mp.getSetMissionStartTime() && !ButtonIO::isThermoHygrochron(&SNum[0]))
+                {
+                    int diffSecs = mp.getMissionStartTime()-QDateTime::currentDateTime().toTime_t();
+                    if(diffSecs > (65535*60))
+                    {
+                        this->abort();
+                        emit setStatus("Used device does not support start delays larger than 65535 minutes.", STYLESHEETRED);
+                        Log::writeError("autoProgramThread: Used device does not support start delays larger than 65535 minutes.");
+                        return;
+                    }
+                }
+
                 //====================================
                 // If a mission is running, stop it
                 //====================================
@@ -214,7 +228,6 @@ void AutoProgramThread::run(){
                 // Store calibration coefficients of DS1922 buttons
                 if(ButtonIO::isThermoHygrochron(&SNum[0]))
                 {
-                    double coeffA, coeffB, coeffC;
                     if(iButtonCon->getCalibrationCoefficients(&SNum[0], button.CalibCoeffA, button.CalibCoeffB, button.CalibCoeffC))
                     {
                         dbButton->storeTempCalibCoeff(button);

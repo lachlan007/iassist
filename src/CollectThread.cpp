@@ -230,7 +230,6 @@ void CollectThread::run()
                 // Store calibration coefficients of DS1922 buttons
                 if(ButtonIO::isThermoHygrochron(&SNum[0]))
                 {
-                    double coeffA, coeffB, coeffC;
                     if(iButtonCon.getCalibrationCoefficients(&SNum[0], button.CalibCoeffA, button.CalibCoeffB, button.CalibCoeffC))
                     {
                         dbButton->storeTempCalibCoeff(button);

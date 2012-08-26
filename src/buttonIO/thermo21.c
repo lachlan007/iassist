@@ -46,12 +46,12 @@
 #include <string.h>
 #endif
 
-// Local Function Prototypes 
+// Local Function Prototypes
 static int ThermoStep(int,ThermoStateType *,ThermoScript *,int *,int *,int *,char *);
 static int ReadPages(int,int,int,int *,uchar *);
 static int WriteScratch(int,uchar *,int,int);
 static int CopyScratch(int,int,int);
-static int WriteMemory(int,uchar *, int, int);
+// made WriteMemory public for iAssist
 
 // global state information
 static int current_speed[MAX_PORTNUM];

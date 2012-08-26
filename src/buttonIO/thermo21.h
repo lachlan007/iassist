@@ -219,7 +219,10 @@ void  LogToString(LogType *, int, char *);
 void  DebugToString(MissionStatus *, TempAlarmEvents *, Histogram *, LogType *, char *);
 float TempToFloat(uchar, int);
 float CToF(float);
-uchar ToBCD(short); 
+uchar ToBCD(short);
+
+// Needed from outside in iAssist
+int WriteMemory(int,uchar *, int, int);
 
 #ifdef __cplusplus
 }

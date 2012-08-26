@@ -67,14 +67,14 @@ bool ThermochronButton::startButtonMission(int portnum, uchar* SNum)
             // Calculate Delay
             if(mp.getSetMissionStartTime()) {
                 QDateTime now = QDateTime::currentDateTime();
-                double secsDelay = static_cast<double>(mp.getMissionStartTime()-now.toTime_t())/60.0;
-                if((secsDelay - (int)secsDelay)>0.5)
+                double minsDelay = static_cast<double>(mp.getMissionStartTime()-now.toTime_t())/60.0;
+                if((minsDelay - (int)minsDelay)>0.5)
                 {
-                    thermoState.MissStat.start_delay = ((int) secsDelay) + 1;
+                    thermoState.MissStat.start_delay = ((int) minsDelay) + 1;
                 }
                 else
                 {
-                    thermoState.MissStat.start_delay = (int) secsDelay;
+                    thermoState.MissStat.start_delay = (int) minsDelay;
                 }
             }
 
@@ -95,7 +95,46 @@ bool ThermochronButton::startButtonMission(int portnum, uchar* SNum)
 
 bool ThermochronButton::stopButtonMission(int portnum, uchar* SNum)
 {
-    return true;
+
+    int retry = 5;
+    int write_addr, write_len;
+    uchar write_buf;
+
+    while(retry > 0)
+    {
+        retry--;
+
+        usleep(1500);
+        // check if port is opened
+        if(owUSB_is_port_open(portnum) == 0)
+        {
+            Log::writeError("ThermochronButton::stopButtonMission: USB port is closed.");
+            return false;
+        }
+        else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+        {
+            Log::writeError("ThermochronButton::stopButtonMission: The current iButton is not on the 1-Wire net.");
+            continue;
+        }
+
+        usleep(2000);
+
+        write_buf = 0;
+        write_len = 1;
+        // A mission can be stopped at any time by writing to any address in the range of 0200h to 0213h
+        // or by writing the MIP bit of the Status register at address 0214h to 0.
+        write_addr = 0x210;
+
+        if (WriteMemory(portnum, &write_buf, write_len, write_addr)) {
+            return true;
+        } else {
+            Log::writeError("ThermochronButton::stopButtonMission: Could not write to button.");
+
+            return false;
+        }
+    }
+
+    return false;
 }
 
 bool ThermochronButton::isMissionInProgress(int portnum, uchar* SNum)
