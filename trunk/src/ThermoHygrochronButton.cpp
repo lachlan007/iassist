@@ -49,14 +49,14 @@ bool ThermoHygrochronButton::startButtonMission(int portnum, uchar* SNum)
     // Calculate Delay
     if(mp.getSetMissionStartTime()) {
         QDateTime now = QDateTime::currentDateTime();
-        double secsDelay = static_cast<double>(mp.getMissionStartTime()-now.toTime_t())/60.0;
-        if((secsDelay - (int)secsDelay)>0.5)
+        double minsDelay = static_cast<double>(mp.getMissionStartTime()-now.toTime_t())/60.0;
+        if((minsDelay - (int)minsDelay)>0.5)
         {
-            settings.startDelay = ((int) secsDelay) + 1;
+            settings.startDelay = ((int) minsDelay) + 1;
         }
         else
         {
-            settings.startDelay = (int) secsDelay;
+            settings.startDelay = (int) minsDelay;
         }
     }
 
