@@ -194,7 +194,7 @@ QVector<int> DBButtonTable::getAllButtonNr()
     QVector<int> list;
 	QSqlQuery query(this->getDB());
 
-	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) +
+	QString text = QString("SELECT DISTINCT ButtonNr FROM ") + QString(BUTTONTABLENAME) +
 	        QString(" WHERE DeploymentID = ") + QString::number(deploymentId) + " ORDER BY ButtonNr ASC;";
 	bool success = query.exec(text);
 
@@ -218,7 +218,7 @@ QVector<int> DBButtonTable::getAllButtonNr(int footprintPrefix)
 	QVector<int> list;
 	QSqlQuery query(this->getDB());
 
-	QString text = QString("SELECT ButtonNr FROM ") + QString(BUTTONTABLENAME) + " WHERE DeploymentID = " +
+	QString text = QString("SELECT DISTINCT ButtonNr FROM ") + QString(BUTTONTABLENAME) + " WHERE DeploymentID = " +
 	        QString::number(deploymentId) + " AND ButtonNr > " + QString::number(footprintPrefix*1000) +
 	        " AND ButtonNr < " + QString::number((footprintPrefix+1)*1000)  + " ORDER BY ButtonNr ASC;";
 	bool success = query.exec(text);
