@@ -34,14 +34,14 @@ outputIButtonConfig = open(fileNameConfig, 'w')
 outputIButtonMeasurements = open(fileNameMeasurements, 'w')
 outputPosMapping = open(fileNamePosMapping, 'w')
 
-outputIButtonConfig.write('# TIMED (unixtime), DEVICE_ID, CONFIG_ID, SERIAL_NR (1001-999999), '
-    'PROGRAMMING_TIME (unixtime), SAMPLING_START_TIME (unixtime), SAMPLING_RATE (int), '
-    'HIGH_TEMP_RESOLUTION_EN (0 or 1), CALIB_COEFF_A (double), CALIB_COEFF_B (double), '
-    'CALIB_COEFF_C (double), COLLECT_TIME_HOST (unixtime), COLLECT_TIME_BUTTON (unixtime), '
-    'NUM_SAMPLES (0-4096), SW_TEMP_CALIB_USED (0 or 1)\n')
+#outputIButtonConfig.write('# DEVICE_ID, CONFIG_ID, SERIAL_NR (1001-999999), '
+#    'PROGRAMMING_TIME (unixtime msec), SAMPLING_START_TIME (unixtime msec), SAMPLING_RATE (int), '
+#    'HIGH_TEMP_RESOLUTION_EN (0 or 1), CALIB_COEFF_A (double), CALIB_COEFF_B (double), '
+#    'CALIB_COEFF_C (double), COLLECT_TIME_HOST (unixtime msec), COLLECT_TIME_BUTTON (unixtime msec), '
+#    'NUM_SAMPLES (0-4096), SW_TEMP_CALIB_USED (0 or 1)\n')
 
-outputIButtonMeasurements.write('# TIMED (unixtime), GENERATION_TIME (unixtime), DEVICE_ID, '
-    'CONFIG_ID, SAMPLE_NR (1-4096), TEMPERATURE (double)\n')
+#outputIButtonMeasurements.write('# GENERATION_TIME (unixtime msec), DEVICE_ID, '
+#    'CONFIG_ID, SAMPLE_NR (1-4096), TEMPERATURE (double)\n')
 
 conn = sqlite3.connect('iassist.db')
 c = conn.cursor()
@@ -67,9 +67,14 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
                 calibCoeffA = 'NULL'
                 calibCoeffB = 'NULL'
                 calibCoeffC = 'NULL'
-            programmingTime = datetime.strptime(str(profile[1]), '%d.%m.%Y %H:%M:%S')
             sampleStart = datetime.strptime(str(profile[2]), '%d.%m.%Y %H:%M:%S')
             samplingRate = int(profile[3])
+            
+            if profile[1] != None and profile[1] != "":
+                programmingTime = datetime.strptime(str(profile[1]), '%d.%m.%Y %H:%M:%S')
+                programmingTimeStr = str(calendar.timegm(programmingTime.utctimetuple())*1000)
+            else:
+                programmingTimeStr = 'NULL'
             
             if profile[4] != None and profile[4] != "":
                 highTempResolutionEn = int(profile[4])
@@ -78,8 +83,6 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
             
             # Write entry for programming event
             out = []
-            # TIMED
-            out.append(str(calendar.timegm(programmingTime.utctimetuple()))), out.append(',')
             # DEVICE_ID
             out.append(str(deviceId)), out.append(',')
             # CONFIG_ID
@@ -87,7 +90,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
             # SERIAL_NR
             out.append(serialNr), out.append(',')
             # PROGRAMMING_TIME
-            out.append(str(calendar.timegm(programmingTime.utctimetuple()))), out.append(',')
+            out.append(programmingTimeStr), out.append(',')
             # SAMPLING_START_TIME
             out.append(str(sampleStart)), out.append(',')
             # SAMPLING_RATE
@@ -120,8 +123,6 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
                 numSamples = c3.fetchone()[0]
         
                 out = []
-                # TIMED
-                out.append(str(calendar.timegm(collectTimeHost.utctimetuple()))), out.append(',')
                 # DEVICE_ID
                 out.append(str(deviceId)), out.append(',')
                 # CONFIG_ID
@@ -129,7 +130,7 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
                 # SERIAL_NR
                 out.append(serialNr), out.append(',')
                 # PROGRAMMING_TIME
-                out.append(str(calendar.timegm(programmingTime.utctimetuple()))), out.append(',')
+                out.append(programmingTimeStr), out.append(',')
                 # SAMPLING_START_TIME
                 out.append(str(sampleStart)), out.append(',')
                 # SAMPLING_RATE
@@ -143,9 +144,9 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
                 # CALIB_COEFF_C
                 out.append(str(calibCoeffC)), out.append(',')
                 # COLLECT_TIME_HOST
-                out.append(str(calendar.timegm(collectTimeHost.utctimetuple()))), out.append(',')
+                out.append(str(calendar.timegm(collectTimeHost.utctimetuple())*1000)), out.append(',')
                 # COLLECT_TIME_BUTTON
-                out.append(str(calendar.timegm(collectTimeButton.utctimetuple()))), out.append(',')
+                out.append(str(calendar.timegm(collectTimeButton.utctimetuple())*1000)), out.append(',')
                 # NUM_SAMPLES
                 out.append(str(numSamples)), out.append(',')
                 # SW_TEMP_CALIB_USED
@@ -163,10 +164,8 @@ for button in c.execute('SELECT ButtonID, ButtonNr, SerialNr, CalibCoeffA, Calib
                 for meas in c3.execute('SELECT MeasurementNr, Measurement FROM Measurements WHERE MeasurementProfileID=?', (profile[0],)):
                     out = []
                     ts = sampleStart+timedelta(0, (int(meas[0])-1)*samplingRateReal)
-                    # TIMED
-                    out.append(str(calendar.timegm(collectTimeHost.utctimetuple()))), out.append(',')
                     # GENERATION_TIME
-                    out.append(str(calendar.timegm(ts.utctimetuple()))), out.append(',')
+                    out.append(str(calendar.timegm(ts.utctimetuple())*1000)), out.append(',')
                     # DEVICE_ID
                     out.append(str(deviceId)), out.append(',')
                     # CONFIG_ID
@@ -192,8 +191,8 @@ for position in c.execute('SELECT DISTINCT ButtonNr FROM Buttons WHERE Deploymen
         firstIterationDone = False
         missionStillRunning = False
         deviceId = deviceIdOffset + int(button[0])
-        for profile in c3.execute('SELECT ProgrammingTime, CollectingTimeHost FROM MeasurementProfiles WHERE ButtonID = ?', (button[0], )):
-            programmingTime = datetime.strptime(str(profile[0]), '%d.%m.%Y %H:%M:%S')
+        for profile in c3.execute('SELECT SamplingStartTime, CollectingTimeHost FROM MeasurementProfiles WHERE ButtonID = ?', (button[0], )):
+            samplingStartTime = datetime.strptime(str(profile[0]), '%d.%m.%Y %H:%M:%S')
             if profile[1] != None and profile[1] != '':
                 collectTimeHost = datetime.strptime(str(profile[1]), '%d.%m.%Y %H:%M:%S')
             else:
@@ -202,12 +201,12 @@ for position in c.execute('SELECT DISTINCT ButtonNr FROM Buttons WHERE Deploymen
                 collectTimeHost = datetime.now()
             
             if firstIterationDone == False:
-                startTime = programmingTime
+                startTime = samplingStartTime
                 endTime = collectTimeHost         
                 firstIterationDone = True
             else:
-                if programmingTime < startTime:
-                    startTime = programmingTime
+                if samplingStartTime < startTime:
+                    startTime = samplingStartTime
                 if collectTimeHost > endTime:
                     endTime = collectTimeHost
         out = []
