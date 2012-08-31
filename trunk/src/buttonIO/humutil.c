@@ -519,7 +519,8 @@ SMALLINT startMission(int portnum, uchar *SNum, startMissionData set,
    state[7] = (uchar) ((sampleRate & 0x3F00) >> 8);
 
    state[22] = (uchar) (set.startDelay & 0x00FF);
-   state[23] = (uchar) ((set.startDelay & 0x3F00) >> 8);
+   state[23] = (uchar) ((set.startDelay & 0xFF00) >> 8);
+   state[24] = (uchar) ((set.startDelay & 0xFF0000) >> 16);
 
    setFlag(MISSION_CONTROL_REGISTER,
            MCR_BIT_ENABLE_ROLLOVER, set.enableRollover, &state[0]);
