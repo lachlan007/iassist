@@ -172,7 +172,10 @@ void CollectThread::run()
 				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toUTC().toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toUTC().toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.TempCalibUsed = iButtonCon.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
-				measurementProfile.SamplingStartTime = missionData.missionStartTime.toUTC().toString("dd.MM.yyyy hh:mm:ss");
+				if(measurement.size > 0)
+				{
+				    measurementProfile.SamplingStartTime = missionData.missionStartTime.toUTC().toString("dd.MM.yyyy hh:mm:ss");
+				}
 
 				//=================================================
 				// Enter the measurement to the database and update
