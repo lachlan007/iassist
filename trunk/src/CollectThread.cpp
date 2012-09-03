@@ -124,7 +124,7 @@ void CollectThread::run()
 
 			    // Verify that mission was in progress
 				int res = this->verifyMissionRunningOnButton(&iButtonCon, &SNum[0]);
-				if(res==-1)
+				if(res == -1)
 				{
 					emit this->setStatus("ERROR: Could not detect a running mission on iButton: " + button.ButtonNr, STYLESHEETRED);
 					this->abort();
@@ -132,11 +132,11 @@ void CollectThread::run()
 				}
 
 				// Stop the running mission, but only if res is not 0
-				if(res!=0)
+				if(res != 0)
 				{
 				    res = this->stopMissionOnButton(&iButtonCon, &SNum[0]);
 				}
-				if(res==-1)
+				if(res == -1)
 				{
 					emit this->setStatus("ERROR: Could not stop the mission on iButton: " + button.ButtonNr, STYLESHEETRED);
 					this->abort();
@@ -172,6 +172,7 @@ void CollectThread::run()
 				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toUTC().toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toUTC().toString("dd.MM.yyyy hh:mm:ss");
 				measurementProfile.TempCalibUsed = iButtonCon.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
+				measurementProfile.SamplingStartTime = missionData.missionStartTime.toUTC().toString("dd.MM.yyyy hh:mm:ss");
 
 				//=================================================
 				// Enter the measurement to the database and update
@@ -259,13 +260,13 @@ void CollectThread::run()
 				sleep(5);
 			}
 			// Case 2: It's a the same button like before
-			else if(latestReadButtonID==button.SerialNr)
+			else if(latestReadButtonID == button.SerialNr)
 			{
 				emit setStatus("Please select NEW iButton.", STYLESHEETGREEN);
 			}
-			else if(ButtonIO::buttonIDStr(&SNum[0])==latestReadButtonID)
+			else if(ButtonIO::buttonIDStr(&SNum[0]) == latestReadButtonID)
 			{
-				emit setStatus("Please insert NEW iButton: " + button.ButtonNr);
+				emit setStatus("Please insert NEW iButton: " + button.ButtonNr, STYLESHEETYELLOW);
 			}
 			// Case 3: It's not the selected button
 			else

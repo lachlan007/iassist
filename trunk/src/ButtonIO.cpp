@@ -170,6 +170,10 @@ bool ButtonIO::downloadMissionData(uchar *SNum, MissionData &data)
         {
             return false;
         }
+        if(!ThermoHygrochronButton::getMissionStartTime(portnum, &SNum[0], data.missionStartTime))
+        {
+            return false;
+        }
     }
     else if(SNum[0] == FAMILY_THERMO)
     {
@@ -178,6 +182,10 @@ bool ButtonIO::downloadMissionData(uchar *SNum, MissionData &data)
             return false;
         }
         if(!ThermochronButton::getButtonTime(portnum, &SNum[0], data.collectTimeButton, data.collectTimeHost))
+        {
+            return false;
+        }
+        if(!ThermochronButton::getMissionStartTime(portnum, &SNum[0], data.missionStartTime))
         {
             return false;
         }

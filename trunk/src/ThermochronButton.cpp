@@ -251,3 +251,35 @@ bool ThermochronButton::downloadMissionData(int portnum, uchar* SNum, int& numSa
 
     return true;
 }
+
+bool ThermochronButton::getMissionStartTime(int portnum, uchar* SNum, QDateTime& missionStartTime)
+{
+    ThermoStateType thermoState;
+
+    usleep(5000);
+    // check if USB port is open
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ThermochronButton::getMissionStartTime: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false)))    // check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ThermochronButton::getMissionStartTime: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    usleep(2000);
+
+    if(!ReadThermoStatus(portnum, &SNum[0], &thermoState, fopen("/dev/null", "w")))
+    {
+        return false;
+    }
+
+    InterpretStatus(&thermoState.MissStat);
+    missionStartTime = QDateTime::fromTime_t(thermoState.MissStat.mission_start_time);
+
+    Log::write("Mission start time: " + missionStartTime.toString());
+
+    return true;
+}

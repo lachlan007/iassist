@@ -38,6 +38,8 @@ public:
 
     QDateTime collectTimeButton;
 
+    QDateTime missionStartTime;
+
 };
 
 #endif /* MISSIONDATA_H_ */

@@ -42,6 +42,8 @@ public:
 
     static bool downloadMissionData(int portnum, uchar* SNum, int& numSamples, double*& samples);
 
+    static bool getMissionStartTime(int portnum, uchar* SNum, QDateTime& missionStartTime);
+
 };
 
 #endif /* THERMOCHRONBUTTON_H_ */

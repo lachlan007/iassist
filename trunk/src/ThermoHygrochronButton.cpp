@@ -168,7 +168,6 @@ bool ThermoHygrochronButton::isMissionInProgress(int portnum, uchar* SNum)
 bool ThermoHygrochronButton::getButtonTime(int portnum, uchar* SNum, QDateTime& buttonTime, QDateTime& hostTime)
 {
 
-    QDateTime rtcTime;
     uchar upper, lower;
     int hour = 0, min = 0, sec = 0, pm = 0, year = 0, month = 0, day = 0;
     configLog config;
@@ -459,6 +458,91 @@ bool ThermoHygrochronButton::getCalibrationCoefficients(int portnum, uchar* SNum
     coeffA = config.tempCoeffA;
     coeffB = config.tempCoeffB;
     coeffC = config.tempCoeffC;
+
+    return true;
+}
+
+bool ThermoHygrochronButton::getMissionStartTime(int portnum, uchar* SNum, QDateTime& missionStartTime)
+{
+
+    uchar upper, lower;
+    int hour = 0, min = 0, sec = 0, pm = 0, year = 0, month = 0, day = 0;
+    configLog config;
+    uchar state[96];
+
+    usleep(5000);
+    // Check if USB port is open
+    if(owUSB_is_port_open(portnum) == 0)
+    {
+        Log::writeError("ThermoHygrochronButton::getMissionTimestamp: USB port is closed.");
+        return false;
+    }
+    else if(!(owVerify(portnum, false))) // Check if the current iButton device is on 1-Wire net
+    {
+        Log::writeError("ThermoHygrochronButton::getMissionTimestamp: The current iButton is not on the 1-Wire net.");
+        return false;
+    }
+
+    usleep(2000);
+    // Read the register contents
+    if(!readDevice(portnum,SNum,&state[0],&config))
+    {
+        Log::writeError("ThermoHygrochronButton::getMissionTimestamp: Cannot read device");
+        return false;
+    }
+
+    // Get seconds
+    lower = state[MISSION_TIMESTAMP_TIME&0x3F];
+    upper = ((lower >> 4) & 0x07);
+    lower = (lower & 0x0f);
+    sec   = (int) lower + (int) upper * 10;
+
+    // Get minutes
+    lower = state [(MISSION_TIMESTAMP_TIME&0x3F) + 1];
+    upper = ((lower >> 4) & 0x07);
+    lower = (lower & 0x0f);
+    min   = (int) lower + (int) upper * 10;
+
+    // Get hours
+    lower = state[(MISSION_TIMESTAMP_TIME&0x3F) + 2];
+    upper = ((lower >> 4) & 0x07);
+    lower = (lower & 0x0f);
+    if ((upper&0x04) != 0)
+    {
+        // Extract the AM/PM byte (PM is indicated by a 1)
+        if((upper&0x02)>0)
+        {
+            pm = 12;
+        }
+        // Isolate the 10s place
+        upper &= 0x01;
+    }
+    hour = (int)(upper*10) + (int)lower + (int)pm;
+
+    // Get day
+    lower  = state[MISSION_TIMESTAMP_DATE&0x3F];
+    upper  = ((lower >> 4) & 0x0f);
+    lower  = (lower & 0x0f);
+    day    = upper*10 + lower;
+
+    // Get month
+    lower = state[(MISSION_TIMESTAMP_DATE&0x3F) + 1];
+    upper = ((lower >> 4) & 0x01);
+    lower = (lower & 0x0f);
+    month = upper*10 + lower;
+
+    // Get year
+    if((state[(MISSION_TIMESTAMP_DATE&0x3F) + 1]&0x80)==0x80)
+       year = 100;
+    lower = state[(MISSION_TIMESTAMP_DATE&0x3F) + 2];
+    upper = ((lower >> 4) & 0x0f);
+    lower = (lower & 0x0f);
+    year  = upper*10 + lower + year + 2000;
+
+    missionStartTime.setDate(QDate(year, month, day));
+    missionStartTime.setTime(QTime(hour, min, sec));
+
+    Log::write("Mission start time: " + missionStartTime.toString());
 
     return true;
 }

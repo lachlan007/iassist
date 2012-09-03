@@ -45,6 +45,9 @@ public:
 
     static bool getCalibrationCoefficients(int portnum, uchar* SNum, double& coeffA, double& coeffB, double& coeffC);
 
+    static bool getMissionStartTime(int portnum, uchar* SNum, QDateTime& missionStartTime);
+
+
 };
 
 #endif /* THERMOHYGROCHRONBUTTON_H_ */
