@@ -22,6 +22,9 @@ MissionData::MissionData()
 {
     samples = 0;
     numSamples = 0;
+    collectTimeHost = QDateTime();
+    collectTimeButton = QDateTime();
+    missionStartTime = QDateTime();
 }
 
 MissionData::~MissionData()
@@ -38,5 +41,8 @@ void MissionData::clear()
     }
     samples = 0;
     numSamples = 0;
+    collectTimeHost = QDateTime();
+    collectTimeButton = QDateTime();
+    missionStartTime = QDateTime();
 }
 
