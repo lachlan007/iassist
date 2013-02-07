@@ -169,12 +169,12 @@ void CollectThread::run()
 				// with the collecting time and so on.
 				measurementProfile.ButtonId = buttonId;
 				measurementProfile.MeasurementProfileID = measurement.MeasurementProfileID;
-				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toUTC().toString("dd.MM.yyyy hh:mm:ss");
-				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toUTC().toString("dd.MM.yyyy hh:mm:ss");
+				measurementProfile.CollectingTimeHost = missionData.collectTimeHost.toUTC().toString("yyyy-MM-dd hh:mm:ss");
+				measurementProfile.CollectingTimeButton = missionData.collectTimeButton.toUTC().toString("yyyy-MM-dd hh:mm:ss");
 				measurementProfile.TempCalibUsed = iButtonCon.isThermoHygrochron(&SNum[0]) && mp.getEnableAutoTempCalib();
 				if(measurement.size > 0)
 				{
-				    measurementProfile.SamplingStartTime = missionData.missionStartTime.toUTC().toString("dd.MM.yyyy hh:mm:ss");
+				    measurementProfile.SamplingStartTime = missionData.missionStartTime.toUTC().toString("yyyy-MM-dd hh:mm:ss");
 				}
 
 				//=================================================
@@ -214,14 +214,14 @@ void CollectThread::run()
 					//========================================
 					measurementProfile.ButtonId = buttonId;
 					measurementProfile.SessionNr = dbProfile->getLatestSessionNrByButtonId(buttonId) + 1;
-					measurementProfile.ProgrammingTime = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss");
+					measurementProfile.ProgrammingTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
 					if(mp.getSetMissionStartTime())
 					{
-					    measurementProfile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toUTC().toString("dd.MM.yyyy hh:mm:ss");
+					    measurementProfile.SamplingStartTime = QDateTime::fromTime_t(mp.getMissionStartTime()).toUTC().toString("yyyy-MM-dd hh:mm:ss");
 					}
 					else
 					{
-					    measurementProfile.SamplingStartTime = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss");
+					    measurementProfile.SamplingStartTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
 					}
 					measurementProfile.SamplingRate = mp.getSamplingRate();
 					measurementProfile.HighResolutionEn = (ButtonIO::isThermoHygrochron(&SNum[0]) && mp.getHighTemperatureResolution()) ? 1 : 0;
