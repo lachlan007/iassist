@@ -42,9 +42,9 @@ for button in c.execute('SELECT ButtonID, ButtonNr FROM Buttons WHERE Deployment
             print 'Ignoring only single available sample for profile ' + str(profile[0])
             continue
         numMeas = int(numMeas)
-        sampleStart = datetime.strptime(str(profile[2]), '%d.%m.%Y %H:%M:%S')
-        collectingTimeHost = datetime.strptime(str(profile[4]), '%d.%m.%Y %H:%M:%S')
-        collectingTimeButton = datetime.strptime(str(profile[5]), '%d.%m.%Y %H:%M:%S')
+        sampleStart = datetime.strptime(str(profile[2]), '%Y-%m-%d %H:%M:%S')
+        collectingTimeHost = datetime.strptime(str(profile[4]), '%Y-%m-%d %H:%M:%S')
+        collectingTimeButton = datetime.strptime(str(profile[5]), '%Y-%m-%d %H:%M:%S')
         samplingRate = int(profile[3])
         samplingDurationNoDrift = samplingRate * (numMeas - 1)
         timeShift = (collectingTimeButton - collectingTimeHost).total_seconds()
