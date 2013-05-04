@@ -29,7 +29,7 @@ def timeStrToUnixtimeMillis(timeStr):
      return int(calendar.timegm(ts.timetuple())*1000)
      
 
-DEPLOYMENT_ID = 1
+DEPLOYMENT_ID = 5
 GSN_HOST = 'pc-10022.ethz.ch'
 UPLOAD_PORT = 22002
 
@@ -117,7 +117,10 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
         # High resolution enabled? 0/1
         line.append(str(mission[6]))
         # Temperature calibration used? 0/1
-        line.append(str(mission[7]))
+        if int(mission[7]) == -9999:
+            line.append('')
+        else:
+            line.append(str(mission[7]))
         # Location Lon
         line.append('')
         # Location Lat
