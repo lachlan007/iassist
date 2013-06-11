@@ -29,7 +29,7 @@ def timeStrToUnixtimeMillis(timeStr):
      return int(calendar.timegm(ts.timetuple())*1000)
      
 
-DEPLOYMENT_ID = 5
+DEPLOYMENT_ID = 1
 GSN_HOST = 'pc-10022.ethz.ch'
 UPLOAD_PORT = 22002
 
@@ -71,6 +71,8 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
                 line.append('2')
                 # Mission ID
                 line.append(uniqueMissionId)
+                # ButtonNr
+                line.append(str(int(button[1])))
                 # Unix timestamp (milli)
                 sampleNr = int(measurement[0])-1;
                 line.append(str((sampleNr * 1000 * samplingRate) * multiplier / divisor + correctedStarttime))
@@ -84,7 +86,6 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
                 print "MEASUREMENT: Sent ", numSent, " bytes" 
                 
                 sampleCnt = sampleCnt + 1
-    
     
         line = []
         # Message type
