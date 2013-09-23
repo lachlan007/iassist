@@ -13,6 +13,18 @@ import time
 import calendar
 import socket
 import random
+import httplib, urllib, mimetypes
+
+# Location of the local SQLite3 database file
+IASSIST_DB = '../iassist.db'
+# The deployment ID within the SQLite database
+DEPLOYMENT_ID = 1
+# The virtual sensor to which data should be uploaded
+GSN_VIRTUAL_SENSOR = 'etz_ibutton_upload'
+# The address of the HTTP interface of the GSN server
+GSN_HOST = 'whymper.ethz.ch:23001'
+# The script that handles uploads
+GSN_UPLOAD_URL = '/upload'
 
 def generateUniqueId(timestampMilli):
     id = (timestampMilli & 0x7FFFFFFFFFF) << 20;
@@ -28,17 +40,73 @@ def timeStrToUnixtimeMillis(timeStr):
      ts = datetime.strptime(str(timeStr), '%Y-%m-%d %H:%M:%S')
      return int(calendar.timegm(ts.timetuple())*1000)
      
+def uploadPayload(host, url, virtualSensor, payloadType, payload):
+    values = {
+              'vsname': virtualSensor,
+              'cmd': 'upload',
+              'upload;payload_type': str(payloadType),
+              'upload;payload': str(payload)
+    }
+    post_multipart(host, url, values)
 
-DEPLOYMENT_ID = 1
-GSN_HOST = 'pc-10022.ethz.ch'
-UPLOAD_PORT = 22002
 
-print 'Connecting to: ', GSN_HOST, socket.gethostbyname(GSN_HOST)
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((socket.gethostbyname(GSN_HOST), UPLOAD_PORT))
-txLineCnt = 0
+def post_multipart(host, url, fields):
+    """
+    Post fields and files to an http host as multipart/form-data.
+    fields is a sequence of (name, value) elements for regular form fields.
+    files is a sequence of (name, filename, value) elements for data to be uploaded as files
+    Return the server's response page.
+    """
+    content_type, body = encode_multipart_formdata(fields)
+    h = httplib.HTTP(host)
+    h.putrequest('POST', url)
+    h.putheader('Content-Type', content_type)
+    h.putheader('Content-Length', str(len(body)))
+    h.putheader('User-Agent', 'Python HTTP Uploader')
+    h.endheaders()
+    h.send(body)
+    errcode, errmsg, headers = h.getreply()
+    return h.file.read()
 
-conn = sqlite3.connect('../iassist.db')
+def encode_multipart_formdata(fields):
+    """
+    fields is a sequence of (name, value) elements for regular form fields.
+    files is a sequence of (name, filename, value) elements for data to be uploaded as files
+    Return (content_type, body) ready for httplib.HTTP instance
+    """
+    BOUNDARY = '------MyFormBoundaryVN1AnA0H4wkOqBA6'
+    CRLF = '\r\n'
+    L = []
+    L.append('--' + BOUNDARY)
+    L.append('Content-Disposition: form-data; name="vsname"')
+    L.append('')
+    L.append(fields['vsname'])
+    
+    L.append('--' + BOUNDARY)
+    L.append('Content-Disposition: form-data; name="cmd"')
+    L.append('')
+    L.append(fields['cmd'])
+    
+    L.append('--' + BOUNDARY)
+    L.append('Content-Disposition: form-data; name="upload;payload_type"')
+    L.append('')
+    L.append(fields['upload;payload_type'])
+
+    L.append('--' + BOUNDARY)
+    L.append('Content-Disposition: form-data; name="upload;payload"')
+    L.append('')
+    L.append(fields['upload;payload'])    
+    
+    L.append('--' + BOUNDARY + '--')
+    L.append('')
+    body = CRLF.join(L)
+    content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+    return content_type, body
+
+def get_content_type(filename):
+    return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+conn = sqlite3.connect(IASSIST_DB)
 cursor = conn.cursor()
 cursorMission = conn.cursor()
 cursorMeas = conn.cursor()
@@ -53,6 +121,7 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
         uniqueMissionId = str(generateUniqueId(syncTime))
         sampleCnt = 0
         
+        # This first part is only executed for buttons for which the data has already been collected
         if mission[2] != None and str(mission[2]) != "":
             programmingTime = timeStrToUnixtimeMillis(mission[1])
             collectionTimeHost = timeStrToUnixtimeMillis(mission[2])
@@ -64,15 +133,19 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
             divisor = collectionTimeButton - programmingTime
             correctedStarttime = ((samplingStartTime - programmingTime) * multiplier / divisor) + programmingTime
             
+            # Put all measurements in one long line
+            line = []
+            # Mission ID
+            line.append(uniqueMissionId)
+            # ButtonNr
+            line.append(str(int(button[1])))
+            # Number of samples
+            cursorMeas.execute("SELECT COUNT(*) FROM Measurements WHERE MeasurementProfileID = ?", (mission[8],))
+            sampleCnt = int(cursorMeas.fetchone()[0])
+            line.append(str(sampleCnt))
+                
             for measurement in cursorMeas.execute("SELECT MeasurementNr, Measurement FROM " + 
                                                   "Measurements WHERE MeasurementProfileID = ?", (mission[8],)):
-                line = []
-                # Message type
-                line.append('2')
-                # Mission ID
-                line.append(uniqueMissionId)
-                # ButtonNr
-                line.append(str(int(button[1])))
                 # Unix timestamp (milli)
                 sampleNr = int(measurement[0])-1;
                 line.append(str((sampleNr * 1000 * samplingRate) * multiplier / divisor + correctedStarttime))
@@ -80,18 +153,15 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
                 line.append(str(sampleNr))
                 # Measurement
                 line.append(str(measurement[1]))
-               
-                numSent = s.send(",".join(line)+"\n");
-                txLineCnt = txLineCnt + 1
-                print "MEASUREMENT: Sent ", numSent, " bytes" 
-                
-                sampleCnt = sampleCnt + 1
-    
+     
+            # Make HTTP request, temperature measurements are payload type 1
+            uploadPayload(GSN_HOST, GSN_UPLOAD_URL, GSN_VIRTUAL_SENSOR, 1, ",".join(line))
+     
         line = []
-        # Message type
-        line.append('1')
         # Mission ID
         line.append(uniqueMissionId)
+        # Button ID
+        line.append(str(button[1]))
         # Session number
         line.append(str(mission[0]))
         # Programming time
@@ -108,6 +178,8 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
             line.append('')
         # Number of samples
         line.append(str(sampleCnt))
+        # Number of rolled over samples
+        line.append('0')
         # Sampling rate
         line.append(str(mission[4]))
         # Sampling start time
@@ -115,13 +187,33 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
             line.append(str(timeStrToUnixtimeMillis(mission[5])))
         else:
             line.append('')
+        # Temperature channel enabled? 0/1
+        line.append('1')
         # High resolution enabled? 0/1
         line.append(str(mission[6]))
         # Temperature calibration used? 0/1
         if int(mission[7]) == -9999:
-            line.append('')
+            line.append('0')
         else:
             line.append(str(mission[7]))
+        # Temperature coefficient A
+        line.append('')
+        # Temperature coefficient B
+        line.append('')
+        # Temperature coefficient C
+        line.append('')
+        # Humidity channel enabled? 0/1
+        line.append('0')
+        # High resolution enabled? 0/1
+        line.append('0')
+        # Humidity calibration used? 0/1
+        line.append('0')
+        # Humidity coefficient A
+        line.append('')
+        # Humidity coefficient B
+        line.append('')
+        # Humidity coefficient C
+        line.append('')
         # Location Lon
         line.append('')
         # Location Lat
@@ -140,14 +232,11 @@ for button in cursor.execute("SELECT ButtonID, ButtonNr, SerialNr FROM Buttons W
         # Sync time
         line.append(str(syncTime))
         
-        numSent = s.send(",".join(line)+"\n");
-        txLineCnt = txLineCnt + 1
-        print "MISSION: Sent ", numSent, " bytes" 
+        # Make HTTP request, mission data is payload type 0
+        uploadPayload(GSN_HOST, GSN_UPLOAD_URL, GSN_VIRTUAL_SENSOR, 0, ",".join(line))
+        
         
 cursor.close()
 cursorMission.close()
 cursorMeas.close()
 conn.close()
-s.close()
-
-print 'Sent ', txLineCnt, ' lines to GSN'
